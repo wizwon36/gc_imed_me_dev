@@ -525,17 +525,15 @@ async function initListFilters() {
   if (window.orgSelect && clinicEl && teamEl) {
     // scope='all' 분기에서 getFilteredTeams/bindClinicTeamSelects가 내부
     // orgDataCache(이 호출이 채움)에 의존하므로 그대로 유지한다.
-    await window.orgSelect.loadOrgData();
-
-    // 조회범위 세분화(2026-06) — RLS가 이미 DB 레벨에서 scope(all/clinic/team)에
-    // 맞는 행만 내려주므로, select UI도 "어차피 결과가 0건일 선택지"를 보여주지
-    // 않도록 getScopedOrgOptions API로 동적으로 좁힌다. 기존엔 admin 여부만
-    // 보고 이진법(전체 자유선택 vs 의원고정+팀자유선택)으로 나눴는데, scope가
-    // all/clinic/team 3단계가 된 지금은 그 가정이 맞지 않는다.
-    var scopedResult = await apiGet('getScopedOrgOptions', {
-      request_user_email: equipmentListState.user?.email || equipmentListState.user?.user_email,
-      app_id: 'equipment'
-    });
+    // loadOrgData + getScopedOrgOptions 병렬 호출
+    var orgInitResults = await Promise.all([
+      window.orgSelect.loadOrgData(),
+      apiGet('getScopedOrgOptions', {
+        request_user_email: equipmentListState.user?.email || equipmentListState.user?.user_email,
+        app_id: 'equipment'
+      })
+    ]);
+    var scopedResult = orgInitResults[1];
     var scopedData = scopedResult?.data || { clinics: [], teams: [], scope: null };
     var scope = scopedData.scope; // 'all' | 'clinic' | 'team' | null(admin은 'all'로 내려옴)
 
@@ -845,24 +843,35 @@ document.addEventListener('DOMContentLoaded', async function() {
     equipmentListState.userClinicCode = String(equipmentListState.user.clinic_code || '').trim();
     equipmentListState.userTeamCode   = String(equipmentListState.user.team_code   || '').trim();
 
-    if (window.appPermission && typeof window.appPermission.requirePermission === 'function') {
-      var canView = await window.appPermission.requirePermission('equipment', ['view', 'edit', 'admin']);
-      if (!canView) {
-        if (typeof hideGlobalLoading === 'function') hideGlobalLoading();
-        return;
-      }
+    // 권한 3개 + org 데이터 병렬 호출 (기존 순차 → Promise.all)
+    var permResults = await Promise.all([
+      window.appPermission && typeof window.appPermission.requirePermission === 'function'
+        ? window.appPermission.requirePermission('equipment', ['view', 'edit', 'admin'])
+        : Promise.resolve(true),
+      window.appPermission && typeof window.appPermission.hasPermission === 'function'
+        ? window.appPermission.hasPermission('equipment', ['edit', 'admin'])
+        : Promise.resolve(false),
+      window.appPermission && typeof window.appPermission.getPermission === 'function'
+        ? window.appPermission.getPermission('equipment')
+        : Promise.resolve(null)
+    ]);
+
+    var canView  = permResults[0];
+    var canEdit  = permResults[1];
+    var appPerm  = permResults[2];
+
+    if (!canView) {
+      if (typeof hideGlobalLoading === 'function') hideGlobalLoading();
+      return;
     }
 
-    if (window.appPermission && typeof window.appPermission.hasPermission === 'function') {
-      equipmentListState.canEdit = await window.appPermission.hasPermission('equipment', ['edit', 'admin']);
-    }
-
-    if (window.appPermission && typeof window.appPermission.getPermission === 'function') {
-      var appPerm = await window.appPermission.getPermission('equipment');
-      equipmentListState.isAppAdmin = (String(appPerm || '').trim().toLowerCase() === 'admin');
-    }
+    equipmentListState.canEdit     = canEdit;
+    equipmentListState.isAppAdmin  = (String(appPerm || '').trim().toLowerCase() === 'admin');
 
     applyListPermissionUi();
+
+    // initListFilters(org 데이터 포함)와 loadEquipmentList 병렬 실행은 불가
+    // (filters가 준비돼야 load 가능) — 단 initListFilters 내부의 두 API 호출은 병렬화
     await initListFilters();
     bindListEvents();
     await loadEquipmentList(equipmentListState.page);

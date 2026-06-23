@@ -262,8 +262,7 @@
 }
 
 .equipment-tbl-th:last-child { border-right: none; }
-.equipment-tbl-th--status  { text-align: center; }
-.equipment-tbl-th--actions { text-align: center; }
+.equipment-tbl-th--name { text-align: left; } /* 장비명만 좌측 */
 
 /* thead는 고정 */
 .equipment-table thead { display: table-header-group; }
@@ -293,19 +292,20 @@
   font-size: 12px;
   border-right: 1px solid #f0f0f0;
   box-sizing: border-box;
+  text-align: center; /* 기본 가운데 */
 }
 
 .equipment-tbl-cell:last-child { border-right: none; }
-.equipment-tbl-cell--name   { font-weight: 600; color: #111827; }
+.equipment-tbl-cell--name   { font-weight: 600; color: #111827; text-align: left; } /* 장비명만 좌측 */
 .equipment-tbl-cell--id     { font-size: 11px; color: #6b7280; font-family: 'Consolas', monospace; }
 .equipment-tbl-cell--serial { font-size: 11px; font-family: 'Consolas', monospace; }
 .equipment-tbl-cell--status { text-align: center; }
-.equipment-tbl-cell--actions { text-align: right; padding-right: 8px; }
+.equipment-tbl-cell--actions { text-align: center; padding: 0 6px; }
 
 .equipment-tbl-actions {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: center;
   gap: 4px;
 }
 

@@ -33,32 +33,11 @@
       .prlabel-qr       { display: flex; align-items: center; justify-content: center; align-self: center; }
       .prlabel-qr img   { display: block; width: 100%; height: 100%; }
       .prlabel--90x48{width:90mm;min-height:48mm;padding:4mm;border-radius:4mm;gap:3.5mm;grid-template-columns:1fr 26mm;align-items:center}
-      .prlabel--90x48 .prlabel-hospital{font-size:7.5pt;margin-bottom:1.5mm}
-      .prlabel--90x48 .prlabel-title{font-size:15pt;margin:0 0 2mm}
-      .prlabel--90x48 .prlabel-rows{gap:1.4mm}
-      .prlabel--90x48 .prlabel-row{grid-template-columns:13mm 1fr;gap:1.4mm 2mm}
-      .prlabel--90x48 .prlabel-key{font-size:7.5pt}
-      .prlabel--90x48 .prlabel-val{font-size:8pt}
-      .prlabel--90x48 .prlabel-id{font-size:11pt}
-      .prlabel--90x48 .prlabel-qr{width:24mm;height:24mm;padding:1.2mm;border-radius:3mm}
+      .prlabel--90x48 .prlabel-hospital{font-size:7.5pt;margin-bottom:1.5mm}.prlabel--90x48 .prlabel-title{font-size:15pt;margin:0 0 2mm}.prlabel--90x48 .prlabel-rows{gap:1.4mm}.prlabel--90x48 .prlabel-row{grid-template-columns:13mm 1fr;gap:1.4mm 2mm}.prlabel--90x48 .prlabel-key{font-size:7.5pt}.prlabel--90x48 .prlabel-val{font-size:8pt}.prlabel--90x48 .prlabel-id{font-size:11pt}.prlabel--90x48 .prlabel-qr{width:24mm;height:24mm;padding:1.2mm;border-radius:3mm}
       .prlabel--70x40{width:70mm;min-height:40mm;padding:2.8mm;border-radius:3mm;gap:2.5mm;grid-template-columns:1fr 19mm;align-items:center}
-      .prlabel--70x40 .prlabel-hospital{font-size:6pt;margin-bottom:1.2mm}
-      .prlabel--70x40 .prlabel-title{font-size:11pt;margin:0 0 1.5mm}
-      .prlabel--70x40 .prlabel-rows{gap:1mm}
-      .prlabel--70x40 .prlabel-row{grid-template-columns:11mm 1fr;gap:1mm 1.4mm}
-      .prlabel--70x40 .prlabel-key{font-size:6pt}
-      .prlabel--70x40 .prlabel-val{font-size:6.5pt}
-      .prlabel--70x40 .prlabel-id{font-size:8pt;letter-spacing:-0.02em;line-height:1.05}
-      .prlabel--70x40 .prlabel-qr{width:17mm;height:17mm;padding:1mm;border-radius:2mm}
+      .prlabel--70x40 .prlabel-hospital{font-size:6pt;margin-bottom:1.2mm}.prlabel--70x40 .prlabel-title{font-size:11pt;margin:0 0 1.5mm}.prlabel--70x40 .prlabel-rows{gap:1mm}.prlabel--70x40 .prlabel-row{grid-template-columns:11mm 1fr;gap:1mm 1.4mm}.prlabel--70x40 .prlabel-key{font-size:6pt}.prlabel--70x40 .prlabel-val{font-size:6.5pt}.prlabel--70x40 .prlabel-id{font-size:8pt;letter-spacing:-0.02em;line-height:1.05}.prlabel--70x40 .prlabel-qr{width:17mm;height:17mm;padding:1mm;border-radius:2mm}
       .prlabel--50x30{width:50mm;min-height:30mm;padding:2.2mm;border-radius:2.6mm;gap:2mm;grid-template-columns:1fr 15mm;align-items:center}
-      .prlabel--50x30 .prlabel-hospital{font-size:5.8pt;margin-bottom:1mm}
-      .prlabel--50x30 .prlabel-title{font-size:9.5pt;margin:0 0 1.2mm}
-      .prlabel--50x30 .prlabel-rows{gap:1mm}
-      .prlabel--50x30 .prlabel-row{grid-template-columns:10mm 1fr;gap:1mm 1.2mm}
-      .prlabel--50x30 .prlabel-key{font-size:5.4pt}
-      .prlabel--50x30 .prlabel-val{font-size:5.8pt}
-      .prlabel--50x30 .prlabel-id{font-size:6.8pt;white-space:nowrap;letter-spacing:-0.03em}
-      .prlabel--50x30 .prlabel-qr{width:13mm;height:13mm;padding:0.8mm;border-radius:2mm}
+      .prlabel--50x30 .prlabel-hospital{font-size:5.8pt;margin-bottom:1mm}.prlabel--50x30 .prlabel-title{font-size:9.5pt;margin:0 0 1.2mm}.prlabel--50x30 .prlabel-rows{gap:1mm}.prlabel--50x30 .prlabel-row{grid-template-columns:10mm 1fr;gap:1mm 1.2mm}.prlabel--50x30 .prlabel-key{font-size:5.4pt}.prlabel--50x30 .prlabel-val{font-size:5.8pt}.prlabel--50x30 .prlabel-id{font-size:6.8pt;white-space:nowrap;letter-spacing:-0.03em}.prlabel--50x30 .prlabel-qr{width:13mm;height:13mm;padding:0.8mm;border-radius:2mm}
     }
   </style>
 </head>
@@ -77,13 +56,15 @@
         <select id="clinic_code" class="eq-filter-select"></select>
         <select id="team_code"   class="eq-filter-select"></select>
         <select id="status"      class="eq-filter-select"></select>
-        <!-- 제조사/페이지당 갯수: hidden으로 JS 호환 유지 -->
-        <input  type="hidden" id="manufacturer" value="" />
-        <input  type="hidden" id="page_size" value="15" />
+        <input type="hidden" id="manufacturer" value="" />
+        <input type="hidden" id="page_size" value="20" />
         <button type="submit" class="btn btn-primary eq-filter-btn">
           <i class="ti ti-search" aria-hidden="true"></i> 조회
         </button>
         <button type="button" class="btn eq-filter-btn" id="resetFilterBtn">초기화</button>
+        <button type="button" class="btn btn-sm eq-filter-btn" id="exportExcelBtn" style="display:none;">
+          <i class="ti ti-download" aria-hidden="true"></i> 엑셀
+        </button>
       </form>
       <a class="btn btn-primary eq-register-btn" id="createEquipmentBtn" href="form.html">
         <i class="ti ti-plus" aria-hidden="true"></i> 장비 등록
@@ -108,11 +89,6 @@
         </select>
         <button type="button" class="btn btn-sm btn-success" id="bulkInspectionCertBtn" style="display:none;">
           <i class="ti ti-file-check" aria-hidden="true"></i> 검수확인서 (<span id="bulkInspectionCertCount">0</span>)
-        </button>
-      </div>
-      <div class="eq-toolbar-right">
-        <button type="button" class="btn btn-sm" id="exportExcelBtn" style="display:none;">
-          <i class="ti ti-download" aria-hidden="true"></i> 엑셀
         </button>
       </div>
     </div>

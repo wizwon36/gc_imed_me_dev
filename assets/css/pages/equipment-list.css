@@ -196,7 +196,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 0;
   overflow: hidden;
 }
 
@@ -211,15 +211,16 @@
 /* 카드 뷰 숨김 */
 .equipment-cards-wrap { display: none !important; }
 
-/* ── 테이블 래퍼 — 스크롤 없음, JS가 높이 조정 ── */
+/* ── 테이블 래퍼 ── */
 .equipment-table-wrap {
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   background: #fff;
   display: flex;
   flex-direction: column;
-  flex-shrink: 0; /* JS가 height를 명시하면 flex:1 대신 이걸 사용 */
 }
 
 /* ── 테이블 ── */
@@ -272,6 +273,7 @@
 
 /* ── 행 — JS가 높이를 동적 계산해서 주입 ── */
 .equipment-tbl-row {
+  height: 36px;
   border-bottom: 1px solid #f0f0f0;
   transition: background 0.1s;
 }
@@ -281,6 +283,7 @@
 
 /* ── 셀 ── */
 .equipment-tbl-cell {
+  height: 36px;
   padding: 0 10px;
   vertical-align: middle;
   color: #374151;
@@ -358,12 +361,13 @@
 /* ── 페이지네이션 ── */
 .pagination-area {
   flex-shrink: 0;
-  height: 30px;
+  height: 36px;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 3px;
   box-sizing: border-box;
+  margin-top: 6px;
 }
 
 .pagination-btn {

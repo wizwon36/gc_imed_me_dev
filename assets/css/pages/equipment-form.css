@@ -837,3 +837,10 @@
   font-size: 11px;
   display: block;
 }
+
+/* ── Shell SPA compact 보정 ── */
+body.in-shell .page-hero-simple .page-title { font-size: 22px; }
+body.in-shell .page-hero-simple .page-desc  { font-size: 13px; margin-top: 4px; }
+body.in-shell .page-hero-simple             { margin-bottom: 14px; }
+body.in-shell .form-card                    { padding: 18px; }
+body.in-shell .form-card .section-title     { font-size: 16px; }

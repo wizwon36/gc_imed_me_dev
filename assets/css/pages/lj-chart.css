@@ -604,3 +604,8 @@ select.lj-edit-input { min-width: 120px; }
   .lj-edit-memo-cell { display: none; }
   /* 편집 행 저장 후 재계산 셀 colspan 조정은 JS에서 처리 */
 }
+
+/* ── Shell SPA compact 보정 ── */
+body.in-shell .page-hero-simple .page-title { font-size: 22px; }
+body.in-shell .page-hero-simple .page-desc  { font-size: 13px; }
+body.in-shell .page-hero-simple             { margin-bottom: 14px; }

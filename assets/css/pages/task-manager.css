@@ -2065,3 +2065,7 @@ input[type="date"].form-input {
   vertical-align: middle;
   line-height: 18px;
 }
+
+/* ── Shell SPA: 탭바 숨김 ── */
+body.in-shell .task-tabs { display: none; }
+body.in-shell .task-tabs + * { margin-top: 0; }

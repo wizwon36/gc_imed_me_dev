@@ -1704,3 +1704,9 @@
 .plabel-page--grid  { display: grid; }
 .plabel-page--single { display: flex; justify-content: center; padding: 10px 0; }
 .plabel-empty { visibility: hidden; }
+
+/* ── Shell SPA compact 보정 ── */
+body.in-shell .equipment-list-page .page-title { font-size: 22px; }
+body.in-shell .equipment-list-page .page-desc  { font-size: 13px; margin-top: 4px; }
+body.in-shell .equipment-list-page .page-hero-simple { margin-bottom: 12px; }
+body.in-shell .filter-card { padding: 14px 16px; }

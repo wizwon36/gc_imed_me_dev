@@ -784,3 +784,8 @@
     width: 100%;
   }
 }
+
+/* ── Shell SPA compact 보정 ── */
+body.in-shell .page-hero-simple .page-title { font-size: 22px; }
+body.in-shell .page-hero-simple .page-desc  { font-size: 13px; }
+body.in-shell .page-hero-simple             { margin-bottom: 14px; }

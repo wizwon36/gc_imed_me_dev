@@ -715,3 +715,7 @@
 
 /* 탭/토글 아이콘-텍스트 간격 스타일은 closing.css로 이동(2026-06) —
    closing.html/statistics.html 둘 다 closing.css를 로드하므로 중복 방지. */
+
+/* ── Shell SPA: 탭바 숨김 ── */
+body.in-shell .cl-tabs { display: none; }
+body.in-shell #appBody .cl-tabs { display: none; }

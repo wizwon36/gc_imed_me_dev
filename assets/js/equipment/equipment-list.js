@@ -332,48 +332,25 @@ function renderFullPagination() {
   var container = document.getElementById('paginationArea');
   var page = equipmentListState.page;
   var totalPages = equipmentListState.totalPages;
-  var pages = [];
-  var start;
-  var end;
-  var i;
+  var i, html = '';
 
   if (!container) return;
+  if (totalPages <= 1) { container.innerHTML = ''; return; }
 
-  if (totalPages <= 1) {
-    container.innerHTML = '';
-    return;
+  // 10개씩 묶어서 현재 페이지가 속한 블록 표시
+  var BLOCK = 10;
+  var blockStart = Math.floor((page - 1) / BLOCK) * BLOCK + 1;
+  var blockEnd   = Math.min(blockStart + BLOCK - 1, totalPages);
+
+  html += '<button type="button" class="pagination-btn" data-page="' + Math.max(1, blockStart - 1) + '" ' + (blockStart <= 1 ? 'disabled' : '') + '>이전</button>';
+
+  for (i = blockStart; i <= blockEnd; i++) {
+    html += '<button type="button" class="pagination-btn ' + (i === page ? 'is-active' : '') + '" data-page="' + i + '">' + i + '</button>';
   }
 
-  // 페이지 번호 목록 생성 (현재 ±3, 양 끝 항상 표시, ... 처리)
-  var pageNums = [];
-  var WINDOW = 3; // 현재 페이지 기준 좌우 표시 개수
+  html += '<button type="button" class="pagination-btn" data-page="' + Math.min(totalPages, blockEnd + 1) + '" ' + (blockEnd >= totalPages ? 'disabled' : '') + '>다음</button>';
 
-  function addPage(n) {
-    if (n < 1 || n > totalPages) return;
-    if (pageNums[pageNums.length - 1] === n) return;
-    pageNums.push(n);
-  }
-
-  addPage(1);
-  if (page - WINDOW > 2) pageNums.push('...');
-  for (i = Math.max(2, page - WINDOW); i <= Math.min(totalPages - 1, page + WINDOW); i++) addPage(i);
-  if (page + WINDOW < totalPages - 1) pageNums.push('...');
-  if (totalPages > 1) addPage(totalPages);
-
-  pageNums.forEach(function(n) {
-    if (n === '...') {
-      pages.push('<span class="pagination-ellipsis">…</span>');
-    } else {
-      pages.push(
-        '<button type="button" class="pagination-btn ' + (n === page ? 'is-active' : '') + '" data-page="' + n + '">' + n + '</button>'
-      );
-    }
-  });
-
-  container.innerHTML =
-    '<button type="button" class="pagination-btn" data-page="' + Math.max(1, page - 1) + '" ' + (page <= 1 ? 'disabled' : '') + '>이전</button>' +
-    pages.join('') +
-    '<button type="button" class="pagination-btn" data-page="' + Math.min(totalPages, page + 1) + '" ' + (page >= totalPages ? 'disabled' : '') + '>다음</button>';
+  container.innerHTML = html;
 
   Array.prototype.forEach.call(container.querySelectorAll('.pagination-btn'), function(btn) {
     btn.addEventListener('click', async function() {

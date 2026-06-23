@@ -382,6 +382,9 @@ function renderEquipmentList(items) {
     columnDefaults: {
       resizable: true,
     },
+    rowFormatter: function(row) {
+      row.getElement().style.lineHeight = '30px';
+    },
   });
 }
 
@@ -553,8 +556,7 @@ async function loadEquipmentList(nextPage) {
 
   try {
     if (typeof clearMessage === 'function') clearMessage();
-    // Tabulator 로딩 overlay (초기화 완료 후에만)
-    if (_tabulatorInstance && _tabulatorInstance.initialized) _tabulatorInstance.alert('불러오는 중...');
+    if (typeof showGlobalLoading === 'function') showGlobalLoading('장비 목록을 불러오는 중...');
 
     if (equipmentListState._initialLoad) {
       var urlParams = getListQueryParams();
@@ -608,7 +610,7 @@ async function loadEquipmentList(nextPage) {
     }
   } finally {
     equipmentListState.loading = false;
-    if (_tabulatorInstance && _tabulatorInstance.initialized) _tabulatorInstance.clearAlert();
+    if (typeof hideGlobalLoading === 'function') hideGlobalLoading();
   }
 }
 

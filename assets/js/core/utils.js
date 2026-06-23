@@ -280,3 +280,19 @@ function applyTopActionsColClass() {
     applyTopActionsColClass();
   }
 })();
+
+// ── Shell SPA 감지 ─────────────────────────────────────────
+// ?shell=1 파라미터가 있으면 body에 in-shell 클래스 추가
+// → common.css의 body.in-shell 규칙으로 topbar 자동 숨김
+(function () {
+  if (new URLSearchParams(location.search).get('shell') === '1') {
+    document.documentElement.classList.add('in-shell');
+    if (document.body) {
+      document.body.classList.add('in-shell');
+    } else {
+      document.addEventListener('DOMContentLoaded', function () {
+        document.body.classList.add('in-shell');
+      });
+    }
+  }
+})();

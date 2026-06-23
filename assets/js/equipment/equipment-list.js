@@ -373,7 +373,7 @@ function renderEquipmentList(items) {
     columns: columns,
     layout: 'fitColumns',
     height: '100%',
-    rowHeight: 36,
+    rowHeight: 30,
     placeholder: '조회된 장비가 없습니다.',
     columnHeaderSortMulti: false,
     pagination: false,   // 페이지네이션은 직접 처리
@@ -553,6 +553,8 @@ async function loadEquipmentList(nextPage) {
 
   try {
     if (typeof clearMessage === 'function') clearMessage();
+    // Tabulator 로딩 overlay
+    if (_tabulatorInstance) _tabulatorInstance.alert('불러오는 중...');
 
     if (equipmentListState._initialLoad) {
       var urlParams = getListQueryParams();
@@ -606,6 +608,7 @@ async function loadEquipmentList(nextPage) {
     }
   } finally {
     equipmentListState.loading = false;
+    if (_tabulatorInstance) _tabulatorInstance.clearAlert();
   }
 }
 
@@ -1015,7 +1018,6 @@ document.addEventListener('DOMContentLoaded', async function() {
       console.error(error);
     }
   } finally {
-    // 성공/실패 무관하게 스피너 끄고 컨텐츠 표시
     if (typeof hideGlobalLoading === 'function') hideGlobalLoading(true);
     document.body.classList.add('page-ready');
   }

@@ -62,16 +62,16 @@
 }
 
 .eq-filter-input {
-  width: 100%;
-  height: 30px;
-  padding: 0 10px 0 28px; /* 아이콘(13px) + 좌여백(9px) + 여유(6px) */
+  width: 100% !important;
+  height: 30px !important;
+  padding: 0 10px 0 30px !important; /* 아이콘 영역 확보 — !important로 common.css 덮어쓰기 */
   border: 1px solid #e5e7eb;
   border-radius: 6px;
   background: #f9fafb;
-  font-size: 12px;
+  font-size: 12px !important;
   color: #111827;
   outline: none;
-  box-sizing: border-box;
+  box-sizing: border-box !important;
   transition: border-color 0.15s, background 0.15s;
 }
 
@@ -211,16 +211,15 @@
 /* 카드 뷰 숨김 */
 .equipment-cards-wrap { display: none !important; }
 
-/* ── 테이블 래퍼 — 스크롤 없음 ── */
+/* ── 테이블 래퍼 — 스크롤 없음, JS가 높이 조정 ── */
 .equipment-table-wrap {
-  flex: 1;
-  min-height: 0;
-  overflow: hidden; /* 스크롤 제거 */
+  overflow: hidden;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   background: #fff;
   display: flex;
   flex-direction: column;
+  flex-shrink: 0; /* JS가 height를 명시하면 flex:1 대신 이걸 사용 */
 }
 
 /* ── 테이블 ── */

@@ -16,6 +16,9 @@
   box-sizing: border-box;
 }
 
+/* 빈 요소는 gap 안 먹게 */
+.eq-page > :empty { display: none; }
+
 /* ── 필터 바 ── */
 .eq-filter-bar {
   display: flex;
@@ -53,12 +56,15 @@
   color: #9ca3af;
   pointer-events: none;
   z-index: 1;
+  line-height: 1;
+  width: 13px;
+  text-align: center;
 }
 
 .eq-filter-input {
   width: 100%;
   height: 30px;
-  padding: 0 10px 0 30px;
+  padding: 0 10px 0 28px; /* 아이콘(13px) + 좌여백(9px) + 여유(6px) */
   border: 1px solid #e5e7eb;
   border-radius: 6px;
   background: #f9fafb;
@@ -147,9 +153,13 @@
   align-items: center;
   justify-content: space-between;
   flex-shrink: 0;
-  height: 22px;
-  box-sizing: border-box;
+  min-height: 0;
+  /* 숨겨진 버튼들(라벨출력/검수확인서)이 표시될 때만 공간 확보 */
 }
+
+/* 툴바가 비어있으면 gap을 먹지 않도록 */
+.eq-toolbar:empty,
+.eq-toolbar .eq-toolbar-left:empty { display: none; }
 
 .eq-toolbar-left, .eq-toolbar-right {
   display: flex;

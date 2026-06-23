@@ -197,7 +197,7 @@
   flex: 1;
   min-height: 0;
   gap: 0;
-  overflow: hidden;
+  /* overflow 없음 — 페이지네이션이 잘리지 않도록 */
 }
 
 .equipment-list-grid {
@@ -205,17 +205,17 @@
   flex-direction: column;
   flex: 1;
   min-height: 0;
-  overflow: hidden;
+  /* overflow 없음 */
 }
 
 /* 카드 뷰 숨김 */
 .equipment-cards-wrap { display: none !important; }
 
-/* ── 테이블 래퍼 ── */
+/* ── 테이블 래퍼 — flex:1로 남은 공간 채움 ── */
 .equipment-table-wrap {
   flex: 1;
   min-height: 0;
-  overflow: hidden;
+  overflow: hidden; /* 테이블 래퍼만 overflow hidden */
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   background: #fff;

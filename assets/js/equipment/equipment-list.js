@@ -395,7 +395,11 @@ function applyListPermissionUi() {
   // ★ user 권한이면 엑셀 다운로드 버튼 숨김
   var exportBtn = document.getElementById('exportExcelBtn');
   if (exportBtn) {
-    exportBtn.style.display = (equipmentListState.canEdit || equipmentListState.isAdmin) ? '' : 'none';
+    if (equipmentListState.canEdit || equipmentListState.isAdmin) {
+      exportBtn.style.display = 'inline-flex';
+    } else {
+      exportBtn.style.display = 'none';
+    }
   }
 
   if (typeof applyTopActionsColClass === 'function') applyTopActionsColClass();

@@ -38,11 +38,8 @@
   position: relative;
   flex: 2;
   min-width: 0;
-  display: flex;
-  align-items: center;
 }
 
-/* 아이콘 — absolute 포지션, input 텍스트와 겹치지 않게 */
 .eq-filter-icon {
   position: absolute;
   left: 9px;
@@ -51,7 +48,7 @@
   font-size: 13px;
   color: #9ca3af;
   pointer-events: none;
-  line-height: 1;
+  z-index: 1;
 }
 
 .eq-filter-input {
@@ -64,6 +61,7 @@
   font-size: 12px;
   color: #111827;
   outline: none;
+  box-sizing: border-box;
   transition: border-color 0.15s, background 0.15s;
 }
 
@@ -86,8 +84,8 @@
   outline: none;
   cursor: pointer;
   flex: 1;
-  min-width: 70px;
-  max-width: 110px;
+  min-width: 72px;
+  max-width: 120px;
   transition: border-color 0.15s;
   appearance: none;
   -webkit-appearance: none;
@@ -131,7 +129,7 @@
   align-items: center;
   justify-content: space-between;
   flex-shrink: 0;
-  min-height: 24px;
+  min-height: 22px;
 }
 
 .eq-toolbar-left, .eq-toolbar-right {
@@ -158,12 +156,9 @@
   cursor: pointer;
   appearance: none;
   -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23adb5bd' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 5px center;
 }
 
-/* ── 콘텐츠 영역 ── */
+/* ── 콘텐츠 ── */
 .eq-content {
   flex: 1;
   min-height: 0;
@@ -173,7 +168,6 @@
   overflow: hidden;
 }
 
-/* ── 테이블 영역 ── */
 .equipment-list-grid {
   flex: 1;
   min-height: 0;
@@ -182,53 +176,56 @@
   overflow: hidden;
 }
 
-/* 카드 뷰 숨김 (PC) */
+/* 카드 뷰 숨김 */
 .equipment-cards-wrap { display: none !important; }
 
-/* 테이블 래퍼 */
+/* ── 테이블 래퍼 ── */
 .equipment-table-wrap {
   flex: 1;
   min-height: 0;
   overflow-y: auto;
-  overflow-x: auto;
+  overflow-x: hidden;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   background: #fff;
 }
 
-.equipment-table-wrap::-webkit-scrollbar { width: 4px; height: 4px; }
+.equipment-table-wrap::-webkit-scrollbar { width: 4px; }
 .equipment-table-wrap::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
 
-/* 테이블 */
+/* ── 테이블 ── */
 .equipment-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 12px;
-  table-layout: fixed;
+  table-layout: fixed; /* 헤더/내용 너비 통일 핵심 */
 }
 
-/* 컬럼 너비 고정 */
-.equipment-table colgroup,
-.tbl-th--check      { width: 32px; }
-.equipment-tbl-th--name   { width: 160px; }
-.equipment-tbl-th--id     { width: 110px; }
-.equipment-tbl-th--model  { width: 100px; }
-.equipment-tbl-th--dept   { width: 150px; }
-.equipment-tbl-th--mfr    { width: 100px; }
-.equipment-tbl-th--serial { width: 120px; }
-.equipment-tbl-th--loc    { width: 80px; }
-.equipment-tbl-th--status { width: 68px; }
-.equipment-tbl-th--actions{ width: 110px; }
+/* ── 컬럼 너비 (table-layout:fixed 에서만 적용) ── */
+.equipment-tbl-th.tbl-th--check,
+.equipment-tbl-cell.tbl-td--check { width: 32px; }
 
-/* 헤더 */
+.equipment-tbl-th--name   { width: 14%; }
+.equipment-tbl-th--id     { width: 10%; }
+.equipment-tbl-th--model  { width: 9%; }
+.equipment-tbl-th--dept   { width: 14%; }
+.equipment-tbl-th--mfr    { width: 9%; }
+.equipment-tbl-th--serial { width: 10%; }
+.equipment-tbl-th--loc    { width: 7%; }
+.equipment-tbl-th--status { width: 6%; }
+.equipment-tbl-th--actions{ width: 10%; }
+
+/* ── 헤더 ── */
 .equipment-tbl-th {
   position: sticky;
   top: 0;
   z-index: 2;
-  padding: 0 10px;
   height: 34px;
+  padding: 0 10px;
   background: #f8fafc;
   border-bottom: 1px solid #e5e7eb;
+  /* 세로선 */
+  border-right: 1px solid #e5e7eb;
   text-align: left;
   font-size: 11px;
   font-weight: 700;
@@ -237,56 +234,46 @@
   overflow: hidden;
   text-overflow: ellipsis;
   vertical-align: middle;
+  box-sizing: border-box;
 }
 
-.tbl-th--check { text-align: center; padding: 0 6px; }
-.equipment-tbl-th--status  { text-align: center; }
-.equipment-tbl-th--actions { text-align: right; }
+.equipment-tbl-th:last-child { border-right: none; }
 
-/* 행 */
+.tbl-th--check    { text-align: center; padding: 0 6px; }
+.equipment-tbl-th--status  { text-align: center; }
+.equipment-tbl-th--actions { text-align: center; }
+
+/* ── 행 ── */
 .equipment-tbl-row {
   border-bottom: 1px solid #f3f4f6;
   transition: background 0.1s;
 }
 
 .equipment-tbl-row:last-child { border-bottom: none; }
-.equipment-tbl-row:hover { background: #f8faff; }
+.equipment-tbl-row:hover { background: #f0f5ff; }
 
-/* 셀 — 높이 고정 36px */
+/* ── 셀 (세로선 포함) ── */
 .equipment-tbl-cell {
-  padding: 0 10px;
   height: 36px;
+  padding: 0 10px;
   vertical-align: middle;
   color: #374151;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 12px;
+  border-right: 1px solid #f0f0f0;
+  box-sizing: border-box;
 }
 
-.tbl-td--check { text-align: center; padding: 0 6px; }
+.equipment-tbl-cell:last-child { border-right: none; }
 
-/* 장비명 */
-.equipment-tbl-cell--name { font-weight: 600; color: #111827; }
-
-/* 장비번호 */
-.equipment-tbl-cell--id {
-  font-size: 11px;
-  color: #6b7280;
-  font-family: 'Consolas', monospace;
-}
-
-/* 시리얼 */
-.equipment-tbl-cell--serial {
-  font-size: 11px;
-  font-family: 'Consolas', monospace;
-}
-
-/* 상태 */
+.tbl-td--check    { text-align: center; padding: 0 6px; }
+.equipment-tbl-cell--name   { font-weight: 600; color: #111827; }
+.equipment-tbl-cell--id     { font-size: 11px; color: #6b7280; font-family: 'Consolas', monospace; }
+.equipment-tbl-cell--serial { font-size: 11px; font-family: 'Consolas', monospace; }
 .equipment-tbl-cell--status { text-align: center; }
-
-/* 액션 */
-.equipment-tbl-cell--actions { text-align: right; }
+.equipment-tbl-cell--actions { text-align: right; padding-right: 8px; }
 
 .equipment-tbl-actions {
   display: flex;

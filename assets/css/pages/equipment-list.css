@@ -1,1712 +1,433 @@
-/* =========================================
- * equipment-list.css
- * 장비 목록 + 라벨 출력
- * portal / dashboard 톤 통일
- * ========================================= */
+/* ============================================================
+ * equipment-list.css — 장비 목록 (그리드 카드)
+ * Shell SPA 전면 재작성
+ * ============================================================ */
 
-.equipment-list-page .page-shell {
-  padding-top: 20px;
-  padding-bottom: 40px;
+/* ── 페이지 구조 ── */
+.equipment-list-page {
+  background: #f0f2f5;
+  min-height: 100vh;
 }
 
-/* topbar */
-.equipment-list-topbar {
-  display: block;
-  margin-bottom: 18px;
-}
-
-.equipment-list-top-actions {
-  gap: 10px;
-}
-
-/* hero */
-.equipment-list-page .page-hero-simple {
-  margin-bottom: 18px;
-  padding: 0 2px;
-}
-
-.equipment-list-page .page-title {
-  margin: 0;
-  font-size: 34px;
-  line-height: 1.15;
-  letter-spacing: -0.03em;
-  color: #0b1f44;
-  font-weight: 800;
-}
-
-.equipment-list-page .page-desc {
-  margin: 8px 0 0;
-  font-size: 15px;
-  line-height: 1.6;
-  color: #667085;
-  word-break: keep-all;
-}
-
-/* message */
-.equipment-list-page #messageBox.message-box {
-  margin-bottom: 16px;
-}
-
-/* filter card */
-.filter-card {
-  padding: 22px;
-  border: 1px solid var(--border-card);
-  border-radius: var(--radius-xl);
-  background: #fff;
-  box-shadow: var(--shadow-card);
-}
-
-.filter-card:hover,
-.filter-card:active {
-  transform: none !important;
-}
-
-.filter-card .section-head {
-  margin-bottom: 18px;
-}
-
-.filter-card .section-title {
-  position: relative;
-  display: inline-block;
-  margin: 0;
-  padding-left: 16px;
-  font-size: 22px;
-  line-height: 1.25;
-  font-weight: 800;
-  color: #0b1f44;
-}
-
-.filter-card .section-title::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 4px;
-  bottom: 4px;
-  width: 4px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #2563eb 0%, #60a5fa 100%);
-}
-
-.filter-card .sub-text {
-  margin-top: 8px;
-  color: #667085;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-/* form grid */
-.filter-card .form-grid.two-col {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px 18px;
-}
-
-.filter-card .form-field {
+.eq-page {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-}
-
-.filter-card .form-field.full-col {
-  grid-column: 1 / -1;
-}
-
-.filter-card .form-label {
-  font-size: 14px;
-  line-height: 1.35;
-  font-weight: 800;
-  color: #516274;
-}
-
-/* inputs */
-.filter-card .input,
-.filter-card select.input,
-.filter-card .textarea {
-  width: 100%;
-  min-height: 52px;
-  padding: 0 16px;
-  border: 1px solid var(--border-input);
-  border-radius: var(--radius-md);
-  background: #fff;
-  color: #0f172a;
-  font-size: 15px;
-  line-height: 1.45;
+  height: calc(100vh - 48px);
+  overflow: hidden;
+  padding: 12px 16px;
+  gap: 10px;
   box-sizing: border-box;
-  transition:
-    border-color 0.16s ease,
-    box-shadow 0.16s ease,
-    background-color 0.16s ease;
 }
 
-.filter-card .input:hover,
-.filter-card select.input:hover,
-.filter-card .textarea:hover {
-  border-color: var(--border-input);
+/* ── 필터 바 ── */
+.eq-filter-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px 12px;
+  flex-shrink: 0;
 }
 
-.filter-card .input:focus,
-.filter-card select.input:focus,
-.filter-card .textarea:focus {
+.eq-filter-form {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1;
+  min-width: 0;
+  flex-wrap: nowrap;
+}
+
+/* 검색어 */
+.eq-filter-keyword {
+  position: relative;
+  display: flex;
+  align-items: center;
+  flex: 1;
+  min-width: 160px;
+}
+
+.eq-filter-icon {
+  position: absolute;
+  left: 9px;
+  font-size: 14px;
+  color: #9ca3af;
+  pointer-events: none;
+}
+
+.eq-filter-input {
+  width: 100%;
+  height: 32px;
+  padding: 0 10px 0 30px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #f9fafb;
+  font-size: 12px;
+  color: #111827;
   outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.10);
+  transition: border-color 0.15s, background 0.15s;
 }
 
-.filter-card select.input {
+.eq-filter-input:focus {
+  border-color: #2563eb;
+  background: #fff;
+  box-shadow: 0 0 0 3px rgba(37,109,246,0.10);
+}
+
+.eq-filter-input::placeholder { color: #9ca3af; }
+
+/* 셀렉트 / 텍스트 필터 */
+.eq-filter-select {
+  height: 32px;
+  padding: 0 24px 0 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 6px;
+  background: #f9fafb;
+  font-size: 12px;
+  color: #374151;
+  outline: none;
+  cursor: pointer;
+  white-space: nowrap;
+  min-width: 80px;
+  max-width: 120px;
+  transition: border-color 0.15s;
   appearance: none;
   -webkit-appearance: none;
-  -moz-appearance: none;
-  padding-right: 44px;
-  background-image:
-    linear-gradient(45deg, transparent 50%, #667085 50%),
-    linear-gradient(135deg, #667085 50%, transparent 50%);
-  background-position:
-    calc(100% - 20px) calc(50% - 3px),
-    calc(100% - 14px) calc(50% - 3px);
-  background-size: 6px 6px, 6px 6px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239ca3af' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
+  background-position: right 8px center;
 }
 
-.filter-card .input-sm {
-  min-width: 110px;
-  min-height: 46px;
-  padding: 0 14px;
-  border-radius: var(--radius-sm);
-}
+.eq-filter-select:focus { border-color: #2563eb; background-color: #fff; }
 
-/* filter actions */
-.filter-actions {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-end;
-  gap: 14px;
-  margin-top: 22px;
-  padding-top: 20px;
-  border-top: 1px solid #e7ecf3;
-  flex-wrap: wrap;
-}
-
-.filter-actions-left,
-.filter-actions-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.inline-field {
+/* 버튼 */
+.eq-filter-btn {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 12px;
+  border-radius: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: 5px;
 }
 
-.inline-field .form-label {
-  margin: 0;
+.eq-filter-btn i { font-size: 13px; }
+
+/* 장비 등록 버튼 */
+.eq-register-btn {
+  height: 32px;
+  padding: 0 14px;
+  font-size: 12px;
+  border-radius: 6px;
+  white-space: nowrap;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  text-decoration: none;
+}
+
+.eq-register-btn i { font-size: 13px; }
+
+/* ── 툴바 ── */
+.eq-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.eq-toolbar-left,
+.eq-toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.eq-summary {
+  font-size: 12px;
+  color: #6b7280;
+  font-weight: 500;
+}
+
+.eq-bulk-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.eq-select-sm {
+  height: 28px;
+  padding: 0 22px 0 8px;
+  border: 1px solid #d1d5db;
+  border-radius: 5px;
+  font-size: 11px;
+  color: #374151;
+  background: #fff;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239ca3af' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 7px center;
+}
+
+.eq-page-size-wrap {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.eq-page-size-label {
+  font-size: 11px;
+  color: #6b7280;
   white-space: nowrap;
 }
 
-.filter-actions-right .btn-primary,
-.filter-actions-right .btn-secondary {
-  appearance: none;
-  border-radius: var(--radius-md);
-  min-height: 48px;
-  padding: 0 18px;
-  font-size: 15px;
-  font-weight: 800;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-  cursor: pointer;
-  box-sizing: border-box;
-}
-
-.filter-actions-right .btn-primary {
-  background: #0b1f44;
-  border: 1px solid #0b1f44;
-  color: #fff;
-}
-
-.filter-actions-right .btn-secondary {
-  background: #fff;
-  border: 1px solid var(--border-input);
-  color: #0b1f44;
-}
-
-.filter-actions-right .btn-secondary:hover {
-  background: #f8fafc;
-  border-color: var(--border-input);
-}
-
-/* list wrap */
-.equipment-list-wrap {
-  margin-top: 18px;
-}
-
-/* list summary */
-.equipment-list-toolbar {
+/* ── 콘텐츠 영역 (스크롤 허용) ── */
+.eq-content {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
+  flex-direction: column;
   gap: 12px;
-  margin-bottom: 14px;
-  padding: 0 2px;
+  padding-bottom: 4px;
 }
 
-.equipment-list-summary {
-  display: inline-flex;
-  align-items: center;
-  min-height: 36px;
-  padding: 0 14px;
-  border-radius: 999px;
-  background: #eef4ff;
-  border: 1px solid var(--border-soft);
-  color: #285ea8;
-  font-size: 14px;
-  font-weight: 700;
-  line-height: 1;
-}
+.eq-content::-webkit-scrollbar { width: 4px; }
+.eq-content::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
 
-/* list grid wrapper */
+/* ── 장비 그리드 ── */
 .equipment-list-grid {
-  width: 100%;
+  display: contents; /* 직접 자식 없음 — equipment-cards-wrap이 그리드 */
 }
 
-/* ── PC 기본: 테이블 표시, 카드 숨김 ── */
+/* JS가 생성하는 카드 래퍼 — 항상 그리드로 표시 */
 .equipment-cards-wrap {
-  display: none;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0,1fr));
+  gap: 10px;
 }
 
-.equipment-table-wrap {
-  display: block;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
+/* 테이블 뷰는 완전히 숨김 — 그리드 카드로 통일 */
+.equipment-table-wrap { display: none !important; }
 
-/* ── 카드 스타일 (모바일에서 활성화) ── */
-.equipment-cards-wrap {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 18px;
-}
-
+/* ── 장비 카드 ── */
 .equipment-card {
   background: #fff;
-  border: 1px solid var(--border-card);
-  border-radius: var(--radius-xl);
-  padding: 22px;
-  box-shadow: var(--shadow-card);
-  transition:
-    transform 0.16s ease,
-    box-shadow 0.16s ease,
-    border-color 0.16s ease;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  padding: 0;
+  overflow: hidden;
+  transition: box-shadow 0.15s, border-color 0.15s, transform 0.15s;
+  display: flex;
+  flex-direction: column;
 }
 
 .equipment-card:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-card-hover);
-  border-color: var(--border-input);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border-color: #d1d5db;
+  transform: translateY(-1px);
 }
 
+/* 카드 헤더 */
 .equipment-card-head {
   display: flex;
   align-items: flex-start;
   justify-content: space-between;
-  gap: 14px;
-  margin-bottom: 18px;
+  gap: 8px;
+  padding: 12px 14px 8px;
+  border-bottom: 1px solid #f3f4f6;
 }
 
-.equipment-card-title-wrap { min-width: 0; }
+.equipment-card-title-wrap { min-width: 0; flex: 1; }
 
 .equipment-card-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #111827;
   margin: 0;
-  font-size: 28px;
-  line-height: 1.18;
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  color: #0b1f44;
-  word-break: break-word;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.3;
 }
 
 .equipment-card-sub {
-  margin-top: 6px;
-  font-size: 14px;
-  line-height: 1.45;
-  color: #7a86a0;
-  word-break: break-all;
+  font-size: 10px;
+  color: #9ca3af;
+  margin-top: 2px;
+  font-family: 'Consolas', monospace;
 }
 
+/* 카드 바디 */
 .equipment-card-grid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 8px 14px;
+  flex: 1;
 }
 
 .equipment-card-row {
-  display: flex;
-  flex-direction: column;
+  display: grid;
+  grid-template-columns: 52px 1fr;
   gap: 6px;
-  min-width: 0;
-  padding: 14px;
-  border: 1px solid var(--border-soft);
-  border-radius: var(--radius-md);
-  background: #f8fafc;
+  align-items: baseline;
+  padding: 3px 0;
+  border-bottom: 1px solid #f9fafb;
 }
 
+.equipment-card-row:last-child { border-bottom: none; }
+
 .equipment-card-label {
-  font-size: 12px;
-  line-height: 1.35;
-  color: #667085;
-  font-weight: 700;
+  font-size: 10px;
+  color: #9ca3af;
+  font-weight: 600;
+  white-space: nowrap;
 }
 
 .equipment-card-value {
-  font-size: 15px;
-  line-height: 1.5;
-  color: #0f172a;
-  font-weight: 700;
-  word-break: break-word;
+  font-size: 11px;
+  color: #374151;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
+/* 카드 액션 */
 .equipment-card-actions {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-top: 18px;
-  padding-top: 18px;
-  border-top: 1px solid #eef2f6;
+  gap: 6px;
+  padding: 8px 14px;
+  border-top: 1px solid #f3f4f6;
+  background: #f9fafb;
 }
 
-.equipment-card-actions-left,
-.equipment-card-actions-right {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
+.equipment-card-actions-left { display: flex; gap: 6px; flex: 1; }
 .equipment-card-actions-right { margin-left: auto; }
 
 .equipment-card-actions .btn,
 .equipment-card-actions .btn-primary {
-  min-width: 96px;
-  min-height: 46px;
-  border-radius: var(--radius-sm);
-  font-size: 14px;
-  font-weight: 800;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  text-decoration: none;
-}
-/* ── Table ── */
-.equipment-table {
-  width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
-  background: #fff;
-  border: 1px solid var(--border-card);
-  border-radius: var(--radius-lg);
-  overflow: hidden;
-  box-shadow: var(--shadow-card);
-  table-layout: fixed;
-}
-
-.equipment-tbl-th {
-  padding: 11px 10px;
-  background: #f1f5fb;
-  border-bottom: 1px solid #d9dee7;
-  font-size: 12px;
-  font-weight: 800;
-  color: #516274;
-  text-align: left;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-/* 컬럼 너비 고정 */
-.equipment-tbl-th:nth-child(1) { width: 44px; }  /* 체크박스 */
-.equipment-tbl-th:nth-child(2) { width: 17%; }  /* 장비명/번호 */
-.equipment-tbl-th:nth-child(3) { width: 11%; }  /* 모델명 */
-.equipment-tbl-th:nth-child(4) { width: 14%; }  /* 부서 */
-.equipment-tbl-th:nth-child(5) { width: 11%; }  /* 제조사 */
-.equipment-tbl-th:nth-child(6) { width: 13%; }  /* 시리얼 */
-.equipment-tbl-th:nth-child(7) { width: 7%; }   /* 위치 */
-.equipment-tbl-th:nth-child(8) { width: 9%; text-align: center; }  /* 상태 */
-.equipment-tbl-th:nth-child(9) { width: 18%; text-align: center; } /* 액션 */
-
-.equipment-tbl-row {
-  transition: background-color 0.12s ease;
-}
-
-.equipment-tbl-row:not(:last-child) td {
-  border-bottom: 1px solid #eef2f6;
-}
-
-.equipment-tbl-row:hover {
-  background: #f7f9fd;
-}
-
-.equipment-tbl-cell {
-  padding: 10px 10px;
-  font-size: 13px;
-  font-weight: 500;
-  color: #1e293b;
-  vertical-align: middle;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.equipment-tbl-cell--serial {
-  font-size: 13px;
-  color: #475467;
-  /* font-family 제거 — 기본 폰트 사용 */
-}
-
-.equipment-tbl-cell--status { text-align: center; }
-.equipment-tbl-cell--actions { text-align: center; overflow: visible; white-space: nowrap; }
-
-.equipment-tbl-name {
-  font-size: 14px;
-  font-weight: 800;
-  color: #0b1f44;
-  line-height: 1.3;
-}
-
-.equipment-tbl-id {
-  margin-top: 3px;
-  font-size: 11.5px;
-  color: #94a3b8;
+  height: 26px;
+  padding: 0 10px;
+  font-size: 11px;
+  border-radius: 5px;
   font-weight: 600;
 }
 
-.equipment-tbl-actions {
-  display: inline-flex;
-  align-items: center;
-  gap: 5px;
-  justify-content: center;
-}
-
+/* tbl-btn도 동일하게 (JS가 tbl-btn 클래스 사용) */
 .tbl-btn {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  min-height: 30px;
-  padding: 0 11px;
-  border-radius: 9px;
-  font-size: 12px;
-  font-weight: 700;
+  height: 26px;
+  padding: 0 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #374151;
+  background: #fff;
+  cursor: pointer;
   text-decoration: none;
+  transition: background 0.12s, border-color 0.12s;
   white-space: nowrap;
-  background: #f1f5f9;
-  border: 1px solid var(--border-input);
-  color: #0f172a;
-  transition: background-color 0.12s ease, border-color 0.12s ease;
 }
 
-.tbl-btn:hover {
-  background: #e8edf5;
-  border-color: var(--border-input);
-}
+.tbl-btn:hover { background: #f3f4f6; }
 
 .tbl-btn--primary {
-  background: #0b1f44;
-  border-color: #0b1f44;
+  background: #2563eb;
+  border-color: #2563eb;
   color: #fff;
 }
 
-.tbl-btn--primary:hover {
-  background: #162f62;
-  border-color: #162f62;
-}
+.tbl-btn--primary:hover { background: #1d4ed8; border-color: #1d4ed8; }
 
+/* 상태 뱃지 (common.css 보완) */
 .status-badge {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  min-height: 32px;
-  padding: 0 14px;
-  border-radius: 999px;
-  font-size: 13px;
-  font-weight: 800;
+  height: 20px;
+  padding: 0 7px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  border: 1px solid transparent;
   white-space: nowrap;
   flex-shrink: 0;
 }
 
-.status-badge.is-in-use {
-  background: #ecfdf3;
-  color: #027a48;
-  border: 1px solid #abefc6;
+.is-in-use     { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
+.is-repairing  { background: #fff7ed; color: #9a3412; border-color: #fed7aa; }
+.is-inspecting { background: #eff6ff; color: #1e40af; border-color: #bfdbfe; }
+.is-stored     { background: #f9fafb; color: #374151; border-color: #e5e7eb; }
+.is-disposed   { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
+
+/* 빈 상태 */
+.equipment-list-grid .empty-box {
+  grid-column: 1 / -1;
 }
 
-.status-badge.is-repairing {
-  background: #fff7ed;
-  color: #c2410c;
-  border: 1px solid #fdba74;
-}
-
-.status-badge.is-inspecting {
-  background: #eff6ff;
-  color: #1d4ed8;
-  border: 1px solid #bfdbfe;
-}
-
-.status-badge.is-stored {
-  background: #f8fafc;
-  color: #475467;
-  border: 1px solid var(--border-input);
-}
-
-.status-badge.is-disposed {
-  background: #fef2f2;
-  color: #b42318;
-  border: 1px solid #fecdca;
-}
-
-/* (card grid/actions removed — now using table layout) */
-
-/* empty / pagination */
-.empty-box {
-  padding: 48px 20px;
-  border: 1px dashed var(--border-dashed);
-  border-radius: var(--radius-xl);
-  background: #fff;
-  color: #667085;
-  text-align: center;
-  font-size: 15px;
-}
-
+/* 페이지네이션 */
 .pagination-area {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 8px;
-  margin-top: 22px;
-  flex-wrap: wrap;
-}
-
-.pagination-btn {
-  min-width: 40px;
-  min-height: 40px;
-  padding: 0 12px;
-  border: 1px solid var(--border-input);
-  border-radius: var(--radius-sm);
-  background: #fff;
-  color: #0f172a;
-  font-size: 14px;
-  font-weight: 700;
-  cursor: pointer;
-  transition:
-    border-color 0.16s ease,
-    background-color 0.16s ease,
-    color 0.16s ease;
-}
-
-.pagination-btn:hover:not(:disabled) {
-  border-color: var(--border-input);
-  background: #f8fafc;
-}
-
-.pagination-btn.is-active {
-  background: #0b1f44;
-  border-color: #0b1f44;
-  color: #fff;
-}
-
-.pagination-btn:disabled {
-  opacity: 0.45;
-  cursor: default;
-}
-
-/* =========================================
- * label print
- * ========================================= */
-
-/* 라벨 출력 모바일 차단 안내 */
-.mobile-block-notice {
-  display: none;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding: 48px 24px;
-  gap: 16px;
-}
-
-.mobile-block-icon {
-  font-size: 48px;
-  line-height: 1;
-}
-
-.mobile-block-title {
-  font-size: 22px;
-  font-weight: 800;
-  color: #0b1f44;
-  margin: 0;
-}
-
-.mobile-block-desc {
-  font-size: 15px;
-  color: #667085;
-  line-height: 1.7;
-  margin: 0;
-}
-
-.mobile-block-btn {
-  min-height: 48px;
-  padding: 0 28px;
-  border-radius: var(--radius-sm);
-  font-size: 15px;
-  font-weight: 800;
-  margin-top: 8px;
-}
-
-.equipment-label-page .label-shell {
-  padding-top: 20px;
-  padding-bottom: 32px;
-}
-
-.equipment-label-page .label-hero {
-  margin-bottom: 18px;
-}
-
-.equipment-label-page .label-hero-topline {
-  font-size: 14px;
-  font-weight: 700;
-  color: var(--text-secondary);
-  margin-bottom: 8px;
-}
-
-.equipment-label-page .label-hero-title {
-  margin: 0 0 10px;
-  font-size: 40px;
-  line-height: 1.1;
-  letter-spacing: -0.03em;
-  color: var(--text-primary);
-  font-weight: 800;
-}
-
-.equipment-label-page .label-hero-subtext {
-  font-size: 17px;
-  line-height: 1.6;
-  color: var(--text-secondary);
-}
-
-.equipment-label-page .label-preview-wrap {
-  margin-top: 8px;
-}
-
-.equipment-label-page .label-preview-card {
-  padding: 22px;
-  border: 1px solid var(--border-card);
-  border-radius: var(--radius-xl);
-  background: #fff;
-  box-shadow: var(--shadow-card);
-}
-
-.equipment-label-page .label-preview-card:hover,
-.equipment-label-page .label-preview-card:active {
-  transform: none !important;
-}
-
-.equipment-label-page .section-head {
-  margin-bottom: 18px;
-}
-
-.equipment-label-page .section-title {
-  position: relative;
-  display: inline-block;
-  margin: 0;
-  padding-left: 16px;
-  font-size: 22px;
-  line-height: 1.25;
-  font-weight: 800;
-  color: #0b1f44;
-}
-
-.equipment-label-page .section-title::before {
-  content: "";
-  position: absolute;
-  left: 0;
-  top: 4px;
-  bottom: 4px;
-  width: 4px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #2563eb 0%, #60a5fa 100%);
-}
-
-.equipment-label-page .section-head .sub-text {
-  margin-top: 8px;
-  color: #667085;
-  font-size: 14px;
-  line-height: 1.5;
-}
-
-.equipment-label-page .label-print-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 18px;
-  flex-wrap: wrap;
-}
-
-.equipment-label-page .label-print-toolbar .form-label {
-  margin: 0;
-  font-size: 14px;
-  font-weight: 800;
-  color: #516274;
-}
-
-.equipment-label-page .label-print-toolbar .input.input-sm {
-  min-width: 170px;
-  min-height: 46px;
-  padding: 0 14px;
-  border: 1px solid var(--border-input);
-  border-radius: var(--radius-sm);
-  background: #fff;
-  font-size: 14px;
-}
-
-.equipment-label-page .label-sheet {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px 0 8px;
-}
-
-.equipment-label-page .device-label {
-  border: 1px solid var(--border-input);
-  border-radius: var(--radius-xl);
-  background: #fff;
-  display: grid;
-  align-items: center;
-  box-shadow: var(--shadow-card);
-  transition: width 0.18s ease, min-height 0.18s ease, gap 0.18s ease;
-}
-
-.equipment-label-page .device-label-main {
-  min-width: 0;
-}
-
-.equipment-label-page .label-hospital {
-  margin-bottom: 10px;
-  font-weight: 800;
-  color: #0b3b91;
-  letter-spacing: -0.01em;
-}
-
-.equipment-label-page .label-title {
-  margin: 0 0 12px;
-  font-weight: 900;
-  color: #0b1f44;
-  letter-spacing: -0.03em;
-  word-break: break-word;
-}
-
-.equipment-label-page .label-info-block {
-  display: flex;
-  flex-direction: column;
-}
-
-.equipment-label-page .label-row {
-  display: grid;
-  align-items: start;
-}
-
-.equipment-label-page .label-row-emphasis {
-  margin-bottom: 2px;
-}
-
-.equipment-label-page .label-key {
-  color: #667085;
-  font-weight: 700;
-}
-
-.equipment-label-page .label-value {
-  color: #0f172a;
-  font-weight: 700;
-  word-break: break-word;
-}
-
-.equipment-label-page .label-value-id {
-  font-weight: 900;
-  color: #111827;
-  letter-spacing: -0.02em;
-}
-
-.equipment-label-page .qr-panel {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.equipment-label-page .label-qr-box {
-  border: 1px solid var(--border-soft);
-  background: #fff;
-  box-sizing: border-box;
-}
-
-/* ===== size: 90 x 48 ===== */
-.equipment-label-page .device-label.size-90x48 {
-  width: 360px;
-  min-height: 181px;
-  padding: 14px 16px;
-  grid-template-columns: minmax(0, 1fr) 94px;
-  gap: 12px;
-  align-items: center;
-}
-
-.equipment-label-page .device-label.size-90x48 .label-hospital {
-  font-size: 12px;
-  line-height: 1.3;
-  margin-bottom: 5px;
-}
-
-.equipment-label-page .device-label.size-90x48 .label-title {
-  font-size: 20px;
-  line-height: 1.15;
-  margin: 0 0 6px;
-}
-
-.equipment-label-page .device-label.size-90x48 .label-info-block {
-  gap: 4px;
-}
-
-.equipment-label-page .device-label.size-90x48 .label-row {
-  grid-template-columns: 52px minmax(0, 1fr);
-  gap: 3px 6px;
-}
-
-.equipment-label-page .device-label.size-90x48 .label-key {
-  font-size: 10.5px;
-  line-height: 1.4;
-  white-space: nowrap;
-}
-
-.equipment-label-page .device-label.size-90x48 .label-value {
-  font-size: 11px;
-  line-height: 1.4;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.equipment-label-page .device-label.size-90x48 .label-value-id {
-  font-size: 15px;
-  line-height: 1.2;
-  white-space: nowrap;
-}
-
-.equipment-label-page .device-label.size-90x48 .label-qr-box {
-  width: 94px;
-  height: 94px;
-  min-width: 94px;
-  min-height: 94px;
-  padding: 5px;
-  border-radius: 10px;
-  margin-top: 0;
-}
-
-.equipment-label-page .device-label.size-90x48 .qr-panel {
-  align-self: center;
-}
-
-/* ===== size: 70 x 40 ===== */
-.equipment-label-page .device-label.size-70x40 {
-  width: 280px;
-  min-height: 151px;
-  padding: 10px 12px;
-  grid-template-columns: minmax(0, 1fr) 72px;
-  gap: 10px;
-  align-items: center;
-}
-
-.equipment-label-page .device-label.size-70x40 .label-hospital {
-  margin-bottom: 4px;
-  font-size: 10px;
-  line-height: 1.2;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.equipment-label-page .device-label.size-70x40 .label-title {
-  margin-bottom: 5px;
-  font-size: 15px;
-  line-height: 1.15;
-}
-
-.equipment-label-page .device-label.size-70x40 .label-info-block {
-  gap: 3px;
-}
-
-.equipment-label-page .device-label.size-70x40 .label-row {
-  grid-template-columns: 44px minmax(0, 1fr);
-  gap: 3px 5px;
-}
-
-.equipment-label-page .device-label.size-70x40 .label-row-emphasis {
-  grid-template-columns: 44px minmax(0, 1fr);
-  align-items: center;
-}
-
-.equipment-label-page .device-label.size-70x40 .label-key {
-  font-size: 8.5px;
-  line-height: 1.3;
-  white-space: nowrap;
-}
-
-.equipment-label-page .device-label.size-70x40 .label-value {
-  font-size: 9px;
-  line-height: 1.3;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.equipment-label-page .device-label.size-70x40 .label-value-id {
-  font-size: 11px;
-  line-height: 1.1;
-  letter-spacing: -0.02em;
-  white-space: nowrap;
-}
-
-.equipment-label-page .device-label.size-70x40 .label-qr-box {
-  width: 72px;
-  height: 72px;
-  min-width: 72px;
-  min-height: 72px;
-  padding: 4px;
-  border-radius: 8px;
-  margin-top: 0;
-}
-
-.equipment-label-page .device-label.size-70x40 .qr-panel {
-  align-self: center;
-}
-
-/* ===== size: 50 x 30 ===== */
-.equipment-label-page .device-label.size-50x30 {
-  width: 260px;
-  min-height: 140px;
-  padding: 12px;
-  grid-template-columns: minmax(0, 1fr) 76px;
-  gap: 10px;
-}
-
-.equipment-label-page .device-label.size-50x30 .label-hospital {
-  margin-bottom: 6px;
-  font-size: 10px;
-  line-height: 1.2;
-}
-
-.equipment-label-page .device-label.size-50x30 .label-title {
-  margin-bottom: 8px;
-  font-size: 15px;
-  line-height: 1.1;
-}
-
-.equipment-label-page .device-label.size-50x30 .label-info-block {
-  gap: 4px;
-}
-
-.equipment-label-page .device-label.size-50x30 .label-row {
-  grid-template-columns: 44px minmax(0, 1fr);
-  gap: 5px;
-}
-
-.equipment-label-page .device-label.size-50x30 .label-key {
-  font-size: 9px;
-  line-height: 1.25;
-}
-
-.equipment-label-page .device-label.size-50x30 .label-value {
-  font-size: 10px;
-  line-height: 1.25;
-}
-
-.equipment-label-page .device-label.size-50x30 .label-value-id {
-  font-size: 11px;
-  line-height: 1.1;
-  white-space: nowrap;
-  letter-spacing: -0.03em;
-}
-
-.equipment-label-page .device-label.size-50x30 .label-qr-box {
-  width: 72px;
-  height: 72px;
-  min-width: 72px;
-  min-height: 72px;
-  padding: 4px;
-  border-radius: var(--radius-sm);
-}
-
-.equipment-label-page .equipment-label-topbar {
-  margin-bottom: 18px;
-}
-
-.equipment-label-page .equipment-label-top-actions {
-  gap: 10px;
-}
-
-/* tablet */
-@media (max-width: 1024px) {
-  .equipment-list-page .page-title {
-    font-size: 30px;
-  }
-
-  .filter-card {
-    padding: 20px;
-    border-radius: var(--radius-xl);
-  }
-
-  /* 태블릿: 테이블 유지, 가로 스크롤 */
-  .equipment-table-wrap {
-    overflow-x: auto;
-  }
-}
-
-/* mobile */
-@media (max-width: 768px) {
-  .equipment-list-page .page-shell {
-    padding-top: 16px;
-    padding-bottom: 28px;
-  }
-
-  .equipment-list-topbar {
-    margin-bottom: 16px;
-  }
-
-  .equipment-list-page .page-hero-simple {
-    margin-bottom: 16px;
-    padding: 0;
-  }
-
-  .equipment-list-page .page-title {
-    font-size: 28px;
-  }
-
-  .equipment-list-page .page-desc {
-    font-size: 14px;
-    line-height: 1.55;
-  }
-
-  .filter-card {
-    padding: 18px;
-    border-radius: var(--radius-xl);
-  }
-
-  .filter-card .section-title {
-    font-size: 20px;
-  }
-
-  .filter-card .form-grid.two-col {
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
-
-  .filter-card .form-field.full-col {
-    grid-column: auto;
-  }
-
-  .filter-card .form-label {
-    font-size: 13px;
-  }
-
-  .filter-card .input,
-  .filter-card select.input {
-    min-height: 50px;
-    font-size: 15px;
-    border-radius: 15px;
-  }
-
-  .filter-actions {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 12px;
-    align-items: stretch;
-  }
-
-  .filter-actions-left,
-  .filter-actions-right {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .filter-actions-right {
-    display: flex;
-    flex-wrap: nowrap;
-    gap: 8px;
-  }
-
-  .filter-actions-right .btn-primary,
-  .filter-actions-right .btn-secondary {
-    flex: 1 1 0;
-    min-width: 0;
-    white-space: nowrap;
-    font-size: 14px;
-    padding: 0 10px;
-  }
-
-  .inline-field {
-    width: 100%;
-    justify-content: space-between;
-  }
-
-  .inline-field .input-sm {
-    width: 120px;
-  }
-
-  .equipment-list-toolbar {
-    margin-bottom: 12px;
-  }
-
-  .equipment-list-summary {
-    width: 100%;
-    min-height: 40px;
-    padding: 0 12px;
-    border-radius: var(--radius-sm);
-    font-size: 13px;
-    line-height: 1.35;
-  }
-
-  /* 모바일: 테이블 숨기고 카드 표시 */
-  .equipment-table-wrap {
-    display: none;
-  }
-
-  .equipment-cards-wrap {
-    display: grid;
-    grid-template-columns: 1fr;
-    gap: 14px;
-  }
-
-  .equipment-card {
-    padding: 16px;
-    border-radius: var(--radius-lg);
-  }
-
-  .equipment-card-head {
-    gap: 10px;
-    margin-bottom: 12px;
-  }
-
-  .equipment-card-title {
-    font-size: 20px;
-  }
-
-  .equipment-card-sub {
-    font-size: 12px;
-    margin-top: 3px;
-  }
-
-  /* 항목 2열로 배치해 카드 높이 줄이기 */
-  .equipment-card-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 8px;
-  }
-
-  .equipment-card-row {
-    padding: 10px 12px;
-    border-radius: var(--radius-sm);
-  }
-
-  .equipment-card-label {
-    font-size: 11px;
-  }
-
-  .equipment-card-value {
-    font-size: 13px;
-  }
-
-  /* 버튼 3개 균등 너비 */
-  .equipment-card-actions {
-    display: flex;
-    flex-direction: row;
-    align-items: stretch;
-    gap: 8px;
-    margin-top: 14px;
-    padding-top: 14px;
-  }
-
-  .equipment-card-actions-left,
-  .equipment-card-actions-right {
-    display: contents;
-  }
-
-  .equipment-card-actions .btn,
-  .equipment-card-actions .btn-primary {
-    flex: 1 1 0;
-    min-width: 0;
-    min-height: 42px;
-    font-size: 13px;
-    border-radius: var(--radius-sm);
-    text-align: center;
-    white-space: nowrap;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .pagination-btn {
-    min-height: 38px;
-    border-radius: 11px;
-    font-size: 13px;
-  }
-
-  .equipment-label-page .label-hero-title {
-    font-size: 30px;
-  }
-
-  .equipment-label-page .top-brand-bar {
-    display: block;
-    padding: 16px 18px 18px;
-    border-radius: var(--radius-lg);
-  }
-
-  .equipment-label-page .top-brand-left {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    width: 100%;
-  }
-
-  .equipment-label-page .top-brand-texts {
-    min-width: 0;
-    flex: 1 1 auto;
-  }
-
-  .equipment-label-page .top-brand-title {
-    display: block;
-    font-size: 16px;
-    line-height: 1.25;
-    word-break: keep-all;
-  }
-
-  .equipment-label-page .top-brand-sub {
-    display: block;
-    margin-top: 4px;
-    font-size: 13px;
-    color: #667085;
-    white-space: normal;
-  }
-
-  .equipment-label-page .equipment-label-top-actions .portal-header-btn {
-    width: 100%;
-    min-width: 0;
-    min-height: 46px;
-    font-size: 14px;
-    font-weight: 800;
-    justify-content: center;
-  }
-
-  .equipment-label-page .label-preview-card {
-    padding: 18px;
-    border-radius: var(--radius-xl);
-  }
-
-  .equipment-label-page .device-label.size-90x48,
-  .equipment-label-page .device-label.size-70x40,
-  .equipment-label-page .device-label.size-50x30 {
-    width: 100%;
-    grid-template-columns: 1fr;
-    min-height: auto;
-  }
-
-  .equipment-label-page .device-label.size-90x48 {
-    padding: 18px;
-  }
-
-  .equipment-label-page .device-label.size-70x40 {
-    padding: 16px;
-  }
-
-  .equipment-label-page .device-label.size-50x30 {
-    padding: 14px;
-  }
-
-  .equipment-label-page .qr-panel {
-    justify-content: flex-start;
-  }
-}
-
-/* narrow mobile */
-@media (max-width: 480px) {
-  .equipment-list-top-actions .portal-header-btn {
-    min-height: 40px;
-    font-size: 12px;
-    padding: 0 6px;
-  }
-
-  .equipment-list-page .page-title {
-    font-size: 26px;
-  }
-
-  .filter-card {
-    padding: 16px;
-    border-radius: var(--radius-lg);
-  }
-
-  .filter-card .section-title {
-    font-size: 18px;
-  }
-
-  .equipment-card {
-    padding: 16px;
-    border-radius: var(--radius-lg);
-  }
-
-  .equipment-card-title {
-    font-size: 22px;
-  }
-
-  .equipment-card-head {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .status-badge {
-    align-self: flex-start;
-  }
-
-  .equipment-card-actions {
-    grid-template-columns: 1fr;
-  }
-
-  .equipment-label-page .label-preview-card {
-    padding: 16px;
-    border-radius: var(--radius-lg);
-  }
-
-  .equipment-label-page .label-print-toolbar {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .equipment-label-page .label-print-toolbar .input.input-sm {
-    width: 100%;
-  }
-}
-
-@media print {
-  body.equipment-label-page {
-    background: #fff;
-  }
-
-  .equipment-label-page .no-print,
-  .equipment-label-page .top-brand-bar,
-  .equipment-label-page .label-hero,
-  .equipment-label-page #messageBox {
-    display: none !important;
-  }
-
-  .equipment-label-page .container.label-shell {
-    max-width: none;
-    padding: 0;
-  }
-
-  .equipment-label-page .label-preview-wrap {
-    margin: 0;
-  }
-
-  .equipment-label-page .label-preview-card {
-    border: none !important;
-    box-shadow: none !important;
-    padding: 0 !important;
-    background: transparent !important;
-  }
-
-  .equipment-label-page .label-sheet {
-    padding: 0;
-    justify-content: flex-start;
-  }
-
-  .equipment-label-page .device-label {
-    box-shadow: none !important;
-    border: 1px solid #111827;
-  }
-
-  /* 90 x 48 */
-  .equipment-label-page .device-label.size-90x48 {
-    width: 90mm;
-    min-height: 48mm;
-    padding: 4mm;
-    border-radius: 4mm;
-    gap: 3.5mm;
-    grid-template-columns: 1fr 26mm;
-    align-items: center;
-  }
-
-  .equipment-label-page .device-label.size-90x48 .label-hospital {
-    margin-bottom: 1.5mm;
-    font-size: 7.5pt;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .equipment-label-page .device-label.size-90x48 .label-title {
-    margin: 0 0 2mm;
-    font-size: 15pt;
-  }
-
-  .equipment-label-page .device-label.size-90x48 .label-row {
-    grid-template-columns: 13mm 1fr;
-    gap: 1.4mm 2mm;
-  }
-
-  .equipment-label-page .device-label.size-90x48 .label-key {
-    font-size: 7.5pt;
-    white-space: nowrap;
-  }
-
-  .equipment-label-page .device-label.size-90x48 .label-value {
-    font-size: 8pt;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .equipment-label-page .device-label.size-90x48 .label-value-id {
-    font-size: 11pt;
-    white-space: nowrap;
-  }
-
-  .equipment-label-page .device-label.size-90x48 .label-qr-box {
-    width: 24mm;
-    height: 24mm;
-    min-width: 24mm;
-    min-height: 24mm;
-    padding: 1.2mm;
-    border-radius: 3mm;
-    margin-top: 0;
-  }
-
-  .equipment-label-page .device-label.size-90x48 .qr-panel {
-    align-self: center;
-  }
-
-  /* 70 x 40 */
-  .equipment-label-page .device-label.size-70x40 {
-    width: 70mm;
-    min-height: 40mm;
-    padding: 2.8mm;
-    border-radius: 3mm;
-    gap: 2.5mm;
-    grid-template-columns: 1fr 19mm;
-    align-items: center;
-  }
-
-  .equipment-label-page .device-label.size-70x40 .label-hospital {
-    margin-bottom: 1.2mm;
-    font-size: 6pt;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .equipment-label-page .device-label.size-70x40 .label-title {
-    margin: 0 0 1.5mm;
-    font-size: 11pt;
-  }
-
-  .equipment-label-page .device-label.size-70x40 .label-row {
-    grid-template-columns: 11mm 1fr;
-    gap: 1mm 1.4mm;
-  }
-
-  .equipment-label-page .device-label.size-70x40 .label-row-emphasis {
-    grid-template-columns: 11mm 1fr;
-    align-items: center;
-  }
-
-  .equipment-label-page .device-label.size-70x40 .label-key {
-    font-size: 6pt;
-    white-space: nowrap;
-  }
-
-  .equipment-label-page .device-label.size-70x40 .label-value {
-    font-size: 6.5pt;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .equipment-label-page .device-label.size-70x40 .label-value-id {
-    font-size: 8pt;
-    line-height: 1.05;
-    letter-spacing: -0.02em;
-    white-space: nowrap;
-  }
-
-  .equipment-label-page .device-label.size-70x40 .label-qr-box {
-    width: 17mm;
-    height: 17mm;
-    min-width: 17mm;
-    min-height: 17mm;
-    padding: 1mm;
-    border-radius: 2mm;
-    margin-top: 0;
-  }
-
-  .equipment-label-page .device-label.size-70x40 .qr-panel {
-    align-self: center;
-  }
-
-  /* 50 x 30 */
-  .equipment-label-page .device-label.size-50x30 {
-    width: 50mm;
-    min-height: 30mm;
-    padding: 2.2mm;
-    border-radius: 2.6mm;
-    gap: 2mm;
-    grid-template-columns: 1fr 15mm;
-  }
-
-  .equipment-label-page .device-label.size-50x30 .label-hospital {
-    margin-bottom: 1mm;
-    font-size: 5.8pt;
-  }
-
-  .equipment-label-page .device-label.size-50x30 .label-title {
-    margin: 0 0 1.2mm;
-    font-size: 9.5pt;
-  }
-
-  .equipment-label-page .device-label.size-50x30 .label-row {
-    grid-template-columns: 10mm 1fr;
-    gap: 1mm 1.2mm;
-  }
-
-  .equipment-label-page .device-label.size-50x30 .label-key {
-    font-size: 5.4pt;
-  }
-
-  .equipment-label-page .device-label.size-50x30 .label-value {
-    font-size: 5.8pt;
-  }
-
-  .equipment-label-page .device-label.size-50x30 .label-value-id {
-    font-size: 6.8pt;
-    white-space: nowrap;
-    letter-spacing: -0.03em;
-  }
-
-  .equipment-label-page .device-label.size-50x30 .label-qr-box {
-    width: 13mm;
-    height: 13mm;
-    min-width: 13mm;
-    min-height: 13mm;
-    padding: 0.8mm;
-    border-radius: 2mm;
-  }
-}
-
-/* ===== 라벨 일괄 출력 - 목록 툴바 ===== */
-
-.equipment-list-toolbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-
-.equipment-list-toolbar-actions {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
-
-.bulk-check-all-wrap {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  font-size: 13px;
-  color: #475569;
-  cursor: pointer;
-  user-select: none;
-}
-
-.bulk-check-all-wrap input { cursor: pointer; }
-
-.tbl-th--check,
-.tbl-td--check {
-  width: 44px;
-  min-width: 44px;
-  text-align: center;
-  padding: 0 !important;
-}
-
-.tbl-th--check input[type="checkbox"],
-.tbl-td--check input[type="checkbox"] {
-  margin: 0 auto;
-  display: block;
-  cursor: pointer;
-  width: 15px;
-  height: 15px;
-}
-
-/* ===== 라벨 일괄 출력 - 인쇄 그리드 ===== */
-
-.bulk-label-wrap {
-  padding: 12px 0;
-}
-
-.bulk-label-grid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 16px;
-  justify-content: flex-start;
-}
-
-.bulk-label-item {
   flex-shrink: 0;
+  padding-bottom: 8px;
 }
 
-@media print {
-  .bulk-label-grid {
-    gap: 0;
-  }
-  .bulk-label-item {
-    page-break-inside: avoid;
-    break-inside: avoid;
-    margin: 2mm;
+/* ── 태블릿 ── */
+@media (max-width: 1200px) {
+  .equipment-cards-wrap {
+    grid-template-columns: repeat(3, minmax(0,1fr));
   }
 }
 
-.input--sm {
-  height: 34px;
-  padding: 0 10px;
-  font-size: 13px;
-  border-radius: 8px;
-  min-width: 120px;
-}
+@media (max-width: 900px) {
+  .equipment-cards-wrap {
+    grid-template-columns: repeat(2, minmax(0,1fr));
+  }
 
-.btn-sm {
-  height: 34px;
-  padding: 0 14px;
-  font-size: 13px;
-  border-radius: 8px;
-  white-space: nowrap;
-}
+  .eq-filter-form {
+    flex-wrap: wrap;
+  }
 
-/* 모바일에서 라벨 일괄 출력 UI 숨김 */
-@media (max-width: 768px) {
-  .equipment-list-toolbar-actions {
-    display: none;
+  .eq-filter-keyword { flex: 1 1 100%; }
+
+  .eq-filter-select {
+    flex: 1 1 calc(50% - 3px);
+    max-width: none;
   }
 }
-/* ===== 라벨 인쇄 오버레이 ===== */
-#printLabelOverlay { display: none; }
-.plabel-page--grid  { display: grid; }
-.plabel-page--single { display: flex; justify-content: center; padding: 10px 0; }
-.plabel-empty { visibility: hidden; }
 
-/* ── Shell SPA compact 보정 ── */
-body.in-shell .equipment-list-page .page-title { font-size: 22px; }
-body.in-shell .equipment-list-page .page-desc  { font-size: 13px; margin-top: 4px; }
-body.in-shell .equipment-list-page .page-hero-simple { margin-bottom: 12px; }
-body.in-shell .filter-card { padding: 14px 16px; }
+/* ── 모바일 ── */
+@media (max-width: 600px) {
+  .eq-page { padding: 10px 12px; gap: 8px; }
+
+  .eq-filter-bar {
+    flex-wrap: wrap;
+    gap: 6px;
+    padding: 8px;
+  }
+
+  .eq-filter-form { flex-wrap: wrap; gap: 6px; }
+  .eq-filter-keyword { flex: 1 1 100%; }
+  .eq-filter-select { flex: 1 1 calc(50% - 3px); max-width: none; min-width: 0; }
+  .eq-filter-btn { flex: 1; justify-content: center; }
+  .eq-register-btn { width: 100%; justify-content: center; }
+
+  .equipment-cards-wrap { grid-template-columns: 1fr; }
+
+  .equipment-card-grid { gap: 0; }
+  .equipment-card-row  { grid-template-columns: 48px 1fr; }
+
+  .eq-toolbar { flex-wrap: wrap; }
+}

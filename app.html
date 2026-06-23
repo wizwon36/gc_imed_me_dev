@@ -400,41 +400,18 @@ function updateActiveMenu(page, tab) {
 
   if (matched) {
     matched.classList.add('active');
-
-    // 부모 아코디언 자동 열기
-    const submenu = matched.closest('.sb-submenu');
-    if (submenu) {
-      submenu.classList.add('open');
-      const menuId = submenu.id.replace('menu-', '');
-      const parent = document.querySelector(`.sb-item-parent[data-menu="${menuId}"]`);
-      if (parent) parent.classList.add('open');
-    }
+    // flyout 방식 — CSS hover로 열리므로 JS open 클래스 불필요
   }
 }
 
-// ── 아코디언 토글 ────────────────────────────────────────────
+// ── 아코디언 토글 — flyout 방식으로 전환, onclick은 유지(호환) ──
 function toggleMenu(menuId) {
+  // flyout은 CSS hover로 동작 — JS 토글 불필요
+  // 단, 클릭 시 첫 번째 서브 아이템으로 이동
   const submenu = document.getElementById(`menu-${menuId}`);
-  const btn     = document.querySelector(`.sb-item-parent[data-menu="${menuId}"]`);
-  if (!submenu || !btn) return;
-
-  const isOpen = submenu.classList.contains('open');
-
-  // 다른 서브메뉴 닫기 (선택 사항 — 현재 활성 항목 포함된 것은 유지)
-  document.querySelectorAll('.sb-submenu.open').forEach(el => {
-    if (el !== submenu) {
-      const hasActive = el.querySelector('.sb-sub-item.active');
-      if (!hasActive) {
-        el.classList.remove('open');
-        const pid = el.id.replace('menu-', '');
-        const pb  = document.querySelector(`.sb-item-parent[data-menu="${pid}"]`);
-        if (pb) pb.classList.remove('open');
-      }
-    }
-  });
-
-  submenu.classList.toggle('open', !isOpen);
-  btn.classList.toggle('open', !isOpen);
+  if (!submenu) return;
+  const first = submenu.querySelector('.sb-sub-item');
+  if (first) first.click();
 }
 
 // ── 모바일 사이드바 ─────────────────────────────────────────

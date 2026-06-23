@@ -515,10 +515,9 @@ async function initListFilters() {
   var teamEl;
 
   equipmentListState.page = query.page > 0 ? query.page : 1;
-  equipmentListState.pageSize = 20; // 고정
+  equipmentListState.pageSize = 15; // 고정
 
   fillStatusFilterOptions();
-  fillPageSizeOptions();
 
   clinicEl = document.getElementById('clinic_code');
   teamEl = document.getElementById('team_code');
@@ -547,7 +546,8 @@ async function initListFilters() {
       clinicEl.disabled = true;
 
       window.orgSelect.fillSelectOptions(teamEl, scopedData.teams, { emptyText: '' });
-      teamEl.value = equipmentListState.userTeamCode;
+      // 진입 시 소속 팀 자동 세팅 (URL params 없으면 소속 팀)
+      teamEl.value = query.team_code || equipmentListState.userTeamCode;
       teamEl.disabled = true;
 
     } else if (scope === 'clinic') {
@@ -557,6 +557,7 @@ async function initListFilters() {
       clinicEl.disabled = true;
 
       window.orgSelect.fillSelectOptions(teamEl, scopedData.teams, { emptyText: '전체 팀' });
+      // 진입 시 소속 팀 자동 세팅
       teamEl.value = query.team_code || equipmentListState.userTeamCode || '';
       teamEl.disabled = false;
 
@@ -571,15 +572,17 @@ async function initListFilters() {
         teamEmptyText: '전체 팀',
         onTeamChanged: null
       });
-      if (query.clinic_code) {
-        clinicEl.value = query.clinic_code;
+      var initClinic = query.clinic_code || equipmentListState.userClinicCode || '';
+      if (initClinic) {
+        clinicEl.value = initClinic;
         window.orgSelect.fillSelectOptions(
           teamEl,
-          window.orgSelect.getFilteredTeams(query.clinic_code),
+          window.orgSelect.getFilteredTeams(initClinic),
           { emptyText: '전체 팀' }
         );
-        teamEl.disabled = false;  // bindClinicTeamSelects가 disabled로 만든 것 해제
-        if (query.team_code) teamEl.value = query.team_code;
+        teamEl.disabled = false;
+        // 진입 시 소속 팀 자동 세팅
+        teamEl.value = query.team_code || equipmentListState.userTeamCode || '';
       } else {
         teamEl.innerHTML = '<option value="">의원을 먼저 선택하세요</option>';
         teamEl.disabled = true;

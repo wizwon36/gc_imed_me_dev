@@ -245,10 +245,8 @@ function buildEquipmentRow(item) {
       '<td class="equipment-tbl-cell tbl-td--check">' +
         '<input type="checkbox" class="bulk-item-check" data-id="' + escapeHtml(item.equipment_id || '') + '" />' +
       '</td>' +
-      '<td class="equipment-tbl-cell equipment-tbl-cell--name">' +
-        '<div class="equipment-tbl-name">' + escapeHtml(item.equipment_name || '-') + '</div>' +
-        '<div class="equipment-tbl-id">' + escapeHtml(item.equipment_id || '') + '</div>' +
-      '</td>' +
+      '<td class="equipment-tbl-cell equipment-tbl-cell--name">' + escapeHtml(item.equipment_name || '-') + '</td>' +
+      '<td class="equipment-tbl-cell equipment-tbl-cell--id">' + escapeHtml(item.equipment_id || '-') + '</td>' +
       '<td class="equipment-tbl-cell">' + escapeHtml(item.model_name || '-') + '</td>' +
       '<td class="equipment-tbl-cell">' + escapeHtml(item.department || '-') + '</td>' +
       '<td class="equipment-tbl-cell">' + escapeHtml(item.manufacturer || '-') + '</td>' +
@@ -295,13 +293,14 @@ function renderEquipmentList(items) {
             '<th class="equipment-tbl-th tbl-th--check">' +
               '<input type="checkbox" id="bulkCheckAll" title="전체 선택" />' +
             '</th>' +
-            '<th class="equipment-tbl-th equipment-tbl-th--name">장비명 / 번호</th>' +
-            '<th class="equipment-tbl-th">모델명</th>' +
-            '<th class="equipment-tbl-th">부서</th>' +
-            '<th class="equipment-tbl-th">제조사</th>' +
-            '<th class="equipment-tbl-th">시리얼</th>' +
-            '<th class="equipment-tbl-th">위치</th>' +
-            '<th class="equipment-tbl-th">상태</th>' +
+            '<th class="equipment-tbl-th equipment-tbl-th--name">장비명</th>' +
+            '<th class="equipment-tbl-th equipment-tbl-th--id">장비번호</th>' +
+            '<th class="equipment-tbl-th equipment-tbl-th--model">모델명</th>' +
+            '<th class="equipment-tbl-th equipment-tbl-th--dept">부서</th>' +
+            '<th class="equipment-tbl-th equipment-tbl-th--mfr">제조사</th>' +
+            '<th class="equipment-tbl-th equipment-tbl-th--serial">시리얼</th>' +
+            '<th class="equipment-tbl-th equipment-tbl-th--loc">위치</th>' +
+            '<th class="equipment-tbl-th equipment-tbl-th--status">상태</th>' +
             '<th class="equipment-tbl-th equipment-tbl-th--actions">액션</th>' +
           '</tr>' +
         '</thead>' +
@@ -459,9 +458,17 @@ async function loadEquipmentList(nextPage) {
       showGlobalLoading('장비 목록을 불러오는 중...');
     }
 
-    filters = equipmentListState._initialLoad
-      ? getListQueryParams()   // 최초 로딩: URL params 직접 사용
-      : getCurrentFilters();   // 이후 검색: form 값 사용
+    if (equipmentListState._initialLoad) {
+      var urlParams = getListQueryParams();
+      // URL에 필터가 없으면 소속 의원/팀으로 기본 필터 적용
+      if (!urlParams.keyword && !urlParams.clinic_code && !urlParams.team_code && !urlParams.status && !urlParams.manufacturer) {
+        urlParams.clinic_code = equipmentListState.userClinicCode || '';
+        urlParams.team_code   = equipmentListState.userTeamCode   || '';
+      }
+      filters = urlParams;
+    } else {
+      filters = getCurrentFilters();
+    }
 
     equipmentListState._initialLoad = false;
     requestParams = buildListRequestParams(filters, nextPage || equipmentListState.page);
@@ -508,7 +515,7 @@ async function initListFilters() {
   var teamEl;
 
   equipmentListState.page = query.page > 0 ? query.page : 1;
-  equipmentListState.pageSize = query.page_size > 0 ? query.page_size : 20;
+  equipmentListState.pageSize = 20; // 고정
 
   fillStatusFilterOptions();
   fillPageSizeOptions();

@@ -1,3 +1,5 @@
+var _tabulatorInstance = null; // Tabulator 그리드 인스턴스
+
 var equipmentListState = {
   user: null,
   page: 1,
@@ -262,51 +264,125 @@ function buildEquipmentRow(item) {
   );
 }
 
+function getStatusBadge(status) {
+  var map = {
+    'IN_USE':     { cls: 'is-in-use',     label: '사용중' },
+    'REPAIRING':  { cls: 'is-repairing',  label: '수리중' },
+    'INSPECTING': { cls: 'is-inspecting', label: '점검중' },
+    'STORED':     { cls: 'is-stored',     label: '보관' },
+    'DISPOSED':   { cls: 'is-disposed',   label: '폐기' },
+  };
+  var s = map[status] || { cls: 'is-stored', label: status || '—' };
+  return '<span class="status-badge ' + s.cls + '">' + s.label + '</span>';
+}
+
+function getActionButtons(item) {
+  var id = escapeHtml(item.equipment_id || '');
+  var btns = '<a class="tbl-btn" href="detail.html?id=' + id + '&shell=1">상세</a>';
+  if (equipmentListState.canEdit && canEditItem(item)) {
+    btns += '<a class="tbl-btn tbl-btn--primary" href="form.html?id=' + id + '&shell=1">수정</a>';
+  }
+  if (equipmentListState.canEdit) {
+    btns += '<button class="tbl-btn" onclick="printSingleLabel('' + id + '')">라벨</button>';
+  }
+  return btns;
+}
+
 function renderEquipmentList(items) {
-  var container = document.getElementById('equipmentList');
-  if (!container) return;
+  var el = document.getElementById('equipmentGrid');
+  if (!el) return;
 
   items = Array.isArray(items) ? items : [];
 
-  if (!items.length) {
-    var emptyMsg = equipmentListState.isRecentMode
-      ? '최근 등록 장비가 없습니다.'
-      : '조회된 장비가 없습니다.';
-    container.innerHTML = '<div class="empty-box">' + emptyMsg + '</div>';
+  // 컬럼 정의
+  var columns = [
+    {
+      title: '장비명', field: 'equipment_name', minWidth: 140, frozen: false,
+      hozAlign: 'left', headerHozAlign: 'left',
+      formatter: function(cell) {
+        var v = cell.getValue() || '—';
+        return '<span class="tab-name">' + escapeHtml(v) + '</span>';
+      }
+    },
+    {
+      title: '장비번호', field: 'equipment_id', width: 130,
+      hozAlign: 'center', headerHozAlign: 'center',
+      formatter: function(cell) {
+        return '<span class="tab-id">' + escapeHtml(cell.getValue() || '—') + '</span>';
+      }
+    },
+    {
+      title: '모델명', field: 'model_name', width: 120,
+      hozAlign: 'center', headerHozAlign: 'center',
+      formatter: function(cell) { return escapeHtml(cell.getValue() || '—'); }
+    },
+    {
+      title: '부서', field: '_dept', width: 160,
+      hozAlign: 'center', headerHozAlign: 'center',
+      formatter: function(cell, formatterParams, onRendered) {
+        var row = cell.getRow().getData();
+        var clinic = row.clinic_name || '';
+        var team   = row.team_name   || '';
+        return escapeHtml(clinic && team ? clinic + ' / ' + team : clinic || team || '—');
+      }
+    },
+    {
+      title: '제조사', field: 'manufacturer_name', width: 120,
+      hozAlign: 'center', headerHozAlign: 'center',
+      formatter: function(cell) {
+        var v = cell.getValue() || '';
+        return v ? '<span class="tab-mfr">' + escapeHtml(v) + '</span>' : '<span style="color:#9ca3af">—</span>';
+      }
+    },
+    {
+      title: '시리얼', field: 'serial_number', width: 130,
+      hozAlign: 'center', headerHozAlign: 'center',
+      formatter: function(cell) {
+        return '<span class="tab-id">' + escapeHtml(cell.getValue() || '—') + '</span>';
+      }
+    },
+    {
+      title: '위치', field: 'location', width: 90,
+      hozAlign: 'center', headerHozAlign: 'center',
+      formatter: function(cell) { return escapeHtml(cell.getValue() || '—'); }
+    },
+    {
+      title: '상태', field: 'status', width: 80,
+      hozAlign: 'center', headerHozAlign: 'center',
+      formatter: function(cell) { return getStatusBadge(cell.getValue()); }
+    },
+    {
+      title: '액션', field: '_actions', width: 130,
+      hozAlign: 'center', headerHozAlign: 'center',
+      headerSort: false,
+      formatter: function(cell) {
+        var row = cell.getRow().getData();
+        return '<div style="display:flex;gap:4px;justify-content:center;align-items:center;">' + getActionButtons(row) + '</div>';
+      }
+    }
+  ];
+
+  if (_tabulatorInstance) {
+    // 이미 생성된 경우 데이터만 교체
+    _tabulatorInstance.replaceData(items);
     return;
   }
 
-  /* 카드 영역 (모바일에서 표시) */
-  var cardsHtml =
-    '<div class="equipment-cards-wrap">' +
-      items.map(buildEquipmentCard).join('') +
-    '</div>';
-
-  /* 테이블 영역 (PC에서 표시) */
-  var tableHtml =
-    '<div class="equipment-table-wrap">' +
-      '<table class="equipment-table">' +
-        '<thead>' +
-          '<tr>' +
-            '<th class="equipment-tbl-th equipment-tbl-th--name">장비명</th>' +
-            '<th class="equipment-tbl-th equipment-tbl-th--id">장비번호</th>' +
-            '<th class="equipment-tbl-th equipment-tbl-th--model">모델명</th>' +
-            '<th class="equipment-tbl-th equipment-tbl-th--dept">부서</th>' +
-            '<th class="equipment-tbl-th equipment-tbl-th--mfr">제조사</th>' +
-            '<th class="equipment-tbl-th equipment-tbl-th--serial">시리얼</th>' +
-            '<th class="equipment-tbl-th equipment-tbl-th--loc">위치</th>' +
-            '<th class="equipment-tbl-th equipment-tbl-th--status">상태</th>' +
-            '<th class="equipment-tbl-th equipment-tbl-th--actions">액션</th>' +
-          '</tr>' +
-        '</thead>' +
-        '<tbody>' +
-          items.map(buildEquipmentRow).join('') +
-        '</tbody>' +
-      '</table>' +
-    '</div>';
-
-  container.innerHTML = cardsHtml + tableHtml;
-
+  _tabulatorInstance = new Tabulator('#equipmentGrid', {
+    data: items,
+    columns: columns,
+    layout: 'fitColumns',
+    height: '100%',
+    rowHeight: 36,
+    placeholder: '조회된 장비가 없습니다.',
+    columnHeaderSortMulti: false,
+    pagination: false,   // 페이지네이션은 직접 처리
+    movableColumns: false,
+    resizableRows: false,
+    columnDefaults: {
+      resizable: true,
+    },
+  });
 }
 
 function renderRecentPagination() {
@@ -939,6 +1015,9 @@ document.addEventListener('DOMContentLoaded', async function() {
       console.error(error);
     }
   } finally {
+    // 성공/실패 무관하게 스피너 끄고 컨텐츠 표시
+    if (typeof hideGlobalLoading === 'function') hideGlobalLoading(true);
+    document.body.classList.add('page-ready');
   }
 });
 
@@ -1089,14 +1168,10 @@ function getSelectedLabelSizeForBulk() {
 // 목록 렌더링 후 체크 상태 초기화
 var _origRenderEquipmentList = renderEquipmentList;
 renderEquipmentList = function(items) {
-  // 현재 페이지 데이터 저장 (일괄 출력용)
   equipmentListState.currentItems = Array.isArray(items) ? items : [];
-
   _origRenderEquipmentList(items);
   bulkSelectedIds.clear();
   updateBulkUI();
-  var checkAll = document.getElementById('bulkCheckAll');
-  if (checkAll) { checkAll.checked = false; checkAll.indeterminate = false; }
 };
 
 document.addEventListener('DOMContentLoaded', function() {

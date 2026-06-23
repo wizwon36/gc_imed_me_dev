@@ -503,7 +503,9 @@ async function loadEquipmentList(nextPage) {
 
     result = await apiGet('listEquipments', requestParams);
 
-    equipmentListState.page = Number(result.page || 1);
+    // GAS result.page는 항상 1을 반환할 수 있으므로 신뢰하지 않고
+    // 요청한 nextPage 값을 그대로 유지
+    // equipmentListState.page = Number(result.page || 1);
     equipmentListState.hasNext = Boolean(result.has_next);
     equipmentListState.hasPrev = Boolean(result.has_prev);
 

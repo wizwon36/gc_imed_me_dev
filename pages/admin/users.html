@@ -1,0 +1,1413 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>사용자 관리</title>
+
+  <link rel="stylesheet" href="../../assets/css/common.css" />
+
+  <style>
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #f8fbff 0%, #f8fafc 100%);
+      color: var(--text-strong);
+      font-family: Pretendard, "Noto Sans KR", Arial, sans-serif;
+    }
+
+    .admin-page {
+      max-width: 1440px;
+      margin: 0 auto;
+      padding: 28px 20px 48px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .page-title-wrap h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .page-title-wrap p {
+      margin: 8px 0 0;
+      color: var(--text-subtle);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .page-header-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .admin-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(15, 23, 42, 0.10);
+      background: #fff;
+      color: var(--text-strong);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, opacity 0.15s ease;
+      text-decoration: none;
+    }
+
+    .admin-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    }
+
+    .admin-btn:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+    
+    .admin-btn.primary {
+      border-color: rgba(37, 99, 235, 0.14);
+      background: rgba(37, 99, 235, 0.08);
+      color: #1d4ed8;
+      box-shadow: none;
+    }
+    
+    .admin-btn.primary:hover {
+      background: rgba(37, 99, 235, 0.12);
+      box-shadow: none;
+    }
+    
+    .admin-btn.secondary {
+      background: #fff;
+    }
+
+    .admin-btn.danger {
+      border-color: rgba(220, 38, 38, 0.18);
+      color: var(--danger-color);
+    }
+
+    .admin-btn.small {
+      min-height: 36px;
+      padding: 0 12px;
+      font-size: 13px;
+      border-radius: 10px;
+    }
+
+    #saveUserBtn {
+      min-width: 140px;
+      padding: 0 22px;
+      border-radius: 16px;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+    }
+    
+    .page-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    /* 1단 레이아웃: 좌/우 구분 없이 세로 스택 */
+    .page-col-left {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-width: 0;
+    }
+
+    .page-col-right {
+      min-width: 0;
+    }
+
+    /* 목록 패널: 내부 스크롤 제거 (1단에서는 자연스럽게 늘어남) */
+    .user-list-scroll {
+      overflow-y: visible;
+    }
+
+    .panel-card {
+      background: var(--bg-panel);
+      border: var(--card-border);
+      border-radius: var(--card-radius);
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+    }
+
+    .panel-header {
+      padding: 22px 22px 14px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    .panel-title {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .panel-desc {
+      margin: 8px 0 0;
+      color: var(--text-subtle);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .panel-body {
+      padding: 22px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0;
+    }
+
+    /* ── 폼 섹션 구분 — 배경색으로 시각적 분리 ── */
+    .form-section {
+      padding: 20px 22px;
+      border-bottom: 1px solid var(--line-soft);
+      margin: 0 -22px;
+    }
+
+    .form-section:first-child { margin-top: -22px; }
+    .form-section:last-child  { border-bottom: none; }
+
+    .form-section:nth-child(odd)  { background: #fff; }
+    .form-section:nth-child(even) { background: #f8fafc; }
+
+    .form-section-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 14px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+      color: #2563eb;
+    }
+
+    .form-section-label::before {
+      content: '';
+      display: inline-block;
+      width: 3px;
+      height: 12px;
+      border-radius: 2px;
+      background: #2563eb;
+      flex-shrink: 0;
+    }
+
+    .form-fields {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 14px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .form-label {
+      display: inline-flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-strong);
+    }
+
+    .field-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 22px;
+      padding: 0 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      line-height: 1;
+      letter-spacing: -0.01em;
+    }
+
+    .field-badge.required {
+      background: var(--danger-soft);
+      color: #b91c1c;
+    }
+
+    .field-badge.optional {
+      background: rgba(100, 116, 139, 0.10);
+      color: #475569;
+    }
+
+    .input,
+    .select {
+      width: 100%;
+      min-height: 46px;
+      padding: 0 14px;
+      border-radius: 12px;
+      border: 1px solid rgba(148, 163, 184, 0.32);
+      background: #fff;
+      font-size: 14px;
+      color: var(--text-strong);
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+      -webkit-appearance: none;
+      appearance: none;
+      box-sizing: border-box;
+    }
+
+    .select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 14px center;
+      padding-right: 36px;
+    }
+
+    .input:focus,
+    .select:focus {
+      border-color: rgba(37, 99, 235, 0.55);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
+    }
+
+    .input[disabled] {
+      background: #f1f5f9;
+      color: #64748b;
+    }
+
+    .is-invalid {
+      border-color: rgba(220, 38, 38, 0.8) !important;
+      box-shadow: 0 0 0 4px rgba(220, 38, 38, 0.10) !important;
+      background: rgba(254, 242, 242, 0.72);
+    }
+
+    .form-help {
+      margin: 0;
+      color: var(--text-subtle);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .required-guide { margin-top: 2px; }
+
+    .message-box {
+      display: none;
+      margin-bottom: 16px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.6;
+    }
+
+    .message-box.success, .message-box.error { display: block; }
+
+    .message-box.success {
+      background: var(--success-soft);
+      border-color: rgba(22, 163, 74, 0.16);
+      color: #166534;
+    }
+
+    .message-box.error {
+      background: rgba(254, 242, 242, 0.9);
+      border-color: rgba(220, 38, 38, 0.18);
+      color: #b91c1c;
+    }
+
+    /* ── 등록 버튼 영역 ── */
+    .form-actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      padding: 18px 22px;
+      margin: 0 -22px -22px;
+      background: #f0f4ff;
+      border-top: 2px solid #dbeafe;
+    }
+
+    /* ── 사용자 목록 탭 — 그리드 카드 ── */
+    .user-card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .user-card {
+      background: #fff;
+      border: 1.5px solid var(--border-card, #e2e8f0);
+      border-radius: 16px;
+      padding: 16px;
+      cursor: pointer;
+      transition: border-color 0.15s, box-shadow 0.15s, transform 0.1s;
+    }
+
+    .user-card:hover {
+      border-color: #93c5fd;
+      box-shadow: 0 4px 16px rgba(37,99,235,0.10);
+      transform: translateY(-1px);
+    }
+
+    .user-card-name {
+      font-size: 15px;
+      font-weight: 800;
+      color: #0b1f44;
+      margin-bottom: 2px;
+    }
+
+    .user-card-email {
+      font-size: 12px;
+      color: #64748b;
+      margin-bottom: 10px;
+    }
+
+    .user-card-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+    }
+
+    .user-card-org {
+      font-size: 12px;
+      color: #475569;
+      flex: 1 1 100%;
+    }
+
+    .user-card-badge {
+      display: inline-flex;
+      align-items: center;
+      padding: 2px 8px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .user-card-badge.active   { background: #dcfce7; color: #166534; }
+    .user-card-badge.inactive { background: #f1f5f9; color: #64748b; }
+    .user-card-badge.role     { background: #eff6ff; color: #1d4ed8; }
+
+    .filter-row {
+      display: grid;
+      grid-template-columns: 2fr repeat(3, minmax(0, 1fr)) auto;
+      gap: 12px;
+      align-items: end;
+      margin-bottom: 16px;
+    }
+    
+    .filter-row > .form-group {
+      min-width: 0;
+    }
+    
+    /* 1단 레이아웃: 검색어 필드가 첫 열에서 2fr로 넓게 표시 */
+    
+    .filter-row .admin-btn {
+      width: 100%;
+    }
+    
+    .list-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .list-count {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-subtle);
+    }
+
+    .user-list {
+      display: block;
+    }
+
+    /* ── 사용자 목록 테이블 ── */
+    .user-tbl {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 0;
+      table-layout: auto;
+      background: #fff;
+      border: 1px solid rgba(148, 163, 184, 0.22);
+      border-radius: 16px;
+      overflow: hidden;
+    }
+
+    .user-tbl-th {
+      padding: 10px 12px;
+      background: #f1f5fb;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+      font-size: 12px;
+      font-weight: 800;
+      color: #516274;
+      text-align: left;
+      white-space: nowrap;
+    }
+
+    .user-tbl-th--name    { min-width: 90px; white-space: nowrap; }
+    .user-tbl-th--org     { min-width: 120px; }
+    .user-tbl-th--role    { min-width: 50px; text-align: center; white-space: nowrap; }
+    .user-tbl-th--status  { min-width: 50px; text-align: center; white-space: nowrap; }
+    .user-tbl-th--actions { min-width: 180px; text-align: center; white-space: nowrap; }
+
+    .user-tbl-row { transition: background-color 0.12s ease; }
+    .user-tbl-row:not(:last-child) td { border-bottom: 1px solid #eef2f6; }
+    .user-tbl-row:hover { background: #f7f9fd; }
+
+    .user-tbl-cell {
+      padding: 10px 12px;
+      font-size: 13px;
+      color: #1e293b;
+      vertical-align: middle;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .user-tbl-cell--org {
+      vertical-align: middle;
+    }
+
+    .user-tbl-org-main {
+      font-size: 13px;
+      color: #1e293b;
+    }
+
+    .user-tbl-cell--status { text-align: center; overflow: visible; white-space: nowrap; }
+    .user-tbl-cell--role { white-space: nowrap; overflow: visible; text-align: center; }
+    .user-tbl-cell--actions { text-align: center; overflow: visible; white-space: nowrap; }
+
+    .user-tbl-name {
+      font-size: 13px;
+      font-weight: 700;
+      color: #0b1f44;
+    }
+
+    .user-tbl-sub {
+      margin-top: 2px;
+      font-size: 11px;
+      color: #94a3b8;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .user-tbl-actions {
+      display: inline-flex;
+      gap: 5px;
+      justify-content: center;
+      flex-wrap: nowrap;
+      white-space: nowrap;
+    }
+
+    .user-tbl-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 28px;
+      padding: 0 10px;
+      border-radius: 8px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid rgba(148, 163, 184, 0.32);
+      background: #f8fafc;
+      color: #0f172a;
+      transition: background 0.12s ease, border-color 0.12s ease;
+      white-space: nowrap;
+    }
+
+    .user-tbl-btn:hover { background: #e8edf5; border-color: #b0bccc; }
+
+    .user-tbl-btn.danger {
+      border-color: rgba(220, 38, 38, 0.24);
+      color: #dc2626;
+      background: rgba(220, 38, 38, 0.05);
+    }
+
+    .user-tbl-btn.danger:hover { background: rgba(220, 38, 38, 0.10); }
+
+    /* 가입신청 카드 */
+    .pending-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      padding: 16px;
+      border-bottom: 1px solid rgba(148,163,184,0.14);
+    }
+    .pending-item:last-child { border-bottom: none; }
+
+    .pending-item__main { flex: 1; min-width: 0; }
+
+    .pending-item__title {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .pending-item__title strong { font-size: 15px; color: #0f172a; }
+    .pending-item__title span { font-size: 13px; color: #64748b; }
+
+    .pending-item__meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      font-size: 13px;
+      color: #64748b;
+      margin-bottom: 4px;
+    }
+    .pending-item__memo {
+      font-size: 13px;
+      color: #475569;
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 6px 10px;
+      margin-top: 6px;
+    }
+
+    .pending-item__actions {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .admin-btn.approve {
+      border-color: rgba(22,163,74,0.2);
+      background: rgba(22,163,74,0.08);
+      color: #166534;
+    }
+    .admin-btn.approve:hover { background: rgba(22,163,74,0.15); }
+
+    .status-chip {
+      display: inline-flex;
+      align-items: center;
+      min-height: 24px;
+      padding: 0 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .status-chip.active {
+      background: var(--success-soft);
+      color: #166534;
+    }
+
+    .status-chip.inactive {
+      background: rgba(148, 163, 184, 0.14);
+      color: #475569;
+    }
+
+    .user-list-empty {
+      display: block;
+      padding: 18px 16px;
+      border-radius: 16px;
+      border: 1px dashed rgba(148, 163, 184, 0.36);
+      background: #fff;
+      color: var(--text-subtle);
+      font-size: 14px;
+      line-height: 1.7;
+      word-break: keep-all;
+      overflow-wrap: break-word;
+      text-align: left;
+    }
+
+    .user-list-empty.error {
+      border-color: rgba(220, 38, 38, 0.24);
+      background: rgba(254, 242, 242, 0.8);
+      color: #b91c1c;
+    }
+
+    .user-list-empty strong {
+      display: inline;
+      white-space: nowrap;
+      word-break: keep-all;
+    }
+
+    #globalLoading {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15, 23, 42, 0.26);
+      backdrop-filter: blur(3px);
+      padding: 20px;
+    }
+
+    #globalLoading[aria-hidden="false"] {
+      display: flex;
+    }
+
+    .global-loading__dialog {
+      min-width: 240px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      padding: 24px 28px;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 18px 40px rgba(15, 23, 42, 0.18);
+      text-align: center;
+    }
+
+    .global-loading__spinner {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 3px solid rgba(148, 163, 184, 0.28);
+      border-top-color: #2563eb;
+      animation: global-loading-spin 0.8s linear infinite;
+    }
+
+    .global-loading__text {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-strong);
+      line-height: 1.5;
+    }
+
+    @keyframes global-loading-spin {
+      to {
+        transform: rotate(360deg);
+      }
+    }
+
+    @media (max-width: 1180px) {
+      .filter-row {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .filter-row > .form-group:first-child {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .admin-page {
+        padding: 20px 14px 34px;
+      }
+
+      .page-header {
+        flex-direction: column;
+      }
+
+      .page-header-actions {
+        width: 100%;
+      }
+
+      .page-header-actions .admin-btn {
+        flex: 1 1 auto;
+      }
+
+      /* 탭 — 모바일에서 좌우 스크롤 */
+      .left-tabs {
+        padding: 12px 14px 0;
+        gap: 2px;
+      }
+
+      .left-tab-btn {
+        padding: 8px 12px;
+        font-size: 13px;
+      }
+
+      /* 검색바 — 모바일에서 신규등록 버튼 아래로 */
+      .user-search-bar {
+        flex-wrap: wrap;
+        padding: 14px 16px;
+        gap: 8px;
+      }
+
+      .user-search-bar .form-group {
+        flex: 1 1 100%;
+      }
+
+      .user-search-bar #searchUsersBtn {
+        flex: 1 1 auto;
+      }
+
+      .user-search-bar #openCreateModalBtn {
+        flex: 1 1 auto;
+      }
+
+      .panel-header,
+      .panel-body {
+        padding: 18px;
+      }
+
+      .form-row,
+      .filter-row,
+      .permission-card {
+        grid-template-columns: 1fr;
+      }
+
+      .user-tbl-th--org,
+      .user-tbl-cell--org,
+      .user-tbl-th--role,
+      .user-tbl-cell--role,
+      .user-tbl-th--status,
+      .user-tbl-cell--status { display: none; }
+
+      .user-tbl-th--name    { width: 40%; }
+      .user-tbl-th--actions { width: 60%; }
+
+      .user-tbl-cell--actions {
+        overflow: visible;
+        white-space: nowrap;
+        padding: 8px 8px;
+      }
+
+      .user-tbl-actions {
+        flex-wrap: nowrap;
+        justify-content: flex-end;
+        gap: 4px;
+      }
+
+      .user-tbl-btn {
+        min-height: 26px;
+        padding: 0 8px;
+        font-size: 11px;
+      }
+
+      .list-topbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .user-item__actions {
+        justify-content: flex-start;
+      }
+      
+      .filter-row {
+        grid-template-columns: 1fr;
+      }
+    
+      .filter-row > .form-group:first-child {
+        grid-column: auto;
+      }
+
+      .user-list-empty {
+        font-size: 15px;
+        line-height: 1.75;
+      }
+
+      #saveUserBtn {
+        width: 100%;
+        min-width: 0;
+      }
+      
+      .form-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }      
+    }
+
+    /* ── 좌측 탭 ── */
+    .left-tabs {
+      display: flex;
+      gap: 4px;
+      padding: 16px 22px 0;
+      border-bottom: 1px solid var(--line-soft);
+      background: var(--bg-panel);
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+    }
+
+    .left-tabs::-webkit-scrollbar { display: none; }
+
+    .left-tab-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 16px;
+      border: none;
+      background: none;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-subtle);
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -1px;
+      border-radius: 8px 8px 0 0;
+      white-space: nowrap;
+      flex-shrink: 0;
+      transition: color 0.15s, border-color 0.15s, background 0.15s;
+    }
+
+    .left-tab-btn:hover {
+      color: var(--text-strong);
+      background: rgba(37,99,235,0.04);
+    }
+
+    .left-tab-btn.is-active {
+      color: #2563eb;
+      border-bottom-color: #2563eb;
+    }
+
+    .left-tab-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 20px;
+      height: 20px;
+      padding: 0 6px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      background: rgba(220,38,38,0.10);
+      color: #b91c1c;
+    }
+
+    .left-tab-panel { display: none; }
+    .left-tab-panel.is-default { display: block; }
+
+    /* ── 사용자 등록 탭 — 검색 + 신규등록 헤더 ── */
+    .user-search-bar {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 16px 22px;
+      border-bottom: 1px solid var(--line-soft);
+      flex-wrap: nowrap;
+    }
+
+    .user-search-bar .form-group {
+      flex: 1 1 auto;
+      min-width: 0;
+      gap: 0;
+    }
+
+    .user-search-bar .admin-btn {
+      flex-shrink: 0;
+    }
+
+    /* ── 등록/수정 모달 ── */
+    .user-modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.45);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .user-modal-backdrop.is-open {
+      display: flex;
+    }
+
+    .user-modal {
+      background: #fff;
+      border-radius: 20px;
+      box-shadow: var(--shadow-modal, 0 20px 60px rgba(15,23,42,0.18));
+      width: 100%;
+      max-width: 720px;
+      max-height: 90vh;
+      overflow-y: auto;
+      margin: 16px;
+    }
+
+    .user-modal-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid var(--line-soft);
+      position: sticky;
+      top: 0;
+      background: #fff;
+      z-index: 1;
+      border-radius: 20px 20px 0 0;
+    }
+
+    .user-modal-title {
+      margin: 0;
+      font-size: 18px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .user-modal-close {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 34px;
+      height: 34px;
+      border: none;
+      background: #f1f5f9;
+      border-radius: 50%;
+      color: #64748b;
+      font-size: 18px;
+      cursor: pointer;
+      transition: background 0.12s;
+    }
+
+    .user-modal-close:hover {
+      background: #e2e8f0;
+    }
+
+    .user-modal-body {
+      padding: 22px 24px;
+    }
+
+    .user-modal-footer {
+      display: flex;
+      gap: 10px;
+      padding: 16px 24px;
+      background: #f8fafc;
+      border-top: 1px solid var(--line-soft);
+      border-radius: 0 0 20px 20px;
+      position: sticky;
+      bottom: 0;
+    }
+
+    /* ── 권한 카드 개선 ── */
+    /* ── 앱별 권한: compact 행 레이아웃 (통합) ── */
+    .permission-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      border: 1px solid rgba(148,163,184,0.20);
+      border-radius: 14px;
+      overflow: hidden;
+      background: #fff;
+    }
+
+    .permission-card {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      grid-template-areas: "head perm" "scope scope";
+      align-items: center;
+      gap: 6px 16px;
+      padding: 11px 16px;
+      border-bottom: 1px solid rgba(148,163,184,0.12);
+      border-right: 1px solid rgba(148,163,184,0.12);
+      background: #fff;
+      transition: background 0.12s;
+    }
+
+    /* scope 블록이 없는 카드(has_scope=false인 앱)는 1행으로 충분하므로
+       빈 grid-area가 공간을 차지하지 않도록 자동으로 처리됨(내용 없는 영역은 0 높이) */
+    .permission-card-head { grid-area: head; }
+    .perm-radio-group { grid-area: perm; }
+
+    .perm-scope-group {
+      grid-area: scope;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding-top: 4px;
+      border-top: 1px dashed rgba(148,163,184,0.2);
+    }
+
+    .perm-scope-group--disabled { opacity: 0.4; }
+    .perm-scope-group--disabled .perm-opt input[type=radio] + label { cursor: not-allowed; }
+
+    .permission-scope-label {
+      margin: 0;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-subtle);
+      flex-shrink: 0;
+    }
+
+    .permission-card:nth-child(even) { border-right: none; }
+    .permission-card:nth-last-child(-n+2) { border-bottom: none; }
+
+    .permission-card:hover { background: #f8fafc; }
+
+    @media (max-width: 760px) {
+      .permission-grid { grid-template-columns: 1fr; }
+      .permission-card:nth-child(even) { border-right: none; }
+      .permission-card:nth-last-child(-n+2) { border-bottom: 1px solid rgba(148,163,184,0.12); }
+      .permission-card:last-child { border-bottom: none; }
+    }
+
+    .permission-card-head { display: flex; align-items: baseline; gap: 10px; min-width: 0; }
+
+    .permission-title {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 800;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .permission-desc {
+      margin: 0;
+      color: var(--text-subtle);
+      font-size: 12px;
+      line-height: 1.4;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    .perm-radio-group {
+      display: flex;
+      gap: 4px;
+      flex-shrink: 0;
+    }
+
+    .perm-opt { display: contents; }
+    .perm-opt input[type=radio] { display: none; }
+
+    .perm-opt input[type=radio] + label {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 44px;
+      height: 28px;
+      padding: 0 10px;
+      border-radius: 7px;
+      border: 1px solid rgba(148,163,184,0.26);
+      background: #f8fafc;
+      font-size: 11px;
+      font-weight: 700;
+      color: var(--text-subtle);
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s, color 0.12s;
+      user-select: none;
+      white-space: nowrap;
+    }
+
+    .perm-opt input[type=radio] + label:hover {
+      background: rgba(37,99,235,0.07);
+      border-color: rgba(37,99,235,0.24);
+      color: #1d4ed8;
+    }
+
+    .perm-opt input[type=radio]:checked + label {
+      background: rgba(37,99,235,0.12);
+      border-color: rgba(37,99,235,0.36);
+      color: #1d4ed8;
+      font-weight: 800;
+    }
+
+    .perm-opt-none input[type=radio]:checked + label {
+      background: rgba(148,163,184,0.12);
+      border-color: rgba(148,163,184,0.28);
+      color: #64748b;
+      font-weight: 700;
+    }
+
+    /* ── 페이지네이션 ── */
+    .user-list-pagination {
+      display: flex;
+      justify-content: center;
+      gap: 4px;
+      padding: 14px 0 2px;
+      flex-wrap: wrap;
+    }
+
+    .user-pg-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 32px;
+      height: 32px;
+      padding: 0 8px;
+      border-radius: 8px;
+      border: 1px solid rgba(148,163,184,0.28);
+      background: #fff;
+      font-size: 13px;
+      font-weight: 700;
+      color: #64748b;
+      cursor: pointer;
+      transition: background 0.12s, border-color 0.12s, color 0.12s;
+    }
+
+    .user-pg-btn:hover:not(:disabled) {
+      background: rgba(37,99,235,0.07);
+      border-color: rgba(37,99,235,0.24);
+      color: #2563eb;
+    }
+
+    .user-pg-btn.is-active {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: #fff;
+      font-weight: 800;
+    }
+
+    .user-pg-btn:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+  </style>
+</head>
+<body class="portal-page admin-body">
+  <div class="admin-page">
+  <section class="top-brand-bar portal-topbar portal-hero-card" style="margin:0 0 12px;">
+    <div class="top-brand-left">
+      <div class="top-brand-logo">+</div>
+      <div class="top-brand-texts">
+        <strong class="top-brand-title">사용자 관리</strong>
+        <span class="top-brand-sub">사용자 등록 · 권한 · 비밀번호 초기화</span>
+      </div>
+    </div>
+    <div class="top-brand-actions portal-top-actions">
+      <a class="portal-header-btn portal-header-btn--secondary" href="../../portal.html">HOME</a>
+      <button type="button" id="logoutBtn" class="portal-header-btn portal-header-btn--secondary">로그아웃</button>
+    </div>
+  </section>
+
+    <div class="page-grid">
+
+      <!-- 좌측: 등록폼 + 가입신청 관리 -->
+      <div class="page-col-left">
+
+        <section class="panel-card">
+          <!-- ★ 탭 헤더 -->
+          <div class="left-tabs">
+            <button type="button" class="left-tab-btn is-active" data-tab="user-form">👤 사용자 등록 / 수정</button>
+            <button type="button" class="left-tab-btn" data-tab="user-list">📋 사용자 목록</button>
+            <button type="button" class="left-tab-btn" data-tab="pending">📬 가입 신청 관리 <span class="left-tab-badge" id="pendingBadge" style="display:none;"></span></button>
+          </div>
+
+          <!-- ★ 탭 패널: 사용자 등록/수정 — 폼이 페이지에 고정 -->
+          <div id="tab-user-form" class="left-tab-panel is-default">
+
+            <!-- 상단 검색창 -->
+            <div class="user-search-bar">
+              <div class="form-group">
+                <input type="text" id="userSearchKeyword" class="input" placeholder="이름, 이메일, 의원, 팀으로 검색" />
+              </div>
+              <button type="button" id="searchUsersBtn" class="admin-btn secondary">🔍 검색</button>
+            </div>
+
+            <div class="panel-header">
+              <h2 class="panel-title" id="formTitle">사용자 등록</h2>
+              <p class="panel-desc" id="formDesc">신규 사용자를 등록하고 앱별 권한을 부여합니다.</p>
+            </div>
+            <div class="panel-body">
+              <div id="adminUserMessage" class="message-box" aria-live="polite"></div>
+
+              <div class="form-grid">
+                <!-- 기본 정보 -->
+                <div class="form-section">
+                  <div class="form-section-label">기본 정보</div>
+                  <div class="form-fields">
+                    <div class="form-group">
+                      <label for="userEmail" class="form-label">이메일(아이디) <span class="field-badge required">필수</span></label>
+                      <input type="email" id="userEmail" class="input" placeholder="이메일 주소 입력" />
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label for="userName" class="form-label">이름 <span class="field-badge required">필수</span></label>
+                        <input type="text" id="userName" class="input" placeholder="사용자 이름" />
+                      </div>
+                      <div class="form-group">
+                        <label for="phone" class="form-label">연락처 <span class="field-badge optional">선택</span></label>
+                        <input type="text" id="phone" class="input" placeholder="연락처" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 소속 -->
+                <div class="form-section">
+                  <div class="form-section-label">소속</div>
+                  <div class="form-fields">
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label for="clinic_code" class="form-label">의원 <span class="field-badge required">필수</span></label>
+                        <select id="clinic_code" class="select"><option value="">의원을 선택하세요</option></select>
+                      </div>
+                      <div class="form-group">
+                        <label for="team_code" class="form-label">팀 <span class="field-badge required">필수</span></label>
+                        <select id="team_code" class="select" disabled><option value="">팀을 선택하세요</option></select>
+                      </div>
+                    </div>
+                    <div class="form-row">
+                      <div class="form-group">
+                        <label for="globalRole" class="form-label">기본 역할 <span class="field-badge optional">선택</span></label>
+                        <select id="globalRole" class="select">
+                          <option value="user">user</option>
+                          <option value="admin">admin</option>
+                        </select>
+                      </div>
+                      <div class="form-group">
+                        <label for="userActive" class="form-label">사용 여부 <span class="field-badge optional">선택</span></label>
+                        <select id="userActive" class="select">
+                          <option value="Y">활성</option>
+                          <option value="N">비활성</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 앱별 권한 -->
+                <div class="form-section">
+                  <div class="form-section-label">앱별 권한 <span class="field-badge optional" style="text-transform:none;letter-spacing:0">선택</span></div>
+                  <p class="form-help" style="margin-bottom:14px">권한을 선택하지 않으면 해당 앱에 접근할 수 없습니다.</p>
+                  <div class="permission-grid" id="permissionGrid">
+                    <!-- 단일 진실 소스화(2026-06) — 11개 앱 권한 카드(이름/설명/등급별
+                         라디오 버튼)를 여기 정적 마크업으로 하드코딩하고 있었는데, 같은
+                         정보가 portal.js의 APP_MAP에도 따로 있고 user_app_permissions
+                         DB의 CHECK 제약에도 11개 앱이 하드코딩되어 있어 앱 하나
+                         추가할 때마다 3곳을 사람이 맞춰 고쳐야 했다. app_registry
+                         테이블(GAS의 getAppRegistry API)을 단일 진실 소스로 두고
+                         admin-users.js가 동적으로 채운다 — 카드 추가는 이제 그
+                         테이블에 행 하나 넣는 것으로 끝난다. -->
+                  </div>
+                </div>
+
+                <!-- 안내 -->
+                <div class="form-section">
+                  <div class="form-section-label">안내</div>
+                  <div class="form-fields">
+                    <p class="form-help" id="passwordHint">신규 사용자는 초기 비밀번호 <strong>1111</strong>로 등록되며, 첫 로그인 후 변경하도록 안내됩니다.</p>
+                    <p class="form-help required-guide"><span class="field-badge required">필수</span> 항목을 먼저 입력한 뒤 저장해 주세요.</p>
+                  </div>
+                </div>
+              </div><!-- /.form-grid -->
+
+              <div class="form-actions">
+                <button type="button" id="saveUserBtn" class="admin-btn primary" style="min-width:120px">사용자 등록</button>
+                <button type="button" id="cancelEditBtn" class="admin-btn secondary" style="display:none;">취소</button>
+              </div>
+            </div>
+          </div><!-- /.left-tab-panel tab-user-form -->
+
+          <!-- ★ 탭 패널: 사용자 목록 — 그리드 카드 페이지 직접 출력 -->
+          <div id="tab-user-list" class="left-tab-panel" style="display:none;">
+            <div class="panel-header">
+              <h2 class="panel-title">사용자 목록</h2>
+              <p class="panel-desc">조건을 설정한 뒤 조회 버튼을 눌러 주세요. 카드를 클릭하면 해당 사용자를 수정할 수 있습니다.</p>
+            </div>
+            <div class="panel-body">
+              <div class="filter-row">
+                <div class="form-group">
+                  <label for="userFilterKeyword" class="form-label">검색어</label>
+                  <input type="text" id="userFilterKeyword" class="input" placeholder="이름, 이메일, 의원, 팀으로 검색" />
+                </div>
+                <div class="form-group">
+                  <label for="userFilterActive" class="form-label">상태</label>
+                  <select id="userFilterActive" class="select">
+                    <option value="">전체</option>
+                    <option value="Y">활성</option>
+                    <option value="N">비활성</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="userFilterRole" class="form-label">역할</label>
+                  <select id="userFilterRole" class="select">
+                    <option value="">전체</option>
+                    <option value="user">user</option>
+                    <option value="admin">admin</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label for="userFilterClinic" class="form-label">의원</label>
+                  <select id="userFilterClinic" class="select">
+                    <option value="">전체 의원</option>
+                  </select>
+                </div>
+                <div class="form-group">
+                  <label class="form-label">&nbsp;</label>
+                  <button type="button" id="searchUsersListBtn" class="admin-btn secondary">사용자 조회</button>
+                </div>
+              </div>
+              <div id="userListAllCount" class="list-count" style="margin-bottom:4px"></div>
+              <div id="userListAll"></div>
+              <div id="userListAllPagination" class="user-list-pagination"></div>
+            </div>
+          </div><!-- /.left-tab-panel tab-user-list -->
+          <!-- ★ 탭 패널: 가입 신청 관리 -->
+          <div id="tab-pending" class="left-tab-panel" style="display:none;">
+          <div class="panel-header" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+            <div>
+              <h2 class="panel-title">가입 신청 관리</h2>
+              <p class="panel-desc">사용자가 직접 신청한 가입 요청을 검토하고 승인 또는 거절합니다.</p>
+            </div>
+            <button type="button" id="loadPendingBtn" class="admin-btn secondary">🔄 신청 목록 조회</button>
+          </div>
+
+          <div class="panel-body">
+            <div id="pendingMessage" class="message-box" aria-live="polite"></div>
+            <div id="pendingListCount" class="list-count" style="margin-bottom:12px;"></div>
+            <div id="pendingList" class="user-list">
+              <div class="user-list-empty">
+                <strong>신청 목록 조회</strong> 버튼을 눌러 대기 중인 가입 신청을 확인해 주세요.
+              </div>
+            </div>
+          </div>
+          </div><!-- /.left-tab-panel tab-pending -->
+
+        </section>
+
+      </div><!-- /.page-col-left -->
+
+
+
+    </div><!-- /.page-grid -->
+  </div>
+
+  <div id="globalLoading" aria-hidden="true">
+    <div class="global-loading__dialog">
+      <div class="global-loading__spinner" aria-hidden="true"></div>
+      <div class="global-loading__text" id="globalLoadingText">로딩 중...</div>
+    </div>
+  </div>
+
+  <script src="../../assets/js/core/config.js"></script>
+  <script src="../../assets/js/core/api.js"></script>
+  <script src="../../assets/js/core/auth.js"></script>
+  <script src="../../assets/js/core/utils.js"></script>
+  <script src="../../assets/js/core/org-select.js"></script>
+  <script src="../../assets/js/admin/admin-users.js"></script>
+<!-- ★ 등록/수정 탭 검색 결과 모달 -->
+<div class="user-modal-backdrop" id="userSearchModal">
+  <div class="user-modal" style="max-width:960px">
+    <div class="user-modal-header">
+      <h2 class="user-modal-title">검색 결과</h2>
+      <button type="button" class="user-modal-close" id="closeUserSearchModalBtn" aria-label="닫기">×</button>
+    </div>
+    <div class="user-modal-body" style="padding:0">
+      <div id="adminUserMessage" class="message-box" style="margin:16px 24px 0" aria-live="polite"></div>
+      <div style="padding:12px 24px 4px">
+        <div id="userListCount" class="list-count"></div>
+      </div>
+      <div id="userList" style="padding:0 24px 16px"></div>
+      <div id="userListPagination" style="padding:0 24px 16px" class="user-list-pagination"></div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

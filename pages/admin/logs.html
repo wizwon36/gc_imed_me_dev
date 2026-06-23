@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>시스템 로그</title>
+
+  <link rel="stylesheet" href="../../assets/css/common.css" />
+
+  <style>
+    :root {
+      --page-max-width: 1440px;
+      --card-radius: 20px;
+      --card-border: 1px solid rgba(15, 23, 42, 0.08);
+      --card-shadow: 0 14px 36px rgba(15, 23, 42, 0.08);
+      --text-subtle: #64748b;
+      --text-strong: #0f172a;
+      --bg-soft: #f8fafc;
+      --bg-panel: #ffffff;
+      --line-soft: rgba(148, 163, 184, 0.22);
+      --primary-color: #2563eb;
+      --danger-color: #dc2626;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      background: linear-gradient(180deg, #f8fbff 0%, #f8fafc 100%);
+      color: var(--text-strong);
+      font-family: Pretendard, "Noto Sans KR", Arial, sans-serif;
+      min-height: 100vh;
+    }
+
+    .logs-page {
+      max-width: var(--page-max-width);
+      margin: 0 auto;
+      padding: 28px 20px 48px;
+    }
+
+    /* ── 페이지 헤더 ── */
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .page-title-wrap h1 {
+      margin: 0;
+      font-size: 28px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .page-title-wrap p {
+      margin: 8px 0 0;
+      color: var(--text-subtle);
+      line-height: 1.6;
+      font-size: 14px;
+    }
+
+    .page-header-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* ── 버튼 ── */
+    .admin-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 0 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(15, 23, 42, 0.10);
+      background: #fff;
+      color: var(--text-strong);
+      font-size: 14px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+      text-decoration: none;
+    }
+
+    .admin-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    }
+
+    .admin-btn:disabled {
+      opacity: 0.55;
+      cursor: not-allowed;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .admin-btn.primary {
+      border-color: rgba(37, 99, 235, 0.14);
+      background: rgba(37, 99, 235, 0.08);
+      color: #1d4ed8;
+    }
+
+    .admin-btn.primary:hover {
+      background: rgba(37, 99, 235, 0.14);
+    }
+
+    .admin-btn.secondary { background: #fff; }
+
+    /* ── 패널 ── */
+    .panel-card {
+      background: var(--bg-panel);
+      border: var(--card-border);
+      border-radius: var(--card-radius);
+      box-shadow: var(--card-shadow);
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .panel-header {
+      padding: 22px 22px 14px;
+      border-bottom: 1px solid var(--line-soft);
+    }
+
+    .panel-title {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .panel-desc {
+      margin: 8px 0 0;
+      color: var(--text-subtle);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .panel-body { padding: 22px; }
+
+    /* ── 필터 영역 ── */
+    .filter-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr 1fr 1fr auto;
+      gap: 12px;
+      align-items: end;
+    }
+
+    /* 검색어: 전체 너비 */
+    .filter-grid .form-group:nth-child(1) {
+      grid-column: 1 / -1;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .form-label {
+      font-size: 13px;
+      font-weight: 700;
+      color: var(--text-strong);
+    }
+
+    .input, .select {
+      width: 100%;
+      min-height: 42px;
+      padding: 0 12px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.32);
+      background: #fff;
+      font-size: 13px;
+      color: var(--text-strong);
+      outline: none;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      -webkit-appearance: none;
+      appearance: none;
+      box-sizing: border-box;
+    }
+
+    /* select 화살표 복원 */
+    .select {
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2364748b' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      padding-right: 32px;
+    }
+
+    .input:focus, .select:focus {
+      border-color: rgba(37, 99, 235, 0.55);
+      box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.10);
+    }
+
+    /* ── 목록 상단바 ── */
+    .list-topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin: 18px 0 12px;
+    }
+
+    .list-count {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-subtle);
+    }
+
+    .list-actions {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    /* ── 테이블 ── */
+    .table-wrap {
+      overflow-x: auto;
+      border-radius: 14px;
+      border: 1px solid rgba(148, 163, 184, 0.20);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    thead tr {
+      background: var(--bg-soft);
+      border-bottom: 1px solid rgba(148, 163, 184, 0.22);
+    }
+
+    th {
+      padding: 12px 14px;
+      text-align: left;
+      font-size: 12px;
+      font-weight: 800;
+      color: var(--text-subtle);
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+
+    tbody tr {
+      border-bottom: 1px solid rgba(148, 163, 184, 0.12);
+      transition: background 0.12s ease;
+    }
+
+    tbody tr:last-child { border-bottom: none; }
+
+    tbody tr:hover { background: rgba(37, 99, 235, 0.03); }
+
+    td { padding: 12px 14px; color: var(--text-strong); vertical-align: middle; max-width: 280px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+    td:nth-child(1), td:nth-child(2), td:nth-child(3), td:nth-child(6) { text-align: center; }
+
+    td.wrap {
+      white-space: normal;
+      word-break: break-all;
+    }
+
+    /* ── action_type 뱃지 ── */
+    .action-badge {
+      display: inline-flex;
+      align-items: center;
+      min-height: 22px;
+      padding: 0 9px;
+      border-radius: 999px;
+      font-size: 11px;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      white-space: nowrap;
+    }
+
+    .action-badge.CREATE   { background: rgba(22,163,74,0.10);  color: #166534; }
+    .action-badge.UPDATE   { background: rgba(37,99,235,0.10);  color: #1d4ed8; }
+    .action-badge.DELETE   { background: rgba(220,38,38,0.10);  color: #b91c1c; }
+    .action-badge.LOGIN    { background: rgba(234,179,8,0.12);  color: #92400e; }
+    .action-badge.UPLOAD   { background: rgba(139,92,246,0.10); color: #5b21b6; }
+    .action-badge.RESET_PASSWORD { background: rgba(234,88,12,0.10); color: #9a3412; }
+    .action-badge.ACTIVATE   { background: rgba(22,163,74,0.10); color: #166534; }
+    .action-badge.DEACTIVATE { background: rgba(100,116,139,0.12); color: #475569; }
+    .action-badge.UPLOAD_PHOTO { background: rgba(139,92,246,0.10); color: #5b21b6; }
+    .action-badge.DELETE_PHOTO { background: rgba(220,38,38,0.10); color: #b91c1c; }
+    .action-badge.OTHER    { background: rgba(148,163,184,0.14); color: #475569; }
+
+    /* ── target_type 텍스트 색상 ── */
+    .target-type {
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--text-subtle);
+    }
+
+    /* ── 빈 상태 / 에러 ── */
+    .empty-state {
+      padding: 40px 20px;
+      text-align: center;
+      color: var(--text-subtle);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .empty-state .empty-icon {
+      font-size: 36px;
+      margin-bottom: 12px;
+    }
+
+    /* ── 페이지네이션 ── */
+    .pagination {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 6px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .page-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 36px;
+      height: 36px;
+      padding: 0 10px;
+      border-radius: 10px;
+      border: 1px solid rgba(148, 163, 184, 0.26);
+      background: #fff;
+      color: var(--text-strong);
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background 0.12s ease, border-color 0.12s ease, transform 0.12s ease;
+      user-select: none;
+    }
+
+    .page-btn:hover:not(:disabled) {
+      background: rgba(37,99,235,0.06);
+      border-color: rgba(37,99,235,0.22);
+      transform: translateY(-1px);
+    }
+
+    .page-btn.active {
+      background: #2563eb;
+      border-color: #2563eb;
+      color: #fff;
+    }
+
+    .page-btn:disabled {
+      opacity: 0.38;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .page-info {
+      font-size: 13px;
+      color: var(--text-subtle);
+      font-weight: 600;
+      padding: 0 4px;
+    }
+
+    /* ── diff 상세 행 ── */
+    .log-main-row.has-diff:hover { background: rgba(37, 99, 235, 0.05); }
+
+    .diff-toggle-hint {
+      display: inline-block;
+      margin-left: 6px;
+      font-size: 11px;
+      font-weight: 700;
+      color: #2563eb;
+      opacity: 0.7;
+    }
+
+    .log-detail-row td {
+      padding: 0;
+      background: #f8faff;
+      border-bottom: 1px solid rgba(148, 163, 184, 0.18);
+      white-space: normal;
+      overflow: visible;
+      text-overflow: unset;
+      max-width: none;
+    }
+
+    .diff-wrap {
+      padding: 14px 20px;
+    }
+
+    .diff-table {
+      width: auto;
+      min-width: 480px;
+      border-collapse: collapse;
+      font-size: 12px;
+    }
+
+    .diff-table thead tr {
+      background: rgba(37, 99, 235, 0.06);
+    }
+
+    .diff-table th {
+      padding: 7px 14px;
+      font-size: 11px;
+      font-weight: 800;
+      color: #475569;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+    }
+
+    .diff-table tbody tr {
+      border-bottom: 1px solid rgba(148, 163, 184, 0.10);
+    }
+
+    .diff-table tbody tr:last-child { border-bottom: none; }
+
+    .diff-field {
+      padding: 6px 14px;
+      font-weight: 700;
+      color: #475569;
+      white-space: nowrap;
+      min-width: 100px;
+    }
+
+    .diff-before {
+      padding: 6px 14px;
+      color: #b91c1c;
+      background: rgba(220, 38, 38, 0.04);
+      max-width: 260px;
+      word-break: break-all;
+      white-space: normal;
+    }
+
+    .diff-arrow {
+      padding: 6px 8px;
+      color: #94a3b8;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .diff-after {
+      padding: 6px 14px;
+      color: #166534;
+      background: rgba(22, 163, 74, 0.05);
+      max-width: 260px;
+      word-break: break-all;
+      white-space: normal;
+    }
+
+    .diff-empty {
+      font-size: 12px;
+      color: #94a3b8;
+    }
+
+    /* ── 메시지 박스 ── */
+    .message-box {
+      display: none;
+      margin-bottom: 16px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid transparent;
+      font-size: 14px;
+      font-weight: 600;
+      line-height: 1.6;
+    }
+
+    .message-box.error {
+      display: block;
+      background: rgba(254,242,242,0.9);
+      border-color: rgba(220,38,38,0.18);
+      color: #b91c1c;
+    }
+
+    /* ── 글로벌 로딩 ── */
+    #globalLoading {
+      position: fixed;
+      inset: 0;
+      z-index: 9999;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      background: rgba(15,23,42,0.26);
+      backdrop-filter: blur(3px);
+      padding: 20px;
+    }
+
+    #globalLoading[aria-hidden="false"] { display: flex; }
+
+    .global-loading__dialog {
+      min-width: 240px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 14px;
+      padding: 24px 28px;
+      border-radius: 18px;
+      background: #fff;
+      box-shadow: 0 18px 40px rgba(15,23,42,0.18);
+      text-align: center;
+    }
+
+    .global-loading__spinner {
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 3px solid rgba(148,163,184,0.28);
+      border-top-color: #2563eb;
+      animation: spin 0.8s linear infinite;
+    }
+
+    .global-loading__text {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-strong);
+      line-height: 1.5;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* ── 반응형 ── */
+    @media (max-width: 1100px) {
+      .filter-grid {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+      }
+      .filter-grid .form-group:nth-child(1) {
+        grid-column: 1 / -1;
+      }
+      .filter-grid .form-group:nth-child(6) {
+        grid-column: 1 / -1;
+      }
+    }
+
+    @media (max-width: 760px) {
+      .logs-page { padding: 20px 14px 34px; }
+
+      .page-header { flex-direction: column; }
+      .page-header-actions { width: 100%; }
+      .page-header-actions .admin-btn { flex: 1 1 auto; }
+
+      /* 모든 항목 1열 */
+      .filter-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+        align-items: start;
+      }
+
+      .filter-grid .form-group:nth-child(1) {
+        grid-column: 1;
+      }
+
+      .filter-grid .form-group:nth-child(6) {
+        grid-column: 1;
+      }
+      .filter-grid .form-group:nth-child(6) .admin-btn {
+        width: 100%;
+        min-height: 48px;
+        font-size: 15px;
+      }
+
+      th, td { padding: 10px 10px; }
+
+      .list-topbar { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body class="portal-page admin-body">
+  <div class="logs-page">
+  <section class="top-brand-bar portal-topbar portal-hero-card" style="margin:0 0 12px;">
+    <div class="top-brand-left">
+      <div class="top-brand-logo">+</div>
+      <div class="top-brand-texts">
+        <strong class="top-brand-title">시스템 로그</strong>
+        <span class="top-brand-sub">사용자 작업 이력 · 데이터 변경 기록</span>
+      </div>
+    </div>
+    <div class="top-brand-actions portal-top-actions">
+      <a class="portal-header-btn portal-header-btn--secondary" href="../../portal.html">HOME</a>
+      <button type="button" id="logoutBtn" class="portal-header-btn portal-header-btn--secondary">로그아웃</button>
+    </div>
+  </section>
+
+    <section class="panel-card">
+      <div class="panel-header">
+        <h2 class="panel-title">로그 조회</h2>
+        <p class="panel-desc">조건을 설정한 뒤 조회 버튼을 눌러 주세요. 조회 기간은 최대 3개월까지 가능합니다.</p>
+      </div>
+      <div class="panel-body">
+
+        <div id="messageBox" class="message-box"></div>
+
+        <!-- 필터 -->
+        <div class="filter-grid">
+          <div class="form-group">
+            <label class="form-label">검색어</label>
+            <input type="text" id="filterKeyword" class="input" placeholder="대상 ID, 작업자, 작업 내용으로 검색" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">작업 유형</label>
+            <select id="filterActionType" class="select">
+              <option value="">전체</option>
+              <option value="CREATE">CREATE</option>
+              <option value="UPDATE">UPDATE</option>
+              <option value="DELETE">DELETE</option>
+              <option value="LOGIN">LOGIN</option>
+              <option value="UPLOAD">UPLOAD</option>
+              <option value="UPLOAD_PHOTO">UPLOAD_PHOTO</option>
+              <option value="DELETE_PHOTO">DELETE_PHOTO</option>
+              <option value="RESET_PASSWORD">RESET_PASSWORD</option>
+              <option value="ACTIVATE">ACTIVATE</option>
+              <option value="DEACTIVATE">DEACTIVATE</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">대상 유형</label>
+            <select id="filterTargetType" class="select">
+              <option value="">전체</option>
+              <option value="EQUIPMENT">EQUIPMENT</option>
+              <option value="HISTORY">HISTORY</option>
+              <option value="INVENTORY">INVENTORY</option>
+              <option value="USER">USER</option>
+              <option value="SIGNAGE">SIGNAGE</option>
+              <option value="SIGNAGE_FILE">SIGNAGE_FILE</option>
+              <option value="LJ_ITEM">LJ_ITEM</option>
+              <option value="LJ_ENTRY">LJ_ENTRY</option>
+              <option value="SUPPORT">SUPPORT</option>
+              <option value="SUPPORT_FILE">SUPPORT_FILE</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">시작일</label>
+            <input type="date" id="filterDateFrom" class="input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">종료일</label>
+            <input type="date" id="filterDateTo" class="input" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">&nbsp;</label>
+            <button type="button" id="searchBtn" class="admin-btn primary">조회</button>
+          </div>
+        </div>
+
+        <!-- 목록 상단바 -->
+        <div class="list-topbar">
+          <div id="listCount" class="list-count">아직 조회하지 않았습니다.</div>
+          <div class="list-actions">
+            <button type="button" id="prevPageBtn" class="admin-btn secondary" style="min-height:36px;padding:0 12px;font-size:13px;border-radius:10px;" disabled>◀ 이전</button>
+            <span id="pageInfo" class="page-info">—</span>
+            <button type="button" id="nextPageBtn" class="admin-btn secondary" style="min-height:36px;padding:0 12px;font-size:13px;border-radius:10px;" disabled>다음 ▶</button>
+          </div>
+        </div>
+
+        <!-- 테이블 -->
+        <div class="table-wrap">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:160px; text-align:center;">작업 시각</th>
+                <th style="width:120px; text-align:center;">작업 유형</th>
+                <th style="width:110px; text-align:center;">대상 유형</th>
+                <th style="width:160px;">대상 ID</th>
+                <th>작업 내용</th>
+                <th style="width:240px; text-align:center;">작업자</th>
+              </tr>
+            </thead>
+            <tbody id="logTableBody">
+              <tr>
+                <td colspan="6">
+                  <div class="empty-state">
+                    <div class="empty-icon">🧾</div>
+                    <div>조건을 설정한 뒤 <strong>조회</strong> 버튼을 눌러 주세요.</div>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- 페이지네이션 -->
+        <div id="pagination" class="pagination" style="display:none;"></div>
+
+      </div>
+    </section>
+
+  </div><!-- /.logs-page -->
+
+  <!-- 글로벌 로딩 -->
+  <div id="globalLoading" aria-hidden="true">
+    <div class="global-loading__dialog">
+      <div class="global-loading__spinner" aria-hidden="true"></div>
+      <div class="global-loading__text" id="globalLoadingText">불러오는 중...</div>
+    </div>
+  </div>
+
+  <script src="../../assets/js/core/config.js"></script>
+  <script src="../../assets/js/core/api.js"></script>
+  <script src="../../assets/js/core/utils.js"></script>
+  <script src="../../assets/js/core/auth.js"></script>
+  <script src="../../assets/js/core/app-permission.js"></script>
+  <script src="../../assets/js/admin/logs.js"></script>
+</body>
+</html>

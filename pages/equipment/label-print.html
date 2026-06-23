@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>장비 라벨 출력</title>
+  <link rel="stylesheet" href="../../assets/css/common.css" />
+  <link rel="stylesheet" href="../../assets/css/pages/equipment-list.css" />
+</head>
+<body class="portal-page equipment-label-page">
+  <div class="container label-shell">
+    <section class="top-brand-bar portal-topbar portal-hero-card no-print equipment-label-topbar">
+      <div class="top-brand-left">
+        <div class="top-brand-logo">+</div>
+        <div class="top-brand-texts">
+          <strong class="top-brand-title">MSO관리팀 업무지원 시스템</strong>
+          <span class="top-brand-sub">QR 라벨 출력 · 장비 식별표 인쇄</span>
+        </div>
+      </div>
+
+      <div class="top-brand-actions portal-top-actions equipment-label-top-actions">
+        <a class="portal-header-btn portal-header-btn--secondary" id="backToDetailBtn" href="#">상세로 돌아가기</a>
+        <button class="portal-header-btn portal-header-btn--primary" id="printBtn" type="button">인쇄</button>
+      </div>
+    </section>
+
+    <!-- 모바일 접근 차단 안내 -->
+    <div id="mobileBlockNotice" class="mobile-block-notice no-print" style="display:none;">
+      <div class="mobile-block-icon">🖨️</div>
+      <h2 class="mobile-block-title">PC에서 이용해주세요</h2>
+      <p class="mobile-block-desc">라벨 출력은 PC 환경에서만 지원됩니다.<br>장비 상세 페이지로 돌아가세요.</p>
+      <a id="mobileBackBtn" href="#" class="btn btn-primary mobile-block-btn">상세로 돌아가기</a>
+    </div>
+
+    <div id="labelMainContent">
+      <section class="label-hero no-print">
+        <div class="label-hero-copy">
+          <div class="label-hero-topline">장비 라벨 출력</div>
+          <h1 class="label-hero-title">QR 포함 장비 라벨</h1>
+          <div class="label-hero-subtext">
+            라벨 크기를 선택한 뒤 장비 식별용 라벨을 미리보고 바로 인쇄할 수 있습니다.
+          </div>
+        </div>
+      </section>
+
+    <div id="messageBox" class="message-box"></div>
+
+    <section class="label-preview-wrap">
+      <article class="card label-preview-card">
+        <div class="section-head no-print">
+          <h2 class="section-title">라벨 미리보기</h2>
+          <div class="sub-text">출력 전에 장비명, 관리번호, QR 정보를 확인하세요.</div>
+        </div>
+
+        <div class="label-print-toolbar no-print">
+          <label for="labelSizeSelect" class="form-label">라벨 크기</label>
+          <select id="labelSizeSelect" class="input input-sm">
+            <option value="size-90x48" selected>90 × 48 mm</option>
+            <option value="size-70x40">70 × 40 mm</option>
+            <option value="size-50x30">50 × 30 mm</option>
+          </select>
+        </div>
+
+        <div class="label-sheet">
+          <div class="device-label size-90x48" id="deviceLabel">
+            <div class="device-label-main">
+              <div class="label-hospital">녹십자아이메드 의료장비 관리시스템</div>
+              <div class="label-title" id="labelEquipmentName">-</div>
+
+              <div class="label-info-block">
+                <div class="label-row label-row-emphasis">
+                  <div class="label-key">관리번호</div>
+                  <div class="label-value label-value-id" id="labelEquipmentId">-</div>
+                </div>
+
+                <div class="label-row" id="labelRowModel">
+                  <div class="label-key">모델명</div>
+                  <div class="label-value" id="labelModelName">-</div>
+                </div>
+
+                <div class="label-row" id="labelRowDepartment">
+                  <div class="label-key">사용부서</div>
+                  <div class="label-value" id="labelDepartment">-</div>
+                </div>
+
+                <div class="label-row" id="labelRowLocation">
+                  <div class="label-key">위치</div>
+                  <div class="label-value" id="labelLocation">-</div>
+                </div>
+
+              </div>
+            </div>
+
+            <div class="qr-panel">
+              <div id="labelQr" class="label-qr-box"></div>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+    </div><!-- /labelMainContent -->
+  </div>
+
+  <script src="../../assets/js/core/config.js"></script>
+  <script src="../../assets/js/core/api.js"></script>
+  <script>
+    window.auth.requireAuth();
+  </script>
+  <script src="../../assets/js/core/utils.js"></script>
+  <script src="../../assets/js/core/auth.js"></script>
+  <script src="../../assets/js/core/app-permission.js"></script>
+  <script src="../../assets/libs/qrcode.min.js"></script>
+  <script src="../../assets/js/equipment/label-print.js"></script>
+  <script>
+    (function() {
+      if (window.innerWidth <= 768) {
+        var notice = document.getElementById('mobileBlockNotice');
+        var main = document.getElementById('labelMainContent');
+        var printBtn = document.getElementById('printBtn');
+        if (notice) notice.style.display = 'flex';
+        if (main) main.style.display = 'none';
+        if (printBtn) printBtn.style.display = 'none';
+
+        // 상세로 돌아가기 링크 설정
+        var backBtn = document.getElementById('mobileBackBtn');
+        var detailBackBtn = document.getElementById('backToDetailBtn');
+        var href = detailBackBtn ? detailBackBtn.getAttribute('href') : '';
+        if (backBtn && href && href !== '#') backBtn.setAttribute('href', href);
+      }
+    })();
+  </script>
+
+  <div id="globalLoading" aria-hidden="true">
+    <div class="global-loading__dialog">
+      <div class="global-loading__spinner" aria-hidden="true"></div>
+      <div class="global-loading__text" id="globalLoadingText">불러오는 중...</div>
+    </div>
+  </div>
+</body>
+</html>

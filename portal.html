@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MSO관리팀 업무지원 시스템</title>
+  <link rel="stylesheet" href="./assets/css/common.css" />
+  <link rel="stylesheet" href="./assets/css/pages/portal.css" />
+  <!-- 포털 카드 아이콘(2026-06) — 외부 CDN(jsdelivr) 의존성 없이 자체
+       저장소에 받아둔 Tabler Icons 웹폰트를 사용한다. -->
+  <link rel="stylesheet" href="./assets/font/tabler-icons/tabler-icons.min.css" />
+</head>
+<body>
+  <div class="container page-shell portal-page portal-page-compact">
+    <section class="top-brand-bar portal-topbar portal-hero-card">
+      <div class="top-brand-left">
+        <div class="top-brand-logo">+</div>
+        <div class="top-brand-texts">
+          <strong class="top-brand-title">MSO관리팀 업무지원 시스템</strong>
+        </div>
+      </div>
+
+      <div class="top-brand-actions portal-top-actions portal-top-actions-compact">
+        <div class="portal-header-userline">
+          <span class="portal-header-userlabel">사용자</span>
+          <strong class="portal-header-username" id="portalUserName">사용자</strong>
+          <span class="portal-header-usersep">·</span>
+          <span class="portal-header-usersub" id="portalUserSub">소속 없음 / user</span>
+        </div>
+
+        <button
+          type="button"
+          id="logoutBtn"
+          class="portal-header-btn portal-header-btn--secondary"
+        >
+          로그아웃
+        </button>
+      </div>
+    </section>
+
+    <section class="portal-section portal-notice-section" id="portalNoticeSection" style="display:none;">
+      <div class="portal-section-head portal-section-head--compact">
+        <div>
+          <h2 class="section-title portal-section-title">공지사항</h2>
+        </div>
+      </div>
+
+      <div id="portalNoticeGrid" class="portal-notice-grid"></div>
+    </section>
+
+    <section class="portal-section portal-favorites-section" id="portalFavoritesSection" style="display:none;">
+      <p class="portal-group-label">즐겨찾기</p>
+      <div id="portalFavoritesGrid" class="portal-app-grid-compact"></div>
+    </section>
+
+    <section class="portal-section portal-apps-section-compact">
+      <p class="portal-group-label">업무 도구</p>
+      <div id="portalAppGrid" class="portal-app-grid-compact"></div>
+
+      <div id="portalEmpty" class="empty-box" style="display:none;">
+        사용 가능한 앱이 없습니다.
+      </div>
+    </section>
+
+    <section class="portal-section portal-admin-apps-section" id="portalAdminAppsSection" style="display:none;">
+      <p class="portal-group-label">관리자</p>
+      <div id="portalAdminAppGrid" class="portal-app-grid-compact portal-app-grid-compact--admin"></div>
+    </section>
+
+    <!-- 공지사항 상세 모달 (2026-06) -->
+    <div id="noticeDetailModal" class="notice-modal" style="display:none;">
+      <div class="notice-modal__backdrop" id="noticeModalBackdrop"></div>
+      <div class="notice-modal__box">
+        <div class="notice-modal__head">
+          <div class="notice-modal__head-main">
+            <span class="notice-modal__head-icon" aria-hidden="true">📢</span>
+            <strong id="noticeModalTitle"></strong>
+          </div>
+          <button type="button" id="noticeModalCloseBtn" class="notice-modal__close" aria-label="닫기">×</button>
+        </div>
+        <div class="notice-modal__meta" id="noticeModalMeta"></div>
+        <div class="notice-modal__body" id="noticeModalContent"></div>
+        <div class="notice-modal__footer">
+          <label class="notice-modal__dismiss">
+            <input type="checkbox" id="noticeModalDismissToday" />
+            오늘 하루 안 보기
+          </label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="./assets/js/core/config.js"></script>
+  <script src="./assets/js/core/api.js"></script>
+  <script src="./assets/js/core/utils.js"></script>
+  <script src="./assets/js/core/auth.js"></script>
+  <script src="./assets/js/core/app-permission.js"></script>
+  <script src="./assets/js/portal/portal.js"></script>
+
+  <div id="globalLoading" aria-hidden="true">
+    <div class="global-loading__dialog">
+      <div class="global-loading__spinner" aria-hidden="true"></div>
+      <div class="global-loading__text" id="globalLoadingText">불러오는 중...</div>
+    </div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>장비 상세정보</title>
+  <link rel="stylesheet" href="../../assets/css/common.css" />
+  <link rel="stylesheet" href="../../assets/css/pages/equipment-detail.css" />
+</head>
+<body class="portal-page equipment-detail-page">
+  <div class="container page-shell detail-shell">
+    <section class="top-brand-bar portal-topbar portal-hero-card detail-topbar">
+      <div class="top-brand-left">
+        <div class="top-brand-logo">+</div>
+        <div class="top-brand-texts">
+          <strong class="top-brand-title">MSO관리팀 업무지원 시스템</strong>
+          <span class="top-brand-sub">상세 조회 · 이력 · 수정</span>
+        </div>
+      </div>
+
+      <div class="top-brand-actions portal-top-actions detail-top-actions">
+        <a class="portal-header-btn portal-header-btn--secondary" href="../../portal.html">HOME</a>
+        <a class="portal-header-btn portal-header-btn--secondary" href="dashboard.html">대시보드</a>
+        <a class="portal-header-btn portal-header-btn--secondary" href="list.html">장비목록</a>
+      </div>
+    </section>
+
+    <section class="page-hero-simple detail-hero">
+      <div class="detail-hero-copy">
+        <h1 class="page-title" id="heroEquipmentName">장비 상세정보</h1>
+        <div class="detail-hero-meta">
+          <span class="sub-text detail-hero-id" id="heroEquipmentId">-</span>
+          <span class="status-badge" id="heroStatusBadge">-</span>
+        </div>
+      </div>
+    </section>
+
+    <div id="messageBox" class="message-box"></div>
+
+    <section class="detail-action-bar">
+      <div class="detail-action-group">
+        <button type="button" id="printLabelBtn" class="btn" style="display:none;">라벨 출력</button>
+        <button type="button" id="inspectionCertBtn" class="btn btn-success" style="display:none;">📄 검수확인서</button>
+        <button type="button" id="editEquipmentBtn" class="btn btn-primary" style="display:none;">장비 수정</button>
+        <button type="button" id="deleteBtn" class="btn btn-danger" style="display:none;">장비 삭제</button>
+      </div>
+    </section>
+
+    <section class="detail-single-col">
+      <article class="card detail-info-card">
+        <div class="section-head">
+          <h2 class="section-title">장비 기본 정보</h2>
+        </div>
+        <div id="detailInfoGrid" class="info-tile-grid">
+          <div class="empty-box">불러오는 중...</div>
+        </div>
+      </article>
+
+      <div class="detail-media-grid">
+        <article class="card detail-photo-card">
+          <div class="section-head">
+            <h2 class="section-title">장비 사진</h2>
+          </div>
+        
+          <div id="detailPhotoWrap" class="detail-photo-wrap">
+            <img
+              id="detailPhotoImage"
+              class="detail-photo-image is-hidden"
+              alt="장비 사진"
+            />
+            <div id="detailPhotoEmpty" class="detail-photo-empty">
+              등록된 사진이 없습니다.
+            </div>
+          </div>
+        
+          <div class="detail-photo-actions">
+            <button type="button" id="photoOpenBtn" class="btn btn-light" style="display:none;">
+              새 창에서 보기
+            </button>
+            <button type="button" id="photoDeleteBtn" class="btn btn-danger" style="display:none;">
+              사진 삭제
+            </button>
+          </div>
+        </article>
+
+        <article class="card detail-qr-card">
+          <div class="section-head">
+            <h2 class="section-title">QR 코드</h2>
+          </div>
+          <div class="qr-panel">
+            <div id="qrBox" class="qr-box">
+              <div class="empty-box">불러오는 중...</div>
+            </div>
+            <div id="qrText" class="sub-text detail-qr-text">-</div>
+          </div>
+        </article>
+      </div>
+
+      <div class="detail-history-grid">
+        <article class="card detail-list-card">
+          <div class="section-head detail-card-head">
+            <div>
+              <h2 class="section-title">수리 / 점검 이력</h2>
+              <div class="sub-text" id="historyCountText">불러오는 중...</div>
+            </div>
+            <button type="button" id="addHistoryBtn" class="btn btn-card-action" style="display:none;">+ 이력 등록</button>
+          </div>
+          <div id="historyArea">
+            <div class="empty-box">불러오는 중...</div>
+          </div>
+        </article>
+
+        <article class="card detail-list-card">
+          <div class="section-head detail-card-head">
+            <div>
+              <h2 class="section-title">재고조사 이력</h2>
+              <div class="sub-text" id="inventoryCountText">불러오는 중...</div>
+            </div>
+            <button type="button" id="addInventoryBtn" class="btn btn-card-action" style="display:none;">+ 재고조사 등록</button>
+          </div>
+          <div id="inventoryArea">
+            <div class="empty-box">불러오는 중...</div>
+          </div>
+        </article>
+      </div>
+    </section>
+  </div>
+
+  <script src="../../assets/js/core/config.js"></script>
+  <script src="../../assets/js/core/api.js"></script>
+  <script src="../../assets/js/core/utils.js"></script>
+  <script src="../../assets/js/core/auth.js"></script>
+  <script src="../../assets/libs/qrcode.min.js"></script>
+  <script src="../../assets/js/equipment/inspection-cert.js"></script>
+  <script src="../../assets/js/equipment/equipment-detail.js"></script>
+
+  <div id="globalLoading" aria-hidden="true">
+    <div class="global-loading__dialog">
+      <div class="global-loading__spinner" aria-hidden="true"></div>
+      <div class="global-loading__text" id="globalLoadingText">불러오는 중...</div>
+    </div>
+  </div>
+</body>
+</html>

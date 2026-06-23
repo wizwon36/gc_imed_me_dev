@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>장비 정보</title>
+  <link rel="stylesheet" href="../../assets/css/common.css" />
+  <link rel="stylesheet" href="../../assets/css/pages/equipment-detail.css" />
+  <style>
+    .public-notice-banner {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      background: #f0f6ff;
+      border: 1px solid #b5d4f4;
+      border-radius: 12px;
+      color: #185fa5;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .public-notice-banner a {
+      color: #185fa5;
+      font-weight: 700;
+      text-decoration: underline;
+      white-space: nowrap;
+    }
+
+    .public-login-banner {
+      display: none;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 18px;
+      margin-bottom: 16px;
+      background: #faeeda;
+      border: 1px solid #FAC775;
+      border-radius: 12px;
+      color: #854F0B;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .public-login-banner a {
+      color: #854F0B;
+      font-weight: 700;
+      text-decoration: underline;
+      white-space: nowrap;
+    }
+
+    .public-action-bar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+  </style>
+</head>
+<body class="portal-page equipment-detail-page">
+  <div class="container page-shell detail-shell">
+
+    <section class="top-brand-bar portal-topbar portal-hero-card detail-topbar">
+      <div class="top-brand-left">
+        <div class="top-brand-logo">+</div>
+        <div class="top-brand-texts">
+          <strong class="top-brand-title">MSO관리팀 업무지원 시스템</strong>
+          <span class="top-brand-sub">장비 정보 조회</span>
+        </div>
+      </div>
+      <div class="top-brand-actions detail-top-actions">
+        <a class="portal-header-btn portal-header-btn--secondary" href="../../index.html">로그인</a>
+      </div>
+    </section>
+
+    <section class="page-hero-simple detail-hero">
+      <div class="detail-hero-copy">
+        <h1 class="page-title" id="heroEquipmentName">장비 정보</h1>
+        <div class="detail-hero-meta">
+          <span class="sub-text detail-hero-id" id="heroEquipmentId">-</span>
+          <span class="status-badge" id="heroStatusBadge">-</span>
+        </div>
+      </div>
+    </section>
+
+    <div id="messageBox" class="message-box"></div>
+
+    <!-- 공개 페이지 안내 -->
+    <div class="public-notice-banner">
+      이 페이지는 QR코드로 접근한 공개 장비 정보 페이지입니다. 일부 정보만 표시됩니다.
+    </div>
+
+    <!-- 로그인 유도 배너 (비로그인 시 표시) -->
+    <div class="public-login-banner" id="loginBanner">
+      전체 정보 및 이력을 확인하려면 <a href="../../index.html">로그인</a>이 필요합니다.
+    </div>
+
+    <div class="public-action-bar">
+      <a id="goToDetailBtn" href="#" class="btn btn-primary" style="display:none;">전체 상세 보기</a>
+    </div>
+
+    <section class="detail-single-col">
+      <article class="card detail-info-card">
+        <div class="section-head">
+          <h2 class="section-title">장비 기본 정보</h2>
+        </div>
+        <div id="publicInfoGrid" class="info-tile-grid">
+          <div class="empty-box">불러오는 중...</div>
+        </div>
+      </article>
+    </section>
+
+  </div>
+
+  <script src="../../assets/js/core/config.js"></script>
+  <script src="../../assets/js/core/api.js"></script>
+  <script src="../../assets/js/core/utils.js"></script>
+  <script src="../../assets/js/equipment/public-detail.js"></script>
+
+  <div id="globalLoading" aria-hidden="true">
+    <div class="global-loading__dialog">
+      <div class="global-loading__spinner" aria-hidden="true"></div>
+      <div class="global-loading__text" id="globalLoadingText">불러오는 중...</div>
+    </div>
+  </div>
+</body>
+</html>

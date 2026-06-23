@@ -1,0 +1,717 @@
+/* ════════════════════════════════════════════════════════════
+   구매·사용 통계 (statistics) 전용 스타일
+   공통 레이아웃(cl-tabs, cl-field, cl-section 등)은 closing.css 재사용
+   ════════════════════════════════════════════════════════════ */
+
+/* ── 버튼 가볍게: common.css의 기본 .btn(50px/16px/700)은 포털 전체 톤이라
+   통계 화면의 조밀한 영역(조회/상세검색/조건추가 등)에서는 과하게 무거워 보임 ── */
+#tabDashboardContent .btn,
+#tabUploadContent .btn,
+#tabVendorContent .btn {
+  min-height: 36px;
+  padding: 0 16px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-md, 14px);
+}
+#tabDashboardContent .btn-primary,
+#tabUploadContent .btn-primary,
+#tabVendorContent .btn-primary {
+  font-weight: 600;
+}
+
+/* ── 공용 패널: 통계 조회 탭과 동일한 카드 톤 (업로드/거래처 탭에서 사용) ── */
+.stat-panel {
+  background: #fff;
+  border: 1px solid var(--border-card, #e2e8f0);
+  border-radius: var(--radius-lg, 20px);
+  box-shadow: var(--shadow-card, 0 2px 8px rgba(15,23,42,.05));
+  padding: 18px 20px;
+}
+.stat-chart-panel {
+  margin-bottom: 14px;
+  height: 320px;
+  position: relative;
+}
+.stat-chart-panel canvas {
+  max-height: 100%;
+}
+
+/* ── 입고/사용 + 관점 서브탭 패널 (B안: 회색 배경으로 영역 구분) ── */
+.stat-scope-panel {
+  background: var(--surface-soft, #f1f4f9);
+  border-radius: var(--radius-lg, 20px);
+  padding: 20px 22px;
+  margin-top: 6px;
+  margin-bottom: 22px;
+}
+/* ── 세그먼트 토글 공용 스타일 (입고/사용, 월별추이/구간비교에서 동일하게 사용) ── */
+.stat-seg-toggle {
+  display: inline-flex;
+  gap: 4px;
+  background: #fff;
+  border: 1px solid var(--border-input, #dde3ed);
+  border-radius: var(--radius-md, 16px);
+  padding: 3px;
+}
+.stat-seg-toggle-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 7px 16px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary, #5f6b7a);
+  border-radius: 12px;
+  transition: background .12s, color .12s;
+}
+.stat-seg-toggle-btn:hover { color: var(--text-primary, #111827); }
+.stat-seg-toggle-btn.active {
+  background: var(--blue-50, #e6f1fb);
+  color: var(--blue, #2f6df6);
+}
+
+.stat-subtab-underline {
+  display: flex;
+  gap: 26px;
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-soft, #e2e8f0);
+  border-bottom: 1px solid var(--border-soft, #e2e8f0);
+}
+.stat-subtab-underline-btn {
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0 0 12px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted, #9aa5b1);
+  border-bottom: 3px solid transparent;
+  margin-bottom: -1px;
+  transition: color .12s, border-color .12s, font-size .12s;
+}
+.stat-subtab-underline-btn:hover { color: var(--text-primary, #111827); }
+.stat-subtab-underline-btn.active {
+  color: var(--blue, #2f6df6);
+  font-weight: 700;
+  font-size: 14px;
+  border-bottom-color: var(--blue, #2f6df6);
+}
+@media (max-width: 720px) {
+  .stat-subtab-underline {
+    gap: 18px;
+    margin-top: 6px;
+    padding-top: 6px;
+    padding-bottom: 0;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    /* 가로 스크롤이 있다는 걸 시각적으로 알림(2026-06) — 기존엔 스크롤
+       가능 여부를 알 만한 힌트가 전혀 없어 5개 서브탭 중 일부가 화면
+       밖에 가려진 걸 사용자가 인지하지 못할 수 있었다. */
+    mask-image: linear-gradient(to right, black calc(100% - 24px), transparent 100%);
+    -webkit-mask-image: linear-gradient(to right, black calc(100% - 24px), transparent 100%);
+  }
+  .stat-subtab-underline-btn {
+    flex-shrink: 0;
+    font-size: 12px;
+    padding-bottom: 6px;
+  }
+  .stat-subtab-underline-btn.active {
+    font-size: 12px;
+  }
+
+  .stat-seg-toggle-btn {
+    padding: 4px 10px;
+    font-size: 12px;
+  }
+}
+
+/* ── 기간 비교: 모드 토글(세그먼트는 .stat-seg-toggle 공용 클래스 사용) + 비교 구간 컨트롤 ── */
+.stat-trend-controls {
+  margin-top: 16px;
+}
+.stat-trend-compare-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+}
+.stat-trend-compare-label { font-size: 13px; color: var(--text-secondary, #5f6b7a); font-weight: 500; width: 64px; flex-shrink: 0; }
+.stat-trend-quick-buttons { display: flex; gap: 6px; margin-left: 6px; }
+.stat-trend-quick-buttons .btn { font-size: 12px; padding: 6px 12px; }
+.stat-trend-quick-buttons .btn:disabled { opacity: .45; cursor: not-allowed; }
+.stat-trend-compare-note {
+  font-size: 12px;
+  color: var(--text-muted, #9aa5b1);
+  margin: 12px 0 0;
+}
+#statDashYmFrom:disabled, #statDashYmTo:disabled, #statDashBranch:disabled {
+  background: var(--surface-soft, #f1f4f9);
+  color: var(--text-muted, #9aa5b1);
+  cursor: not-allowed;
+}
+
+/* ── 구간 비교 결과 표시 ──────────────────────────────────── */
+.stat-compare-period-labels {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+}
+.stat-compare-period-chip {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 999px;
+}
+.stat-compare-period-chip--base { background: var(--blue-50, #e6f1fb); color: var(--blue, #2f6df6); }
+.stat-compare-period-chip--compare { background: var(--surface-soft, #f1f4f9); color: var(--text-secondary, #5f6b7a); }
+.stat-compare-subheading {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary, #5f6b7a);
+  margin: 22px 0 10px;
+}
+.stat-vat-note {
+  font-size: 11px;
+  color: var(--text-muted, #9aa5b1);
+  margin: 0 0 12px;
+}
+.stat-result-panel {
+  padding: 16px;
+}
+.cl-upload-zone--disabled {
+  opacity: .5;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.stat-table td.stat-trend-up { color: #c0392b; }
+.stat-table td.stat-trend-down { color: #1d6f42; }
+
+/* ── 필터 바: 카드형 검색 도구 ──────────────────────────── */
+.stat-filter-bar {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  flex-wrap: wrap;
+  background: #fff;
+  border: 1px solid var(--border-card, #e2e8f0);
+  border-radius: var(--radius-lg, 20px);
+  box-shadow: var(--shadow-card, 0 2px 8px rgba(15,23,42,.05));
+  padding: 16px 20px;
+  margin-bottom: 20px;
+}
+.stat-filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.stat-filter-field label {
+  font-size: 10px;
+  font-weight: 700;
+  color: var(--text-muted, #7b8794);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+}
+.stat-filter-field select,
+.stat-filter-field input[type=month],
+.stat-trend-compare-row input[type=month] {
+  border: 1px solid var(--border-input, #dde3ed);
+  border-radius: var(--radius-md, 16px);
+  background: var(--surface-soft, #f8fafc);
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--text-primary, #111827);
+  min-width: 130px;
+  outline: none;
+  transition: border-color .15s, background .15s;
+}
+.stat-filter-field select:focus,
+.stat-filter-field input[type=month]:focus,
+.stat-trend-compare-row input[type=month]:focus {
+  border-color: var(--blue, #2f6df6);
+  background: #fff;
+}
+.stat-filter-field--search { min-width: 180px; flex: 1; }
+.stat-filter-input-icon {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+.stat-filter-input-icon span,
+.stat-filter-input-icon i {
+  position: absolute;
+  left: 11px;
+  font-size: 12px;
+  opacity: .55;
+  pointer-events: none;
+}
+.stat-filter-input-icon input {
+  width: 100%;
+  border: 1px solid var(--border-input, #dde3ed);
+  border-radius: var(--radius-md, 16px);
+  background: var(--surface-soft, #f8fafc);
+  padding: 8px 12px 8px 30px;
+  font-size: 13px;
+  color: var(--text-primary, #111827);
+  outline: none;
+  transition: border-color .15s, background .15s;
+}
+.stat-suggest-dropdown {
+  display: none;
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  z-index: 50;
+  max-height: 220px;
+  overflow-y: auto;
+  background: #fff;
+  border: 1px solid var(--border-input, #dde3ed);
+  border-radius: 10px;
+  box-shadow: 0 4px 14px rgba(15,23,42,.10);
+  padding: 4px;
+}
+.stat-suggest-item {
+  padding: 7px 10px;
+  font-size: 13px;
+  color: var(--text-primary, #111827);
+  border-radius: 7px;
+  cursor: pointer;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.stat-suggest-item:hover {
+  background: var(--blue-50, #e6f1fb);
+  color: var(--blue, #2f6df6);
+}
+.stat-filter-input-icon input:focus {
+  border-color: var(--blue, #2f6df6);
+  background: #fff;
+}
+.stat-filter-submit {
+  padding: 0 22px;
+  white-space: nowrap;
+}
+.stat-filter-advanced {
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.stat-advanced-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 17px;
+  height: 17px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--blue, #2f6df6);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 700;
+}
+@media (max-width: 720px) {
+  .stat-filter-bar { padding: 14px; }
+  .stat-filter-field { flex: 1 1 140px; }
+  .stat-filter-field--search { flex: 1 1 100%; }
+  .stat-filter-advanced { flex: 1 1 calc(50% - 7px); justify-content: center; }
+  .stat-filter-bar > .btn:not(.stat-filter-advanced):not(.stat-filter-submit) { flex: 1 1 calc(50% - 7px); }
+  .stat-filter-submit { width: 100%; }
+}
+
+/* ── 상세검색 패널 ──────────────────────────────────────── */
+.stat-advanced-panel {
+  background: #fff;
+  border: 1px solid var(--border-card, #e2e8f0);
+  border-radius: var(--radius-lg, 20px);
+  box-shadow: var(--shadow-card, 0 2px 8px rgba(15,23,42,.05));
+  padding: 16px 20px;
+  margin-bottom: 14px;
+}
+.stat-advanced-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  font-size: 13px;
+}
+.stat-advanced-close {
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text-muted, #7b8794);
+  padding: 2px 6px;
+}
+.stat-advanced-close:hover { color: var(--text-primary, #111827); }
+.stat-advanced-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+.stat-advanced-combinator-placeholder {
+  width: 118px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  padding: 7px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-muted, #7b8794);
+}
+.stat-advanced-combinator,
+.stat-advanced-field {
+  border: 1px solid var(--border-input, #dde3ed);
+  border-radius: var(--radius-md, 16px);
+  background: var(--surface-soft, #f8fafc);
+  padding: 7px 10px;
+  font-size: 12px;
+  color: var(--text-primary, #111827);
+  outline: none;
+  flex-shrink: 0;
+}
+.stat-advanced-combinator { width: 118px; font-weight: 600; }
+.stat-advanced-field { width: 110px; }
+.stat-advanced-keyword-wrap { flex: 1; position: relative; }
+.stat-advanced-keyword {
+  width: 100%;
+  border: 1px solid var(--border-input, #dde3ed);
+  border-radius: var(--radius-md, 16px);
+  background: var(--surface-soft, #f8fafc);
+  padding: 7px 12px;
+  font-size: 13px;
+  color: var(--text-primary, #111827);
+  outline: none;
+}
+.stat-advanced-keyword:focus,
+.stat-advanced-combinator:focus,
+.stat-advanced-field:focus { border-color: var(--blue, #2f6df6); background: #fff; }
+.stat-advanced-remove {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: var(--text-muted, #9aa5b1);
+  font-size: 13px;
+  padding: 4px 8px;
+  flex-shrink: 0;
+}
+.stat-advanced-remove:hover { color: #c0392b; }
+.stat-advanced-footer {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+@media (max-width: 720px) {
+  .stat-advanced-row { flex-wrap: wrap; }
+  .stat-advanced-keyword-wrap { flex: 1 1 100%; order: 3; }
+}
+
+.stat-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  background: #fff;
+  border: 1px solid var(--border-card, #e2e8f0);
+  border-radius: var(--radius-lg, 20px);
+  box-shadow: var(--shadow-card, 0 2px 8px rgba(15,23,42,.05));
+  margin-bottom: 14px;
+  overflow: hidden;
+}
+@media (max-width: 900px) {
+  .stat-summary-grid { grid-template-columns: repeat(2, 1fr); }
+  .stat-summary-card:nth-child(2n) { border-right: none; }
+  .stat-summary-card:nth-child(n+3) { border-top: 1px solid var(--border-soft, #eaeff5); }
+  .stat-summary-card { padding: 9px 10px 8px 14px; }
+  .stat-summary-card::before { top: 8px; bottom: 8px; }
+  .stat-summary-label { margin-bottom: 4px; }
+  .stat-summary-value {
+    font-size: 14px;
+    word-break: keep-all;
+  }
+  .stat-summary-value.small { font-size: 12px; }
+}
+.stat-summary-card {
+  position: relative;
+  padding: 18px 20px 16px 22px;
+  border-right: 1px solid var(--border-soft, #eaeff5);
+}
+.stat-summary-card:last-child { border-right: none; }
+.stat-summary-card::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 16px; bottom: 16px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: var(--stat-accent, #cbd5e1);
+}
+.stat-summary-card.accent-total  { --stat-accent: #2f6df6; }
+.stat-summary-card.accent-count  { --stat-accent: #2fa36b; }
+.stat-summary-card.accent-avg    { --stat-accent: #b45309; }
+.stat-summary-card.accent-top    { --stat-accent: #7c3aed; }
+.stat-summary-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-muted, #7b8794);
+  text-transform: uppercase;
+  letter-spacing: .5px;
+  margin-bottom: 7px;
+}
+.stat-summary-vat-tag {
+  font-size: 9px;
+  font-weight: 600;
+  color: var(--text-muted, #9aa5b1);
+  text-transform: none;
+  letter-spacing: 0;
+  margin-left: 4px;
+}
+.stat-summary-value {
+  font-size: 21px;
+  font-weight: 800;
+  color: var(--text-primary, #111827);
+  line-height: 1.3;
+  letter-spacing: -.2px;
+}
+.stat-summary-value.small { font-size: 15px; }
+.stat-summary-sub {
+  font-size: 11px;
+  color: var(--text-muted, #7b8794);
+  margin-top: 5px;
+}
+
+/* ── 상세 표: 헤더 배경 + 컬럼 구분선 + 순위 배지 + 점유율 바 ── */
+.stat-table-wrap {
+  border: 1px solid var(--border-card, #e2e8f0);
+  border-radius: var(--radius-md, 16px);
+  /* 가로 스크롤 허용(2026-06) — 기존엔 overflow: hidden이라 표 폭이
+     컨테이너에 강제로 맞춰지면서, 좁은 화면에서 "강남"/"강북" 같은
+     의원명이 세로로 줄바꿈되는 문제가 있었다(사용자 확인). 세로는 그대로
+     hidden(모서리 둥글게 깎기 유지), 가로만 스크롤 가능하게 분리한다. */
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+.stat-table {
+  width: 100%;
+  min-width: max-content;
+  border-collapse: collapse;
+}
+.stat-table thead th {
+  background: var(--surface-soft, #f8fafc);
+  text-align: left;
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border-card, #e2e8f0);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--text-secondary, #5f6b7a);
+  text-transform: uppercase;
+  white-space: nowrap;
+  letter-spacing: .4px;
+}
+.stat-table thead th + th { border-left: 1px solid var(--border-soft, #eaeff5); }
+.stat-table th.num { text-align: right; }
+.stat-table td {
+  padding: 10px 14px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border-soft, #eaeff5);
+  border-left: 1px solid transparent;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.stat-table td + td { border-left: 1px solid var(--border-soft, #eaeff5); }
+.stat-table tbody tr:last-child td { border-bottom: none; }
+.stat-table td.num { text-align: right; font-weight: 600; font-variant-numeric: tabular-nums; }
+.stat-table td.stat-itemtype-cell { color: var(--text-secondary, #5f6b7a); font-weight: 500; }
+.stat-table thead th.num { font-weight: 700; }
+.stat-table tbody tr:hover td { background-color: var(--blue-soft, #eaf1ff); }
+.stat-table tbody tr:hover td.stat-bar-cell {
+  background-image: linear-gradient(90deg, #d9e6ff var(--bar-pct, 0%), var(--blue-soft, #eaf1ff) var(--bar-pct, 0%));
+}
+
+.stat-rank-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px; height: 22px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 800;
+  background: #f1f5f9;
+  color: #64748b;
+  margin-right: 9px;
+  flex-shrink: 0;
+}
+.stat-rank-badge.top1 { background: #fef3c7; color: #b45309; }
+.stat-rank-badge.top2 { background: #e5e7eb; color: #4b5563; }
+.stat-rank-badge.top3 { background: #fde8d7; color: #b35c1e; }
+
+.stat-name-cell { display: flex; align-items: center; }
+.stat-vendor-bizno {
+  font-size: 11px;
+  color: var(--text-muted, #9aa5b1);
+  font-variant-numeric: tabular-nums;
+  margin-top: 1px;
+}
+
+.stat-expand-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  font-size: 10px;
+  color: var(--text-muted, #9aa5b1);
+  margin-right: 4px;
+  transition: transform .1s;
+}
+.stat-expandable-row { cursor: pointer; }
+.stat-breakdown-row td {
+  background: var(--surface-soft, #f8fafc);
+  font-size: 12px;
+  color: var(--text-secondary, #5f6b7a);
+}
+.stat-breakdown-name {
+  padding-left: 38px !important;
+  color: var(--text-muted, #7b8794);
+}
+
+.stat-bar-cell {
+  position: relative;
+  background-image: linear-gradient(90deg, var(--blue-soft, #eaf1ff) var(--bar-pct, 0%), transparent var(--bar-pct, 0%));
+}
+.stat-pct-text {
+  font-size: 11px;
+  color: var(--text-muted, #7b8794);
+  margin-left: 6px;
+  white-space: nowrap;
+}
+
+/* ── 작은 인라인 로딩 스피너 (탭/서브탭 전환 시 표 영역에 표시) ── */
+.stat-loading-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #6b7280;
+  font-size: 13px;
+  padding: 4px 0;
+}
+.stat-mini-spinner {
+  width: 14px; height: 14px;
+  border: 2px solid #e5e7eb;
+  border-top-color: #1a56db;
+  border-radius: 50%;
+  animation: stat-spin .7s linear infinite;
+  flex-shrink: 0;
+}
+@keyframes stat-spin { to { transform: rotate(360deg); } }
+
+/* ── 자재구분 컬럼 클릭 표시 ───────────────────────────────── */
+.stat-itemtype-clickable {
+  cursor: pointer;
+  text-decoration: underline;
+  text-decoration-color: var(--border-input, #dde3ed);
+  text-underline-offset: 3px;
+}
+.stat-itemtype-clickable:hover {
+  color: var(--blue, #2f6df6);
+  text-decoration-color: var(--blue, #2f6df6);
+}
+
+/* ── 드릴다운 모달 ──────────────────────────────────────── */
+.stat-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, .45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+.stat-modal-dialog {
+  background: #fff;
+  border-radius: var(--radius-lg, 20px);
+  box-shadow: 0 12px 32px rgba(15,23,42,.18);
+  width: min(1100px, 100%);
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.stat-modal-dialog--wide {
+  width: min(1440px, 96vw);
+}
+.stat-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border-soft, #eaeff5);
+  font-size: 14px;
+}
+.stat-modal-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px 20px;
+  border-bottom: 1px solid var(--border-soft, #eaeff5);
+}
+.stat-modal-count {
+  font-size: 12px;
+  color: var(--text-muted, #7b8794);
+  white-space: nowrap;
+}
+.stat-modal-body {
+  padding: 0 20px 20px;
+  overflow: auto;
+}
+@media (max-width: 720px) {
+  .stat-modal-overlay { padding: 8px; }
+  .stat-modal-dialog { max-height: 92vh; }
+}
+
+/* 모바일 최적화(2026-06) — 데이터 업로드는 파일을 다루는 작업이라 모바일
+   환경에 적합하지 않다고 판단해, edit 권한자도 모바일에서는 탭 자체를
+   완전히 숨긴다(사용자 확인). 탭 버튼이 안 보이므로 그 탭으로 진입할
+   방법이 없어 콘텐츠(tabUploadContent)는 그대로 둬도 노출되지 않는다. */
+@media (max-width: 720px) {
+  #tabUpload {
+    display: none;
+  }
+}
+
+/* 세로 스크롤 제거(2026-06) — 콘텐츠 전체 높이가 모바일 뷰포트를 살짝
+   넘쳐 스크롤바가 짧게 끊긴 것처럼 보이는데, iOS Safari는 스크롤바를
+   CSS로 숨길 수 없어(::-webkit-scrollbar 미지원) 스크롤 자체를 없애는
+   방향으로 간다(사용자 확인). 각 영역의 세로 여백을 압축해 전체 높이를
+   줄인다. #appBody .cl-tabs는 closing.css(공용 파일)의 24px margin을
+   더 구체적인 셀렉터로 덮어쓴다. */
+@media (max-width: 720px) {
+  #appBody .cl-tabs { margin-bottom: 14px; }
+  #appBody .cl-tab { padding: 6px 14px; font-size: 12px; }
+  .stat-scope-panel { padding: 8px 14px; margin-top: 2px; margin-bottom: 8px; }
+  .stat-filter-bar { margin-bottom: 12px; }
+  .stat-summary-grid { margin-bottom: 10px; }
+  .stat-result-panel { padding: 12px; }
+  .stat-vat-note { margin-bottom: 8px; }
+}
+
+/* 통계 페이지 전용 헤더 압축(2026-06) — common.css의 .top-brand-bar는
+   전역 공유 스타일이라 함부로 못 줄이므로, 이 페이지에서만 더 구체적인
+   셀렉터(.container.page-shell .top-brand-bar)로 마진만 추가 압축한다.
+   모바일에서 헤더가 세로 배치(display:block)로 바뀌며 높이가 커지는
+   걸 보완. */
+@media (max-width: 768px) {
+  .container.page-shell .top-brand-bar {
+    margin-bottom: 10px;
+  }
+}
+
+/* 탭/토글 아이콘-텍스트 간격 스타일은 closing.css로 이동(2026-06) —
+   closing.html/statistics.html 둘 다 closing.css를 로드하므로 중복 방지. */

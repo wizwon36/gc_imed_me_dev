@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>사인물 제작 신청</title>
+  <link rel="stylesheet" href="../../assets/css/common.css" />
+  <link rel="stylesheet" href="../../assets/css/pages/equipment-form.css" />
+  <link rel="stylesheet" href="../../assets/css/pages/signage-form.css" />
+</head>
+<body class="portal-page equipment-form-page signage-form-page">
+  <div class="container page-shell equipment-form-shell">
+
+    <!-- 헤더 -->
+    <section class="top-brand-bar portal-topbar portal-hero-card equipment-form-topbar">
+      <div class="top-brand-left">
+        <div class="top-brand-logo">+</div>
+        <div class="top-brand-texts">
+          <strong class="top-brand-title">MSO관리팀 업무지원 시스템</strong>
+          <span class="top-brand-sub">사인물 · 명판 제작 신청</span>
+        </div>
+      </div>
+      <div class="top-brand-actions portal-top-actions equipment-form-top-actions">
+        <a class="portal-header-btn portal-header-btn--secondary" href="../../portal.html">HOME</a>
+      </div>
+    </section>
+
+    <!-- 타이틀 -->
+    <section class="page-hero-simple equipment-form-hero">
+      <div class="equipment-form-hero-copy">
+        <span class="portal-section-kicker">SIGNAGE REQUEST</span>
+        <h1 class="page-title">사인물 제작 신청</h1>
+        <p class="page-desc">사인물 또는 규격 명판 제작을 신청합니다. <span class="signage-req">*</span> 표시 항목은 필수입니다.</p>
+      </div>
+    </section>
+
+    <div id="messageBox" class="message-box"></div>
+
+    <form id="signageForm" novalidate>
+
+      <!-- STEP 1 -->
+      <div class="card form-card equipment-form-card">
+        <div class="section-head equipment-form-section-head">
+          <div>
+            <span class="portal-section-kicker">STEP 1</span>
+            <h2 class="section-title">제작 종류 선택 <span class="signage-req">*</span></h2>
+            <p class="sub-text equipment-form-section-desc">신청하실 제작 종류를 먼저 선택해 주세요.</p>
+          </div>
+        </div>
+        <div class="signage-type-grid">
+          <label class="signage-type-card" id="typeCard_SIGN">
+            <input type="radio" name="type" value="SIGN" class="signage-sr-only" />
+            <span class="signage-type-icon">🪧</span>
+            <span class="signage-type-title">일반 사인물</span>
+            <span class="signage-type-desc">배너, 간판, 안내판 등<br>맞춤 제작 사인물</span>
+          </label>
+          <label class="signage-type-card" id="typeCard_NAMEPLATE">
+            <input type="radio" name="type" value="NAMEPLATE" class="signage-sr-only" />
+            <span class="signage-type-icon">🏷</span>
+            <span class="signage-type-title">규격 명판</span>
+            <span class="signage-type-desc">A~D 타입 규격 명판<br>사이즈 자동 적용</span>
+          </label>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="card form-card equipment-form-card" id="sectionCommon" style="display:none; margin-top:16px;">
+        <div class="section-head equipment-form-section-head">
+          <div>
+            <span class="portal-section-kicker">STEP 2</span>
+            <h2 class="section-title">기본 정보</h2>
+            <p class="sub-text equipment-form-section-desc">로그인 계정 정보로 자동 입력됩니다. 수정이 필요한 경우 직접 변경해 주세요.</p>
+          </div>
+        </div>
+        <div class="form-grid two-col">
+          <label class="form-field">
+            <span class="form-label required">요청 의원</span>
+            <input type="text" id="clinic_name_display" class="input" readonly placeholder="로그인 정보에서 자동 입력" />
+            <input type="hidden" id="clinic_code" />
+          </label>
+          <label class="form-field">
+            <span class="form-label required">요청 팀</span>
+            <input type="text" id="team_name_display" class="input" readonly placeholder="로그인 정보에서 자동 입력" />
+            <input type="hidden" id="team_code" />
+          </label>
+          <label class="form-field">
+            <span class="form-label required">요청자명</span>
+            <input type="text" id="requester_name" class="input" placeholder="이름을 입력하세요" required />
+          </label>
+          <label class="form-field">
+            <span class="form-label required">연락처</span>
+            <input type="tel" id="contact" class="input" placeholder="010-0000-0000" required />
+          </label>
+          <label class="form-field">
+            <span class="form-label required">수량</span>
+            <input type="number" id="quantity" class="input" min="1" value="1" required />
+          </label>
+          <label class="form-field">
+            <span class="form-label required">긴급 여부</span>
+            <select id="is_urgent" class="input">
+              <option value="N">일반</option>
+              <option value="Y">🚨 긴급</option>
+            </select>
+          </label>
+          <label class="form-field full-col" id="urgentReasonField" style="display:none;">
+            <span class="form-label required">긴급 사유</span>
+            <input type="text" id="urgent_reason" class="input" placeholder="긴급 처리가 필요한 사유를 입력하세요" />
+          </label>
+          <label class="form-field full-col">
+            <span class="form-label required">문구 (텍스트)</span>
+            <textarea id="text_content" class="input textarea" rows="3" placeholder="제작에 들어갈 문구를 입력하세요" required></textarea>
+          </label>
+          <div class="form-field full-col">
+            <span class="form-label">시안 파일 첨부</span>
+            <div class="photo-upload-box">
+              <div class="form-photo-preview signage-file-preview" id="preview_main">
+                <div class="photo-preview-empty" id="previewEmpty_main">첨부된 파일이 없습니다.</div>
+                <div class="signage-file-list" id="fileList_main"></div>
+              </div>
+              <div class="photo-upload-actions">
+                <div class="photo-file-control">
+                  <input type="file" id="file_main" class="photo-file-input" multiple accept="image/*,.pdf,.ai,.psd" />
+                  <label for="file_main" class="photo-file-trigger">파일 선택</label>
+                  <div id="fileName_main" class="photo-file-name">선택된 파일 없음</div>
+                </div>
+                <div class="photo-upload-help">이미지, PDF, AI, PSD 파일을 첨부해 주세요.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3A: 사인물 -->
+      <div class="card form-card equipment-form-card" id="sectionSign" style="display:none; margin-top:16px;">
+        <div class="section-head equipment-form-section-head">
+          <div>
+            <span class="portal-section-kicker">STEP 3</span>
+            <h2 class="section-title">일반 사인물 상세</h2>
+          </div>
+        </div>
+        <div class="form-grid two-col">
+          <label class="form-field">
+            <span class="form-label required">사이즈</span>
+            <input type="text" id="sign_size" class="input" placeholder="예: 900 × 600 × 5 mm" />
+          </label>
+          <label class="form-field">
+            <span class="form-label required">형태 / 종류</span>
+            <input type="text" id="sign_type" class="input" placeholder="예: 현수막, 아크릴 판넬 등" />
+          </label>
+          <label class="form-field full-col">
+            <span class="form-label required">설치 환경</span>
+            <select id="install_env" class="input">
+              <option value="">선택하세요</option>
+              <option value="INDOOR">실내</option>
+              <option value="OUTDOOR">실외</option>
+            </select>
+          </label>
+          <label class="form-field full-col">
+            <span class="form-label required">설치 위치 상세</span>
+            <input type="text" id="install_location" class="input" placeholder="예: 1층 로비 입구 우측" />
+          </label>
+          <div class="form-field full-col">
+            <span class="form-label required">설치 위치 사진 <span class="signage-badge-note">(필수 첨부)</span></span>
+            <div class="photo-upload-box">
+              <div class="form-photo-preview signage-file-preview" id="preview_location">
+                <div class="photo-preview-empty" id="previewEmpty_location">첨부된 사진이 없습니다.</div>
+                <div class="signage-file-list" id="fileList_location"></div>
+              </div>
+              <div class="photo-upload-actions">
+                <div class="photo-file-control">
+                  <input type="file" id="file_location" class="photo-file-input" multiple accept="image/*" />
+                  <label for="file_location" class="photo-file-trigger">사진 선택</label>
+                  <div id="fileName_location" class="photo-file-name">선택된 파일 없음</div>
+                </div>
+                <div class="photo-upload-help">설치 위치가 잘 보이는 사진을 올려주세요.</div>
+              </div>
+            </div>
+          </div>
+          <div class="form-field full-col">
+            <span class="form-label required">참고 자료 <span class="signage-badge-note">(도면 또는 레퍼런스 이미지)</span></span>
+            <div class="photo-upload-box">
+              <div class="form-photo-preview signage-file-preview" id="preview_reference">
+                <div class="photo-preview-empty" id="previewEmpty_reference">첨부된 파일이 없습니다.</div>
+                <div class="signage-file-list" id="fileList_reference"></div>
+              </div>
+              <div class="photo-upload-actions">
+                <div class="photo-file-control">
+                  <input type="file" id="file_reference" class="photo-file-input" multiple accept="image/*,.pdf,.ai,.dwg" />
+                  <label for="file_reference" class="photo-file-trigger">파일 선택</label>
+                  <div id="fileName_reference" class="photo-file-name">선택된 파일 없음</div>
+                </div>
+                <div class="photo-upload-help">도면, 레퍼런스 이미지, PDF, AI, DWG 파일을 첨부해 주세요.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3B: 명판 -->
+      <div class="card form-card equipment-form-card" id="sectionNameplate" style="display:none; margin-top:16px;">
+        <div class="section-head equipment-form-section-head">
+          <div>
+            <span class="portal-section-kicker">STEP 3</span>
+            <h2 class="section-title">규격 명판 상세</h2>
+          </div>
+        </div>
+
+        <div class="form-field" style="margin-bottom:20px;">
+          <span class="form-label required">명판 타입 선택</span>
+          <div class="signage-np-type-grid">
+            <label class="signage-np-card" id="npCard_A">
+              <input type="radio" name="nameplate_type" value="A" class="signage-sr-only" />
+              <div class="signage-np-badge">A</div>
+              <div class="signage-np-size">높이 5cm</div>
+              <div class="signage-np-sub">20cm / 16cm</div>
+            </label>
+            <label class="signage-np-card" id="npCard_B">
+              <input type="radio" name="nameplate_type" value="B" class="signage-sr-only" />
+              <div class="signage-np-badge">B</div>
+              <div class="signage-np-size">높이 4cm</div>
+              <div class="signage-np-sub">20cm / 18cm</div>
+            </label>
+            <label class="signage-np-card" id="npCard_C">
+              <input type="radio" name="nameplate_type" value="C" class="signage-sr-only" />
+              <div class="signage-np-badge">C</div>
+              <div class="signage-np-size">높이 3cm</div>
+              <div class="signage-np-sub">20cm / 18cm</div>
+            </label>
+            <label class="signage-np-card" id="npCard_D">
+              <input type="radio" name="nameplate_type" value="D" class="signage-sr-only" />
+              <div class="signage-np-badge">D</div>
+              <div class="signage-np-size">높이 2.5cm</div>
+              <div class="signage-np-sub">20cm</div>
+            </label>
+          </div>
+        </div>
+
+        <!-- 항상 2컬럼 고정: 왼쪽=타입 디자인(미선택시 안내문구), 오른쪽=레이아웃 -->
+        <div class="signage-np-detail-grid" style="margin-bottom:20px;">
+          <!-- 왼쪽: 타입 미선택 시 안내, 선택 시 이미지 -->
+          <div class="signage-np-detail-col">
+            <span class="form-label">선택한 타입 디자인</span>
+            <div id="npDesignPlaceholder" class="signage-np-placeholder">
+              <span class="signage-np-placeholder-icon">🏷</span>
+              <span class="signage-np-placeholder-text">위에서 명판 타입을 선택해 주세요</span>
+            </div>
+            <img id="nameplateDesignImg" src="" alt="명판 디자인" class="signage-np-img" style="display:none;" />
+            <div class="signage-np-size-badge" id="selectedSizeText" style="display:none;"></div>
+          </div>
+          <!-- 오른쪽: 항상 레이아웃 이미지 -->
+          <div class="signage-np-detail-col">
+            <span class="form-label">문구 레이아웃 안내</span>
+            <img id="layoutImg" src="" alt="문구 레이아웃" class="signage-np-img" />
+            <p class="sub-text" style="margin-top:6px;">위 레이아웃(ㄱ/ㄴ/ㄷ) 중 원하시는 형태를 아래 문구 상세에 기재해 주세요.</p>
+          </div>
+        </div>
+
+        <div class="form-grid two-col">
+          <label class="form-field full-col">
+            <span class="form-label required">설치 환경</span>
+            <select id="install_env_nameplate" class="input">
+              <option value="">선택하세요</option>
+              <option value="INDOOR">실내</option>
+              <option value="OUTDOOR">실외</option>
+            </select>
+          </label>
+          <label class="form-field full-col">
+            <span class="form-label required">명판 문구 상세</span>
+            <textarea id="nameplate_text" class="input textarea" rows="5"
+              placeholder="예)&#10;레이아웃: ㄴ형&#10;성함: 홍길동&#10;직함: MD / G.D&#10;부서: 내과" required></textarea>
+          </label>
+        </div>
+      </div>
+
+      <!-- 신청 버튼 -->
+      <div class="form-actions" id="formActions" style="display:none; margin-top:16px;">
+        <button type="submit" id="submitBtn" class="btn btn-primary">
+          <span id="submitBtnText">신청하기</span>
+        </button>
+      </div>
+
+    </form>
+  </div>
+
+  <!-- 전역 로딩 -->
+  <div id="globalLoading" aria-hidden="true">
+    <div class="global-loading__dialog">
+      <div class="global-loading__spinner"></div>
+      <div id="globalLoadingText" class="global-loading__text">처리 중...</div>
+    </div>
+  </div>
+
+  <!-- ★ 수정: 스크립트 로드 전 스피너를 즉시 표시 (showGlobalLoading과 동일하게 is-open 클래스 사용) -->
+  <script>
+    (function () {
+      var el = document.getElementById('globalLoading');
+      var txt = document.getElementById('globalLoadingText');
+      if (el) {
+        el.classList.add('is-open');
+        el.setAttribute('aria-hidden', 'false');
+      }
+      if (txt) txt.textContent = '화면을 준비하는 중...';
+    })();
+  </script>
+
+  <script src="../../assets/js/core/config.js"></script>
+  <script src="../../assets/js/core/utils.js"></script>
+  <script src="../../assets/js/core/auth.js"></script>
+  <script src="../../assets/js/core/api.js"></script>
+  <script src="../../assets/js/core/org-select.js"></script>
+  <script src="../../assets/js/signage/nameplate-images.js"></script>
+  <script src="../../assets/js/signage/signage-form.js"></script>
+</body>
+</html>

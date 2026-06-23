@@ -1,0 +1,166 @@
+/* =========================
+ * AUTH PAGE — 로그인 / 회원가입 공통 스타일
+ * index.html, register.html, change-password.html 공통
+ * ========================= */
+
+body.auth-page {
+  min-height: 100vh;
+  margin: 0;
+  background:
+    radial-gradient(circle at top left, rgba(37, 99, 235, 0.08), transparent 32%),
+    linear-gradient(180deg, #f8fbff 0%, #eef4fb 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+
+.auth-shell {
+  width: 100%;
+  max-width: 460px;
+}
+
+.auth-card {
+  background: #fff;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-card-hover);
+  padding: 28px;
+}
+
+.auth-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.auth-brand-badge {
+  width: 42px;
+  height: 42px;
+  border-radius: var(--radius-sm);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #22c55e, #2563eb);
+  color: #fff;
+  font-size: 20px;
+  font-weight: 800;
+}
+
+.auth-brand-text strong {
+  display: block;
+  font-size: 18px;
+  line-height: 1.35;
+  color: #0f172a;
+}
+
+.auth-brand-text span {
+  display: block;
+  margin-top: 2px;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #667085;
+}
+
+.auth-title {
+  margin: 0 0 6px;
+  font-size: 26px;
+  line-height: 1.25;
+  color: #0f172a;
+}
+
+.auth-desc {
+  margin: 0 0 20px;
+  font-size: 14px;
+  line-height: 1.55;
+  color: #667085;
+}
+
+.auth-form {
+  display: grid;
+  gap: 14px;
+}
+
+.auth-form .field-group {
+  display: grid;
+  gap: 8px;
+}
+
+.auth-form label {
+  font-size: 13px;
+  font-weight: 800;
+  color: #344054;
+}
+
+.auth-form input {
+  width: 100%;
+  min-height: 52px;
+  padding: 0 16px;
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-md);
+  font-size: 15px;
+  box-sizing: border-box;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.auth-form input:focus {
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.12);
+}
+
+.auth-submit-btn {
+  min-height: 52px;
+  border: 0;
+  border-radius: var(--radius-md);
+  background: #0b1b46;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.auth-submit-btn:disabled {
+  opacity: 0.7;
+  cursor: default;
+}
+
+.auth-message {
+  min-height: 20px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.auth-message.is-error   { color: var(--danger-text); }
+.auth-message.is-success { color: var(--success-text); }
+
+@media (max-width: 768px) {
+  body.auth-page {
+    padding: 16px;
+  }
+
+  .auth-card {
+    padding: 22px;
+    border-radius: var(--radius-lg);
+  }
+
+  .auth-title {
+    font-size: 22px;
+  }
+
+  .auth-desc {
+    font-size: 13px;
+    margin-bottom: 16px;
+  }
+
+  .auth-form {
+    gap: 12px;
+  }
+
+  .auth-form input,
+  .auth-submit-btn {
+    min-height: 48px;
+    border-radius: var(--radius-sm);
+  }
+}

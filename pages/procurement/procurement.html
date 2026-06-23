@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>구매규정 | MSO관리팀 업무포털</title>
+  <link rel="stylesheet" href="../../assets/css/common.css" />
+  <link rel="stylesheet" href="../../assets/css/pages/procurement.css" />
+  <link rel="stylesheet" href="../../assets/libs/ckeditor5/ckeditor5.css" />
+</head>
+<body>
+  <div class="container page-shell">
+
+    <!-- 상단 헤더 -->
+    <section class="top-brand-bar portal-hero-card">
+      <div class="top-brand-left">
+        <div class="top-brand-logo">+</div>
+        <div class="top-brand-texts">
+          <strong class="top-brand-title">GC녹십자아이메드 구매규정</strong>
+          <span class="top-brand-sub">구매규정 조회</span>
+        </div>
+      </div>
+      <div class="top-brand-actions top-actions--cols-3">
+        <button class="portal-header-btn portal-header-btn--deploy" id="prDeployBtn" style="display:none;">🚀 배포</button>
+        <button class="portal-header-btn portal-header-btn--history" id="prVersionHistoryBtn" style="display:none;">🕘 버전 히스토리</button>
+        <button class="portal-header-btn portal-header-btn--primary" id="prPdfDownload">📄 PDF 다운로드</button>
+        <a href="../../pages/regulation/regulation-list.html" class="portal-header-btn portal-header-btn--secondary">규정 목록</a>
+        <a href="../../portal.html" class="portal-header-btn portal-header-btn--secondary">HOME</a>
+      </div>
+    </section>
+
+    <!-- 버전 배지 + 검색 -->
+    <section class="pr-search-section" id="prSearchSection">
+      <div class="pr-version-row">
+        <span class="pr-badge pr-badge--green">Ver 1.0</span>
+        <span class="pr-badge pr-badge--blue">-</span>
+        <span class="pr-badge pr-badge--gray">GC녹십자아이메드 적용</span>
+      </div>
+      <div class="pr-search-wrap">
+        <input
+          type="text"
+          id="prSearchInput"
+          class="pr-search-input"
+          placeholder="조항, 키워드로 검색... (예: 협력사, 계약, 직무분리)"
+          autocomplete="off"
+        />
+        <button class="pr-search-clear" id="prSearchClear" style="display:none;" title="검색 초기화">✕</button>
+      </div>
+      <div id="prSearchResultInfo" class="pr-search-info" style="display:none;"></div>
+    </section>
+
+    <!-- 목차 + 본문 레이아웃 -->
+    <div class="pr-layout">
+
+      <!-- 사이드 목차 -->
+      <aside class="pr-toc-aside" id="prToc">
+        <div class="pr-toc-header">
+          <span class="pr-toc-title">목차</span>
+          <button class="pr-toc-toggle" id="prTocToggle" title="목차 접기/펼치기">◀</button>
+        </div>
+        <nav class="pr-toc-nav" id="prTocNav">
+          <ul class="pr-toc-list">
+            <li class="pr-toc-group">
+              <a class="pr-toc-link pr-toc-link--h1 active" href="#sec-1" data-section="sec-1">1.0 구매규정 총칙</a>
+              <ul>
+                <li><a class="pr-toc-link" href="#sec-1-1" data-section="sec-1-1">1.1 목적</a></li>
+                <li><a class="pr-toc-link" href="#sec-1-2" data-section="sec-1-2">1.2 적용 범위</a></li>
+                <li><a class="pr-toc-link" href="#sec-1-3" data-section="sec-1-3">1.3 권한과 책임</a></li>
+                <li><a class="pr-toc-link" href="#sec-1-4" data-section="sec-1-4">1.4 규정 관리</a></li>
+              </ul>
+            </li>
+            <li class="pr-toc-group">
+              <a class="pr-toc-link pr-toc-link--h1" href="#sec-2" data-section="sec-2">2.0 구매실천지침</a>
+              <ul>
+                <li><a class="pr-toc-link" href="#sec-2-1" data-section="sec-2-1">2.1 구매거래 원칙</a></li>
+                <li><a class="pr-toc-link" href="#sec-2-2" data-section="sec-2-2">2.2 지속가능한 구매</a></li>
+                <li><a class="pr-toc-link" href="#sec-2-3" data-section="sec-2-3">2.3 통제 및 관리</a></li>
+              </ul>
+            </li>
+            <li class="pr-toc-group">
+              <a class="pr-toc-link pr-toc-link--h1" href="#sec-3" data-section="sec-3">3.0 구매 관리</a>
+              <ul>
+                <li><a class="pr-toc-link" href="#sec-3-1" data-section="sec-3-1">3.1 표준 구매 절차</a></li>
+                <li><a class="pr-toc-link" href="#sec-3-2" data-section="sec-3-2">3.2 구매 계약</a></li>
+                <li><a class="pr-toc-link" href="#sec-3-3" data-section="sec-3-3">3.3 협력사 평가</a></li>
+                <li><a class="pr-toc-link" href="#sec-3-4" data-section="sec-3-4">3.4 구매절차 위반</a></li>
+              </ul>
+            </li>
+          </ul>
+        </nav>
+      </aside>
+
+      <!-- 본문 -->
+      <main class="pr-content" id="prContent">
+
+        <!-- ══════════════════════════════════════════════════════ -->
+        <!-- 1.0 구매규정 총칙 -->
+        <!-- ══════════════════════════════════════════════════════ -->
+        <article class="pr-section" id="sec-1">
+          <h2 class="pr-h1">
+            <span class="pr-h1-num">1.0</span>
+            구매규정 총칙
+          </h2>
+
+          <div class="pr-subsection" id="sec-1-1">
+            <div class="pr-subsection-header">
+            <h3 class="pr-h2">1.1 목적</h3>
+            <button class="pr-edit-btn" data-sec-id="sec-1-1" data-sec-title="1.1 목적" title="섹션 편집" style="display:none;">✏️ 편집</button>
+          </div>
+            <p>본 규정은 GC녹십자아이메드(이하 '회사')의 전반적인 구매행위에 대한 정책과 규정을 정의하여 협력사와의 동반성장을 달성하기 위한 목적으로 제정되었다. 회사는 경영 목적을 달성하고 경영방침을 구현하는 데 기여하기 위해 구매규정과 정책을 수립하고, 이를 기반으로 구매프로세스를 표준화하여 관리 운영한다.</p>
+          </div>
+
+          <div class="pr-subsection" id="sec-1-2">
+            <div class="pr-subsection-header">
+            <h3 class="pr-h2">1.2 적용 범위</h3>
+            <button class="pr-edit-btn" data-sec-id="sec-1-2" data-sec-title="1.2 적용 범위" title="섹션 편집" style="display:none;">✏️ 편집</button>
+          </div>
+            <p>본 규정은 GC로부터 권한을 위임 받아 구매활동을 수행하는 모든 조직 및 담당자에게 공통적으로 적용된다. 전 임직원은 구매에 관련된 모든 행위에 대해 본 규정을 준수하여야 하며, 권한과 책임을 위임받은 MSO관리팀은 기본과 원칙을 준수하여 정도투명한 구매활동을 수행한다.</p>
+          </div>
+
+          <div class="pr-subsection" id="sec-1-3">
+            <div class="pr-subsection-header">
+            <h3 class="pr-h2">1.3 권한과 책임</h3>
+            <button class="pr-edit-btn" data-sec-id="sec-1-3" data-sec-title="1.3 권한과 책임" title="섹션 편집" style="display:none;">✏️ 편집</button>
+          </div>
+
+            <h4 class="pr-h3">1.3.1 GC-가족사 간 권한 위임</h4>
+            <p>MSO관리팀은 GC와 가족사를 대상으로 양사간 위수탁계약에 의거하여 구매업무를 수행하며, 본 규정은 구매 업무와 관련된 전 임직원에게 적용된다.</p>
+
+            <h4 class="pr-h3">1.3.2 구매 담당자의 권한과 책임</h4>
+            <p>본 규정에 의하여 전결권자가 결정한 사항은 최고 구매책임자가 결정한 것과 동일한 효력을 갖는다. 구매담당자는 본 규정을 성실히 준수하여야 하며, 그 행위에 대하여 책임을 진다. 전결사항 중에서 특히 중요하다고 판단되는 것이나 이례적인 사항은 전결권자의 상위자까지 보고한다.</p>
+          </div>
+
+          <div class="pr-subsection" id="sec-1-4">
+            <div class="pr-subsection-header">
+            <h3 class="pr-h2">1.4 규정 관리</h3>
+            <button class="pr-edit-btn" data-sec-id="sec-1-4" data-sec-title="1.4 규정 관리" title="섹션 편집" style="display:none;">✏️ 편집</button>
+          </div>
+            <p>본 규정의 관리주관부서는 MSO관리팀으로 하며, 해석함에 있어 질의 또는 이견이 있을 시에는 MSO관리팀과 해당 부서와 협의하여 유권해석을 한다. 별도의 명시적인 규정이 없는 한 구매규정은 동일하고 동등하게 적용되나, 부득이하게 예외가 필요한 경우 최고 구매책임자의 허가를 받아야 한다.</p>
+          </div>
+        </article>
+
+        <!-- ══════════════════════════════════════════════════════ -->
+        <!-- 2.0 구매실천지침 -->
+        <!-- ══════════════════════════════════════════════════════ -->
+        <article class="pr-section" id="sec-2">
+          <div class="pr-section-intro-wrap" id="sec-2-intro">
+            <h2 class="pr-h1">
+              <span class="pr-h1-num">2.0</span>
+              구매실천지침
+              <button class="pr-edit-btn pr-edit-btn--section" data-sec-id="sec-2-intro" data-sec-title="2.0 구매실천지침 (도입문)" style="display:none;">✏️ 편집</button>
+            </h2>
+            <div class="pr-section-intro-content">
+              <p class="pr-intro">MSO관리팀은 회사의 지속가능한 성장을 위해 협력사와의 기본 구매 원칙을 수립하고 정책 준수 여부를 주기적으로 관리 감독한다. 또한 윤리, 인권, 노동 및 지구환경 분야의 국제협약, 국가/지역별 환경안전 및 산업보건에 관한 법률과 규정을 준수하는 협력사와 거래관계를 유지하고, 모든 경영활동이 이루어지는 국가/지역의 법률 및 규제를 준수하여야 한다.</p>
+            </div>
+          </div>
+
+          <div class="pr-subsection" id="sec-2-1">
+            <div class="pr-subsection-header">
+            <h3 class="pr-h2">2.1 구매거래 원칙</h3>
+            <button class="pr-edit-btn" data-sec-id="sec-2-1" data-sec-title="2.1 구매거래 원칙" title="섹션 편집" style="display:none;">✏️ 편집</button>
+          </div>
+
+            <h4 class="pr-h3">2.1.1 MSO관리팀의 역할</h4>
+            <p>MSO관리팀의 주요 역할은 다음과 같다.</p>
+            <ul class="pr-list">
+              <li><strong>최적가격 결정</strong>: 가격, 품질, 납기, 서비스 등 제반 영역에서 최고의 가치를 창출할 수 있는 상품, 원부자재, 부품, 서비스 및 자산 등을 구매하고 공급한다.</li>
+              <li><strong>협력사 선정 및 관리</strong>: 협력사 개발 및 선정, 가격 등 거래조건의 협상, 그리고 협력사에 대한 평가·관리·지원 등의 직무를 수행한다.</li>
+              <li><strong>구매전략 수립 및 실행</strong>: 총원가(TCO: Total Cost of Ownership) 관점에서 가장 경쟁력 있는 가격을 제시할 수 있는 구매전략을 수립하고 적용한다.</li>
+            </ul>
+
+            <h4 class="pr-h3">2.1.2 구매거래 실천지침</h4>
+            <p>회사는 공정하고 투명한 거래 문화를 정착시키고 모든 협력사와 공감, 배려, 상생의 마음으로 더불어 함께 발전하는 정도투명의 경영이념을 실천한다.</p>
+
+            <div class="pr-callout pr-callout--info">
+              <strong>(1) 윤리규범 준수</strong>
+              <p>구매 업무에 관련된 모든 임직원은 GC 윤리 규범 및 규정을 숙지하고 반드시 준수해야 한다. 주요 윤리 판단 및 행동 기준:</p>
+            </div>
+            <ul class="pr-list">
+              <li><strong>금전거래 금지</strong>: 협력업체와의 어떠한 형태의 금전거래(대여, 차용, 투자 등)도 하여서는 안 된다.</li>
+              <li><strong>상급자의 거래업체 추천</strong>: 상급자가 하급자에게 거래업체를 추천하는 것은 가능하나, 특정업체와 거래하도록 압력을 행사하는 것은 부당지시로 일절 금지한다.</li>
+              <li><strong>친인척, 친지 운영업체와의 거래</strong>: 친인척, 친지가 운영하는 업체를 지원하기 위한 고가 구매나 수의계약 행위를 일절 금지한다.</li>
+              <li><strong>업무상 취득 정보의 사적 이용</strong>: 취득한 정보의 외부 누설 또는 사적 이용 행위는 일절 금지한다. (업무상 배임행위로 형사고발 대상)</li>
+              <li><strong>회사 자산의 부당한 사용 금지</strong>: 사소한 정보라도 임의로 유출하거나 또는 사적으로 이용해서는 안된다.</li>
+              <li><strong>경쟁사와의 정보 교환</strong>: 임원(부서장)의 사전 승인없이 경쟁사와 정보를 교환하는 행위는 취득 정보의 중요성 여부를 떠나 금지한다.</li>
+              <li><strong>동산, 부동산 임차 또는 담보 제공</strong>: 협력업체나 이해관계자로부터 동산·부동산을 임차하거나 담보 제공을 요구하여 실질적인 이익을 취해서는 안된다.</li>
+              <li><strong>도박(협력업체 및 직원)</strong>: 임직원 상호 간, 협력업체 및 이해관계자와의 일체의 도박을 금지한다.</li>
+            </ul>
+
+            <div class="pr-callout pr-callout--warning">
+              <strong>(2) 공정 거래</strong>
+              <p>회사는 협력사와 거래할 때 평등한 참여 기회를 보장하고, 관련 법규를 준수하며, 투명하고 공정한 거래를 기반으로 상호신뢰와 협력관계를 구축한다.</p>
+            </div>
+            <div class="pr-callout pr-callout--danger">
+              <strong>[불공정거래행위]</strong>
+              <ol class="pr-list-ol">
+                <li>정당한 사유없는 거래 거절·중단 및 거래내용 제한</li>
+                <li>부당하게 <strong>거래의 상대방을 차별</strong>하여 취급하는 행위</li>
+                <li>부당하게 <strong>경쟁사업자를 배제</strong>하는 행위</li>
+                <li><strong>거래상 지위를 남용</strong>하여 상대방과 거래하는 행위</li>
+                <li>특수관계인 또는 다른 회사에 부당한 자금·자산·인력을 제공하거나 상당히 유리한 조건으로 거래하는 행위</li>
+                <li>다른 사업자와 직접 상품·용역을 거래하면 상당히 유리함에도 불구하고 거래상 실질적인 역할이 없는 특수관계인이나 다른 회사를 매개로 거래하는 행위</li>
+              </ol>
+            </div>
+          </div>
+
+          <div class="pr-subsection" id="sec-2-2">
+            <div class="pr-subsection-header">
+            <h3 class="pr-h2">2.2 지속가능한 구매</h3>
+            <button class="pr-edit-btn" data-sec-id="sec-2-2" data-sec-title="2.2 지속가능한 구매" title="섹션 편집" style="display:none;">✏️ 편집</button>
+          </div>
+            <p>MSO관리팀은 ESG 경영에 대한 이해를 바탕으로 지속가능한 구매를 실천함으로써 회사의 사회적 책임 및 지속적으로 성장해나갈 수 있는 원동력을 구축한다.</p>
+
+            <div class="pr-table-wrap">
+              <p class="pr-table-caption">[표 1] 지속가능한 구매 달성을 위한 구매업무 수행 내용</p>
+              <table class="pr-table">
+                <thead>
+                  <tr><th>분류</th><th>수행 내용</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>ESG공급망 관리</td>
+                    <td>
+                      <ul class="pr-table-list">
+                        <li>구매정책 및 협력사 관리체계 고도화</li>
+                        <li>협력사 ESG 성과평가를 통한 공급망 경쟁력 강화</li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>협력사 동반성장</td>
+                    <td>
+                      <ul class="pr-table-list">
+                        <li>협력사 간담회 등을 통한 수시/정기 VOC 청취</li>
+                        <li>협력사 행동규범 공유를 통한 잠재 Risk 축소</li>
+                      </ul>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td>환경친화적 구매</td>
+                    <td>
+                      <ul class="pr-table-list">
+                        <li>환경 유해요소 사전 파악 및 이해관계자 공유</li>
+                        <li>친환경 소재 또는 친환경 기업의 물품 우선 사용</li>
+                      </ul>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="pr-subsection" id="sec-2-3">
+            <div class="pr-subsection-header">
+            <h3 class="pr-h2">2.3 통제 및 관리</h3>
+            <button class="pr-edit-btn" data-sec-id="sec-2-3" data-sec-title="2.3 통제 및 관리" title="섹션 편집" style="display:none;">✏️ 편집</button>
+          </div>
+
+            <h4 class="pr-h3">2.3.1 직무의 분리 (Separation of Duties)</h4>
+            <p>직무 분리란 구매 업무 수행 시 발생 가능한 위험 및 부정 행위를 방지하기 위해 구매업무 단계별 직무가 동일인 혹은 동일 부서에서 중복 수행되지 않도록 분리하는 것으로, 구매 업무의 투명성 및 공정성을 확보하는 데 목적이 있다.</p>
+            <p>아래 4가지 업무 중, 두 개 이상 연속적인 직무에 대해 책임과 권한을 동시에 갖지 않는다. <strong>(①-②, ②-③, ③-④)</strong></p>
+            <div class="pr-duty-flow">
+              <div class="pr-duty-step">
+                <span class="pr-duty-num">①</span>
+                <div>
+                  <strong>구매 요청</strong>
+                  <p>구매 요청 부서는 소요 판단, 품목등록, 사양 확정, 수량, 품질수준, 납기 등의 요구 사항을 결정하고 구매를 요청한다.</p>
+                </div>
+              </div>
+              <div class="pr-duty-arrow">→</div>
+              <div class="pr-duty-step">
+                <span class="pr-duty-num">②</span>
+                <div>
+                  <strong>협력사 선정 및 계약 체결</strong>
+                  <p>전략적 협력사 발굴 및 공정한 평가를 통해 최적의 협력사를 결정하며, 거래조건 결정 후 계약을 체결하여 구매 발주를 한다.</p>
+                </div>
+              </div>
+              <div class="pr-duty-arrow">→</div>
+              <div class="pr-duty-step">
+                <span class="pr-duty-num">③</span>
+                <div>
+                  <strong>검사/입고</strong>
+                  <p>납품내역에 대해 검수 및 품질검사를 수행한다.</p>
+                </div>
+              </div>
+              <div class="pr-duty-arrow">→</div>
+              <div class="pr-duty-step">
+                <span class="pr-duty-num">④</span>
+                <div>
+                  <strong>대금 지급</strong>
+                  <p>협력사에 대금 지급을 진행한다.</p>
+                </div>
+              </div>
+            </div>
+
+            <h4 class="pr-h3">2.3.2 Compliance 관리</h4>
+            <p>구매 규정의 준수여부 관리는 MSO관리팀장이 내부 심사하며, MSO관리팀은 모니터링 지표(Compliance Check Point)를 정의하고 정기적으로 점검하여 업무 발생이 예상되는 Risk에 대하여 사전 대응하여야 한다. Compliance 담당자는 MSO관리팀장이 선정하여 상시 모니터링을 수행하되, 모니터링 수행 중 이슈 발생 시에는 업무 프로세스 흐름을 중단하지 않고 문제 발견 즉시 통보 및 조치를 요구하여 시정하도록 한다.</p>
+            <p>Compliance 담당자는 모니터링 운영 상황에 대한 데이터를 취하여 검토 및 분석하고, 분석 결과는 연 1회 규정 준수 보고서를 작성하여 관련 담당자 및 팀장, 유관부서와 공유하는 것을 원칙으로 한다.</p>
+          </div>
+        </article>
+
+        <!-- ══════════════════════════════════════════════════════ -->
+        <!-- 3.0 구매 관리 -->
+        <!-- ══════════════════════════════════════════════════════ -->
+        <article class="pr-section" id="sec-3">
+          <div class="pr-section-intro-wrap" id="sec-3-intro">
+            <h2 class="pr-h1">
+              <span class="pr-h1-num">3.0</span>
+              구매 관리
+              <button class="pr-edit-btn pr-edit-btn--section" data-sec-id="sec-3-intro" data-sec-title="3.0 구매 관리 (도입문)" style="display:none;">✏️ 편집</button>
+            </h2>
+            <div class="pr-section-intro-content">
+              <p class="pr-intro">MSO관리팀은 회사 Mission 달성 및 효율적인 업무 수행을 위해 <strong>표준 구매 절차를 규정</strong>하고, 모든 구성원은 이를 준수하여야 한다. 구매 절차 위반 시, 예외 없이 심사를 거쳐 징계 여부를 결정한다. 또한 MSO관리팀은 구매프로세스를 준수함과 동시에, 구매대상 품목의 구매가치 및 공급시장 여건을 분석하여 <strong>구매전략을 수립</strong>하고, 최적화된 구매 시나리오를 선택하여 실행함으로써 <strong>총 구매비용을 절감</strong>하고 Supply Chain의 건전성을 확보한다.</p>
+            </div>
+          </div>
+
+          <div class="pr-subsection" id="sec-3-1">
+            <div class="pr-subsection-header">
+            <h3 class="pr-h2">3.1 표준 구매 절차</h3>
+            <button class="pr-edit-btn" data-sec-id="sec-3-1" data-sec-title="3.1 표준 구매 절차" title="섹션 편집" style="display:none;">✏️ 편집</button>
+          </div>
+
+            <h4 class="pr-h3">3.1.1 자재 유형</h4>
+            <p>회사의 자재 유형을 아래와 같이 정의하고, 간접자재 품목을 제외한 모든 자재 유형 품목은 MSO관리팀에서 발주와 정산의 권한을 가지고 업무를 수행한다.</p>
+
+            <div class="pr-table-wrap">
+              <p class="pr-table-caption">[표 2] 자재 유형</p>
+              <table class="pr-table pr-table--compact">
+                <thead>
+                  <tr><th>자재 유형 1</th><th>자재 유형 2</th><th>자재 유형 3</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td rowspan="2">진단시약</td>
+                    <td rowspan="2">시약류</td>
+                    <td>주시약</td>
+                  </tr>
+                  <tr><td>부시약</td></tr>
+                  <tr>
+                    <td rowspan="2">의약품</td>
+                    <td rowspan="2">의약품</td>
+                    <td>처방의약품</td>
+                  </tr>
+                  <tr><td>비처방의약품</td></tr>
+                  <tr>
+                    <td rowspan="6">소모품</td>
+                    <td rowspan="2">의료소모품</td>
+                    <td>의료소모품</td>
+                  </tr>
+                  <tr><td>위생소모품</td></tr>
+                  <tr>
+                    <td rowspan="2">검사소모품</td>
+                    <td>검사용 소모품</td>
+                  </tr>
+                  <tr><td>장비소모품</td></tr>
+                  <tr>
+                    <td rowspan="2">일반소모품</td>
+                    <td>사무용품</td>
+                  </tr>
+                  <tr><td>인쇄물</td></tr>
+                  <tr>
+                    <td rowspan="2">의료장비</td>
+                    <td rowspan="2">의료장비</td>
+                    <td>진단장비</td>
+                  </tr>
+                  <tr><td>치료장비</td></tr>
+                  <tr><td colspan="3">상품</td></tr>
+                  <tr><td colspan="3">간접자재</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <div class="pr-def-grid">
+              <div class="pr-def-item"><strong>진단시약</strong>: 진단검사에 사용되는 주시약 및 부시약류</div>
+              <div class="pr-def-item"><strong>의약품</strong>: 처방 및 비처방 의약품으로 환자 치료에 사용되는 약제류</div>
+              <div class="pr-def-item"><strong>의료소모품</strong>: 진료 및 처치에 사용되는 의료용 소모품 및 위생용품류</div>
+              <div class="pr-def-item"><strong>검사소모품</strong>: 검사 수행에 사용되는 소모품 및 장비용 소모품류</div>
+              <div class="pr-def-item"><strong>일반소모품</strong>: 사무용품, 인쇄물 등 진료 외 업무 전반에 사용되는 소모품</div>
+              <div class="pr-def-item"><strong>의료장비</strong>: 자산코드가 부여된 진단·치료용 고정자산 장비류</div>
+              <div class="pr-def-item"><strong>상품</strong>: 외부 구매 후 재판매 목적으로 취급하는 품목</div>
+              <div class="pr-def-item"><strong>간접자재</strong>: 서비스 제공을 위한 판촉물, 소모성 비품 등</div>
+            </div>
+
+            <h4 class="pr-h3">3.1.2 구매활동 유형</h4>
+            <ul class="pr-list">
+              <li><strong>일반구매</strong>: 제품 생산에 필요한 원부자재, 부품, 서비스를 외부에서 수급하는 것.</li>
+              <li><strong>제조위탁구매</strong>: 제품생산에 투입되는 원부자재 중 일부를 협력사에 반제품 또는 완제품 상태로 조립해 줄 것을 의뢰하여 납품을 받는 행위.</li>
+              <li><strong>대행구매</strong>: 회사가 협력사에게 일부 품목의 구매를 대행하게 하거나 특정 업무를 위임하는 것.</li>
+              <li><strong>개발구매</strong>: MSO관리팀이 제품 초기 단계부터 최적의 가격경쟁력을 유지하기 위해 원자재의 소싱 등의 행위를 통해 제품개발 단계에 참여하는 것.</li>
+              <li><strong>By Pass 구매</strong>: MSO관리팀의 참여 없이 현업부서와 공급처 사이에 직접 거래가 이루어진 경우. 공정하고 경쟁력 있는 가격 결정 및 협력사 선정의 기회를 상실하게 하는 원인이 되므로 원칙적으로 금지함.</li>
+            </ul>
+
+            <h4 class="pr-h3">3.1.3 구매 Process</h4>
+            <p>MSO관리팀은 현업부서의 구매요청(Purchase Request, 이하 'PR')을 통해 구매품목을 접수하는 것을 원칙으로 하고 공식적인 업무협조를 제외한 협력사와의 가격정보 등이 노출 될 수 있는 견적전달 행위나 현업부서의 구매관련 E-mail, 구두 요청에 대한 대응은 지양한다.</p>
+
+            <div class="pr-callout pr-callout--info">
+              <strong>[표준 구매 절차]</strong>
+            </div>
+            <ul class="pr-list">
+              <li><strong>구매요청(PR)</strong>: 현업부서에서 사업에 필요한 물품을 확보하기 위한 정보를 구매시스템(SAP M/M, SRM 외)에서 구매요청(PR)을 생성하고 관리자에게 결재를 득하는 절차.</li>
+              <li><strong>구매요청접수</strong>: 구매담당자가 품목, 수량, 자재코드 등 구매요청 정보를 수령/검토하는 절차.</li>
+              <li><strong>RFQ</strong>: PR에 기입된 기본정보 또는 URS(User Requirement Specifications)에 따라 단독 또는 복수의 거래선에 견적 참여 요청.</li>
+              <li><strong>견적/입찰참여</strong>: 협력사가 요청 품목/서비스에 대해 단가, 납기, Warranty 등을 확정하고 견적 및 제반사항을 회신.</li>
+              <li><strong>협력사 선정</strong>: 회사의 요구조건에 부합하는 최적의 협력사를 선정.</li>
+              <li><strong>발주(PO, Purchase Order)</strong>: 구매담당자가 발주서를 생성하고 협력사에 관련 내용을 전송하는 행위.</li>
+              <li><strong>납품/서비스 제공</strong>: 협력사가 양사간의 발주 및 계약내용을 이행하는 절차.</li>
+              <li><strong>입고 검수</strong>: 현업 부서에서 물품이 이상이 없는지 검수 후 전산 입고처리.</li>
+              <li><strong>입고내역승인</strong>: 사전 공지된 마감기간에 입고된 품목을 확정하고 협력사에 동의를 구하는 행위.</li>
+              <li><strong>계산서 발행</strong>: 협력사에서 GC로 세금계산서를 정발행하고 MSO관리팀 담당자에게 계산서를 발송함.</li>
+              <li><strong>매입전표처리</strong>: MSO관리팀담당자가 매입된 세금계산서를 ERP에서 송장처리.</li>
+              <li><strong>매입전표승인</strong>: 처리 완료된 송장에 대해 재무/회계부문이 승인하는 절차.</li>
+              <li><strong>대금지급</strong>: 정해진 대금지급 조건에 따라 재무부문이 협력사에 대금을 지급하는 행위.</li>
+            </ul>
+
+            <div class="pr-table-wrap">
+              <p class="pr-table-caption">[표 3] 구매프로세스 도식도</p>
+              <div class="pr-process-flow">
+                <div class="pr-process-col">
+                  <div class="pr-process-header">현업부서</div>
+                  <div class="pr-process-box pr-process-box--start">구매요청(PR)</div>
+                  <div class="pr-process-spacer"></div>
+                  <div class="pr-process-spacer"></div>
+                  <div class="pr-process-spacer"></div>
+                  <div class="pr-process-spacer"></div>
+                  <div class="pr-process-box">입고 검수</div>
+                  <div class="pr-process-box">매입전표승인</div>
+                </div>
+                <div class="pr-process-col pr-process-col--main">
+                  <div class="pr-process-header">구매부서</div>
+                  <div class="pr-process-box">구매요청접수</div>
+                  <div class="pr-process-label-chip">기준자재</div>
+                  <div class="pr-process-box pr-process-box--accent">RFQ</div>
+                  <div class="pr-process-box">협력사 선정</div>
+                  <div class="pr-process-box pr-process-box--accent">발주(PO)</div>
+                  <div class="pr-process-box">입고내역승인</div>
+                  <div class="pr-process-box">매입전표처리</div>
+                </div>
+                <div class="pr-process-col">
+                  <div class="pr-process-header">협력사</div>
+                  <div class="pr-process-spacer"></div>
+                  <div class="pr-process-spacer"></div>
+                  <div class="pr-process-box">견적/입찰참여</div>
+                  <div class="pr-process-spacer"></div>
+                  <div class="pr-process-box">납품/서비스 제공</div>
+                  <div class="pr-process-box">계산서 발행</div>
+                  <div class="pr-process-spacer"></div>
+                  <div class="pr-process-box pr-process-box--accent">대금 지급</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="pr-subsection" id="sec-3-2">
+            <div class="pr-subsection-header">
+            <h3 class="pr-h2">3.2 구매 계약</h3>
+            <button class="pr-edit-btn" data-sec-id="sec-3-2" data-sec-title="3.2 구매 계약" title="섹션 편집" style="display:none;">✏️ 편집</button>
+          </div>
+
+            <h4 class="pr-h3">3.2.1 계약 체결 및 효력</h4>
+            <p>구매 계약에 대한 권한과 책임은 MSO관리팀이 가지며, 승인된 계약서는 회사의 이해관계가 완벽하게 보호되고 구매활동이 적절하게 수행되었음을 보증한다. 신규 협력사일 경우에는 '물품구매기본계약서'를 활용하여 협력사와의 계약을 진행한다. 물품에 대해서는 단가 계약을 진행하고, 개별 단가 계약이 없는 경우는 견적서와 발주서로 대체 한다.</p>
+
+            <h4 class="pr-h3">3.2.2 계약 기본 준수 사항</h4>
+            <ul class="pr-list">
+              <li><strong>서면 발급 및 보존</strong>: 사전에 계약서를 체결하는 것을 원칙으로 하며, 기명날인된 계약서를 서면 교부하고 보존한다.</li>
+              <li><strong>합리적인 가격 결정</strong>: 가격 결정 시 수량, 품질, 사양, 납기, 재료비, 노무비 및 원자재 시황을 고려하고, 적정한 관리비 및 이익을 가산하는 등 합리적이고 객관적인 산정 방식에 따라 단가를 결정한다.</li>
+              <li><strong>합리적인 대금지급 기일</strong>을 결정하고 계약서에 규정한다.</li>
+              <li><strong>부당한 위탁취소 및 수령거부 금지</strong>: 협력사의 귀책사유가 있는 경우를 제외하고 위탁을 임의 취소·변경하거나 납품에 대한 수령을 거부·지연하는 행위를 하지 않는다.</li>
+              <li><strong>부당 반품의 금지</strong>: 협력사의 귀책사유가 있는 경우를 제외하고 부당한 반품을 하지 않는다.</li>
+            </ul>
+
+            <h4 class="pr-h3">3.2.3 계약 관리</h4>
+            <p>신규 공급처와 최초 거래 시에는 표준 계약서(물품구매기본계약서)를 활용하여 계약을 체결한다. 계약문서는 체결업체와 1부씩 보관하며 통합적으로 계약 문서를 관리한다. 표준 계약서를 사용하여 계약 체결 시에는 법무팀 검토를 생략하고, 비표준 계약서 사용 시에는 반드시 법무팀 검토를 거친다. 계약의 유효기간 및 갱신 기간을 내부 규정으로 설정하여 관리하고 MSO관리팀의 구매 담당자가 주기적으로 재협상을 한다.</p>
+          </div>
+
+          <div class="pr-subsection" id="sec-3-3">
+            <div class="pr-subsection-header">
+            <h3 class="pr-h2">3.3 협력사 평가</h3>
+            <button class="pr-edit-btn" data-sec-id="sec-3-3" data-sec-title="3.3 협력사 평가" title="섹션 편집" style="display:none;">✏️ 편집</button>
+          </div>
+            <p>협력사 평가는 기술 및 전문성, 대응력 등이 <strong>우수한 협력사를 발굴</strong>하고, 성과분석을 통해 우수 협력사와 <strong>장기적인 파트너십을 구축</strong>하며, 협력사가 역량을 개선하여 경쟁력을 갖도록 지원함으로써 <strong>공급망 전체의 경쟁력을 강화</strong>하는 데 그 목적이 있다.</p>
+
+            <h4 class="pr-h3">3.3.1 협력사 대금지급</h4>
+            <p>기본 대금지급조건은 GC가 협력사와 상호 협의 하에 결정하되, 하도급사의 경우 최장 60일 이내에 지급이 완료되어야 한다.</p>
+
+            <div class="pr-table-wrap">
+              <p class="pr-table-caption">[표 4] GC가족사 대금지급조건</p>
+              <table class="pr-table">
+                <thead>
+                  <tr><th>구분</th><th>마감기간</th><th>기본 대금지급조건</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>GC Labs</td><td>매월 30일 이전 입고분</td><td>계산서 발행일로부터 90일 현금</td></tr>
+                  <tr><td>GC Genome</td><td>매월 25일 이전 입고분</td><td>계산서 발행일로부터 60일 현금</td></tr>
+                  <tr><td>Mogam Institute</td><td>매월 30일 이전 입고분</td><td>계산서 발행일로부터 60일 현금</td></tr>
+                  <tr><td>GCWB</td><td>매월 30일 이전 입고분</td><td>계산서 발행일로부터 60일 현금</td></tr>
+                  <tr><td>GC Cell</td><td>매월 25일 이전 입고분</td><td>계산서 발행일로부터 60일 현금</td></tr>
+                  <tr><td>GreenVET</td><td>매월 25일 이전 입고분</td><td>계산서 발행일로부터 60일 현금</td></tr>
+                  <tr><td>GCCL</td><td>매월 25일 이전 입고분</td><td>계산서 발행일로부터 60일 현금</td></tr>
+                  <tr><td>기계장치</td><td>사용자 품질규격 승인 시, 당월마감</td><td>상호 계약에 근거</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <h4 class="pr-h3">3.3.2 협력사 경고 및 징계</h4>
+            <p>협력사와의 거래가 더이상 불가능하다고 판단한 경우, 아래의 근거를 바탕으로 MSO관리팀장의 결재를 득하여 거래 정지 또는 거래 종료할 수 있다.</p>
+
+            <div class="pr-table-wrap">
+              <p class="pr-table-caption">[표 5] 협력사 경고 및 징계표</p>
+              <table class="pr-table pr-table--compact">
+                <thead>
+                  <tr><th>과정별 분류</th><th>주요 제재 대상 행위</th><th>제재 기준</th></tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td rowspan="4">전과정<br>(공정/투명거래 준수위반)</td>
+                    <td>거래의 성립, 유리한 거래 조건의 설정 등 거래에 영향을 미칠 목적으로 현금, 상품권 등의 금품, 향응, 접대, 편의 등을 직접 또는 제3자를 통하여 제공하는 행위</td>
+                    <td class="pr-badge-cell"><span class="pr-sanction pr-sanction--red">영구퇴출</span></td>
+                  </tr>
+                  <tr>
+                    <td>공정하고 객관적인 업무수행을 저해하는 금전대차, 대출보증 등의 금전거래 행위 및 부동산 매매, 임대차 등의 부동산 거래 행위</td>
+                    <td class="pr-badge-cell"><span class="pr-sanction pr-sanction--red">영구퇴출</span></td>
+                  </tr>
+                  <tr>
+                    <td>타 사업자와의 입찰담합 등의 불공정 거래 행위</td>
+                    <td class="pr-badge-cell"><span class="pr-sanction pr-sanction--red">영구퇴출</span></td>
+                  </tr>
+                  <tr>
+                    <td>거래관계에서 알게 된 기술자료, 경영정보 등을 사전 서면 동의 없이 무단 사용 또는 제 3자에게 무단 유출하는 행위</td>
+                    <td class="pr-badge-cell"><span class="pr-sanction pr-sanction--red">영구퇴출</span></td>
+                  </tr>
+                  <tr>
+                    <td>협력사 등록</td>
+                    <td>협력사 등록 시 자격 요건 서류 및 관련 면허를 고의로 허위 제출한 경우</td>
+                    <td class="pr-badge-cell"><span class="pr-sanction pr-sanction--red">영구퇴출</span></td>
+                  </tr>
+                  <tr>
+                    <td rowspan="5">계약자 선정</td>
+                    <td>경쟁업체 또는 GC 및 가족사에 대해 악의성 투서 또는 유언비어 유포 행위</td>
+                    <td class="pr-badge-cell"><span class="pr-sanction pr-sanction--orange">거래정지 1년</span></td>
+                  </tr>
+                  <tr>
+                    <td>입찰 참여에 필요한 입찰 자격 요건 및 관련 면허 등 제반사항이 타사 명의의 도움 또는 부당한 사용, 허위로 판명된 경우</td>
+                    <td class="pr-badge-cell"><span class="pr-sanction pr-sanction--orange">거래정지 2년</span></td>
+                  </tr>
+                  <tr>
+                    <td>입찰, 협상관련 업무 방해</td>
+                    <td class="pr-badge-cell"><span class="pr-sanction pr-sanction--orange">거래정지 1년</span></td>
+                  </tr>
+                  <tr>
+                    <td>가격 정보를 GC 구매부서가 아닌 타 부서 및 경쟁업체에게 공개하는 행위</td>
+                    <td class="pr-badge-cell"><span class="pr-sanction pr-sanction--orange">거래정지 2년</span></td>
+                  </tr>
+                  <tr>
+                    <td>GC 및 가족사 내부 지인 또는 외부인을 통한 부정당한 계약자 선정 청탁</td>
+                    <td class="pr-badge-cell"><span class="pr-sanction pr-sanction--orange">거래정지 3년</span></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <div class="pr-subsection" id="sec-3-4">
+            <div class="pr-subsection-header">
+            <h3 class="pr-h2">3.4 구매 절차 위반</h3>
+            <button class="pr-edit-btn" data-sec-id="sec-3-4" data-sec-title="3.4 구매 절차 위반" title="섹션 편집" style="display:none;">✏️ 편집</button>
+          </div>
+
+            <h4 class="pr-h3">3.4.1 구매 절차 위반의 정의</h4>
+            <p>구매절차 위반의 기준을 아래의 같이 정의한다.</p>
+            <ul class="pr-list">
+              <li>구매 담당자의 참여 없이 공급처 선정, 가격 결정, 계약조건 협의 업무 또는 업무 시작 지시나 진행된 경우</li>
+              <li>구매 의사결정 사항에 대해 구매담당자가 영향을 줄 수 없는 경우 (요청부서가 공급처에 구두로 계약을 약속한 상황도 구매절차 위반으로 간주)</li>
+              <li>승인된 구매주문서 상의 금액 또는 기간을 초과하여 거래가 지속된 경우</li>
+              <li>구매 대상인 품목에 대해 이미 계약 및 공지된 공급처가 있음에도 다른 공급처에 발주한 경우</li>
+              <li>구매 대상인 품목에 대해 계약된 공급처에 발주 하였으나, 공식적인 구매 절차를 거치지 아니하고 요청부서에서 자체적으로 진행한 경우</li>
+            </ul>
+
+            <h4 class="pr-h3">3.4.2 규정 위반자에 대한 조치</h4>
+            <p>구매 규정 위반 사항 발생시, 전결규정 및 내부승인절차에 따라 관리자에게 보고 한다. 위반에 따른 조치는 사규에 따른다.</p>
+
+            <div class="pr-table-wrap">
+              <p class="pr-table-caption">[표 6] 규정 위반자에 대한 보고선</p>
+              <table class="pr-table">
+                <thead>
+                  <tr><th>위반 횟수</th><th>팀장</th><th>실장</th><th>감사/인사</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>1회 위반</td><td>보고</td><td>✕</td><td>△</td></tr>
+                  <tr><td>2회 위반</td><td>보고</td><td>✕</td><td>△</td></tr>
+                  <tr><td>3회 위반</td><td>보고</td><td>보고</td><td>△</td></tr>
+                  <tr class="pr-table-row--highlight"><td>4회 이상</td><td colspan="3">MSO관리팀·담당실장의 판단에 따라 인사팀/감사팀 이관</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </article>
+
+
+      </main>
+    </div><!-- /pr-layout -->
+  </div><!-- /container -->
+
+  <!-- 맨 위로 버튼 -->
+  <button class="pr-back-to-top" id="prBackToTop" title="맨 위로">↑</button>
+
+  <!-- ── 배포 모달 ─────────────────────────────────────────── -->
+  <div class="pr-modal-backdrop" id="prDeployModal" style="display:none;">
+    <div class="pr-modal pr-modal--sm">
+      <div class="pr-modal-header">
+        <div>
+          <h2 class="pr-modal-title">버전 배포</h2>
+          <p class="pr-modal-subtitle">현재 규정 전체를 새 버전으로 저장합니다.</p>
+        </div>
+        <button class="pr-modal-close" id="prDeployModalClose" title="닫기">✕</button>
+      </div>
+      <div class="pr-modal-body">
+        <div class="pr-modal-msg" id="prDeployModalMsg" style="display:none;"></div>
+        <div class="pr-form-row">
+          <label class="pr-form-label" for="prDeployVersionLabel">버전명 <span class="pr-required">*</span></label>
+          <input type="text" id="prDeployVersionLabel" class="pr-form-input" placeholder="예: Ver 1.1" autocomplete="off" />
+        </div>
+        <div class="pr-form-row">
+          <label class="pr-form-label" for="prDeployEffectiveDate">시행일 <span class="pr-required">*</span></label>
+          <input type="date" id="prDeployEffectiveDate" class="pr-form-input" />
+        </div>
+        <div class="pr-form-row">
+          <label class="pr-form-label" for="prDeployMemo">변경 사유 (선택)</label>
+          <textarea id="prDeployMemo" class="pr-form-textarea" placeholder="주요 변경 내용을 입력하세요." rows="3"></textarea>
+        </div>
+      </div>
+      <div class="pr-modal-footer">
+        <button type="button" class="btn btn-primary" id="prDeployConfirmBtn">🚀 배포 확정</button>
+        <button type="button" class="btn pr-cancel-btn" id="prDeployCancelBtn">취소</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── 버전 히스토리 모달 ──────────────────────────────────── -->
+  <div class="pr-modal-backdrop" id="prVersionModal" style="display:none;">
+    <div class="pr-modal pr-modal--wide">
+      <div class="pr-modal-header">
+        <div>
+          <h2 class="pr-modal-title">버전 히스토리</h2>
+          <p class="pr-modal-subtitle">배포된 버전을 확인하고 복원할 수 있습니다.</p>
+        </div>
+        <button class="pr-modal-close" id="prVersionModalClose" title="닫기">✕</button>
+      </div>
+
+      <!-- 목록 뷰 -->
+      <div id="prVersionListView">
+        <div class="pr-modal-body pr-version-list-body">
+          <div class="pr-modal-msg" id="prVersionListMsg" style="display:none;"></div>
+          <div id="prVersionListWrap">
+            <div class="pr-version-loading">목록 불러오는 중...</div>
+          </div>
+        </div>
+        <div class="pr-version-pager" id="prVersionPager" style="display:none;"></div>
+        <div class="pr-modal-footer">
+          <button type="button" class="btn pr-cancel-btn" id="prVersionModalCloseBtn">닫기</button>
+        </div>
+      </div>
+
+      <!-- 상세 뷰 (특정 버전 미리보기) -->
+      <div id="prVersionDetailView" style="display:none;">
+        <div class="pr-modal-body pr-version-detail-body">
+          <div class="pr-version-detail-meta" id="prVersionDetailMeta"></div>
+          <div class="pr-modal-msg" id="prVersionDetailMsg" style="display:none;"></div>
+          <div class="pr-version-detail-content" id="prVersionDetailContent">
+            <div class="pr-version-loading">내용 불러오는 중...</div>
+          </div>
+        </div>
+        <div class="pr-modal-footer">
+          <button type="button" class="btn btn-primary" id="prVersionRestoreBtn">↩ 이 버전으로 복원</button>
+          <button type="button" class="btn" id="prVersionBackBtn">← 목록으로</button>
+          <button type="button" class="btn pr-cancel-btn" id="prVersionDetailCloseBtn">닫기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+    <!-- 편집 모달 (admin 전용) -->
+  <div class="pr-modal-backdrop" id="prEditModal" style="display:none;">
+    <div class="pr-modal">
+      <div class="pr-modal-header">
+        <div>
+          <h2 class="pr-modal-title" id="prEditModalTitle">섹션 편집</h2>
+          <p class="pr-modal-subtitle" id="prEditModalSubtitle"></p>
+        </div>
+        <button class="pr-modal-close" id="prEditModalClose" title="닫기">✕</button>
+      </div>
+      <!-- Step 1: 편집 -->
+      <div class="pr-modal-body" id="prEditStep1">
+        <div class="pr-modal-msg" id="prEditModalMsg" style="display:none;"></div>
+        <div id="prEditorArea"></div>
+      </div>
+      <div class="pr-modal-footer" id="prEditFooter1">
+        <button type="button" class="btn btn-primary" id="prEditPreviewBtn">변경 내용 확인 →</button>
+        <button type="button" class="btn pr-cancel-btn" id="prEditCancelBtn">취소</button>
+        <span class="pr-modal-updated" id="prEditLastUpdated"></span>
+      </div>
+
+      <!-- Step 2: diff 확인 -->
+      <div class="pr-modal-body pr-diff-body" id="prEditStep2" style="display:none;">
+        <div class="pr-modal-msg" id="prEditModalMsg2" style="display:none;"></div>
+        <div class="pr-diff-wrap">
+          <div class="pr-diff-col">
+            <div class="pr-diff-label pr-diff-label--before">저장 전</div>
+            <div class="pr-diff-content" id="prDiffBefore"></div>
+          </div>
+          <div class="pr-diff-col">
+            <div class="pr-diff-label pr-diff-label--after">저장 후</div>
+            <div class="pr-diff-content" id="prDiffAfter"></div>
+          </div>
+        </div>
+      </div>
+      <div class="pr-modal-footer" id="prEditFooter2" style="display:none;">
+        <button type="button" class="btn btn-primary pr-save-btn" id="prEditSaveBtn">저장 확정</button>
+        <button type="button" class="btn" id="prEditBackBtn">← 다시 편집</button>
+        <button type="button" class="btn pr-cancel-btn" id="prEditCancelBtn2">취소</button>
+        <span class="pr-revert-wrap" id="prRevertWrap" style="display:none;">
+          <button type="button" class="btn pr-revert-btn" id="prRevertBtn">↩ 이전 버전으로 되돌리기</button>
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <script src="../../assets/js/core/config.js"></script>
+  <script src="../../assets/js/core/api.js"></script>
+  <script src="../../assets/js/core/utils.js"></script>
+  <script src="../../assets/js/core/auth.js"></script>
+  <script src="../../assets/js/core/app-permission.js"></script>
+  <script src="../../assets/js/procurement/procurement.js"></script>
+
+  <div id="globalLoading" aria-hidden="true">
+    <div class="global-loading__dialog">
+      <div class="global-loading__spinner" aria-hidden="true"></div>
+      <div class="global-loading__text" id="globalLoadingText">불러오는 중...</div>
+    </div>
+  </div>
+</body>
+</html>

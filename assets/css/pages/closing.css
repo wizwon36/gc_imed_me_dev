@@ -1,0 +1,445 @@
+/* ════════════════════════════════════════════════════════════
+   월마감 자동화 (closing) 전용 스타일
+   ════════════════════════════════════════════════════════════ */
+
+/* ── 탭 ─────────────────────────────────────────────────── */
+.cl-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 24px;
+  padding: 4px;
+  background: #f1f5f9;
+  border-radius: 10px;
+  width: fit-content;
+}
+.cl-tab {
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  cursor: pointer;
+  background: none;
+  border: none;
+  border-radius: 7px;
+  transition: color .15s, background .15s, box-shadow .15s;
+  white-space: nowrap;
+}
+.cl-tab:hover { color: #1a56db; background: #e2e8f0; }
+.cl-tab.active {
+  color: #1a56db;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(0,0,0,.1);
+}
+
+/* ── 스텝 바 ─────────────────────────────────────────────── */
+.cl-steps {
+  display: flex;
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  margin-bottom: 18px;
+}
+.cl-step {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-right: 1px solid var(--border-soft);
+  transition: background .2s;
+}
+.cl-step:last-child { border-right: none; }
+.cl-step.active { background: #eff6ff; }
+.cl-step.done   { background: #f0fdf4; }
+.cl-step-num {
+  width: 26px; height: 26px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px; font-weight: 700; flex-shrink: 0;
+  background: #e2e8f0; color: #64748b;
+  transition: background .2s, color .2s;
+}
+.cl-step.active .cl-step-num { background: #1a56db; color: #fff; }
+.cl-step.done   .cl-step-num { background: #0e7c3a; color: #fff; }
+.cl-step-label { font-size: 12px; color: var(--text-secondary); line-height: 1.35; }
+.cl-step.active .cl-step-label { color: #1a56db; font-weight: 600; }
+.cl-step.done   .cl-step-label { color: #0e7c3a; }
+
+/* ── 업로드 존 ───────────────────────────────────────────── */
+.cl-upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.cl-upload-zone {
+  border: 2px dashed var(--border-dashed);
+  border-radius: var(--radius-md);
+  padding: 28px 20px;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
+  transition: border-color .2s, background .2s;
+  background: #f8fafc;
+}
+.cl-upload-zone:hover,
+.cl-upload-zone.dragover { border-color: #1a56db; background: #eff6ff; }
+.cl-upload-zone.uploaded  { border-color: #0e7c3a; border-style: solid; background: #f0fdf4; }
+.cl-upload-zone input[type=file] {
+  position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%;
+}
+.cl-upload-icon   { font-size: 26px; margin-bottom: 8px; }
+.cl-upload-label  { font-size: 13px; font-weight: 700; color: var(--text-primary); margin-bottom: 4px; }
+.cl-upload-hint   { font-size: 11px; color: var(--text-muted); }
+.cl-upload-status { font-size: 12px; color: #0e7c3a; font-weight: 600; margin-top: 6px; }
+
+/* ── 설정 행 ─────────────────────────────────────────────── */
+.cl-settings-row { display: flex; gap: 14px; flex-wrap: wrap; align-items: flex-end; }
+.cl-field { display: flex; flex-direction: column; gap: 5px; }
+.cl-field label {
+  font-size: 11px; font-weight: 700;
+  color: var(--text-secondary);
+  text-transform: uppercase; letter-spacing: .5px;
+}
+.cl-field input[type=text],
+.cl-field input[type=month],
+.cl-field select {
+  border: 1px solid var(--border-input);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+  font-size: 13px;
+  color: var(--text-primary);
+  background: #fff;
+  outline: none;
+  transition: border-color .15s;
+  min-width: 140px;
+}
+.cl-field input:focus,
+.cl-field select:focus { border-color: #1a56db; }
+
+/* ── 진행 표시 ───────────────────────────────────────────── */
+.cl-progress-label {
+  font-size: 12px; color: var(--text-secondary);
+  margin-bottom: 6px;
+  display: flex; justify-content: space-between;
+}
+.cl-progress-bar {
+  height: 6px; background: #e2e8f0;
+  border-radius: 10px; overflow: hidden;
+}
+.cl-progress-fill {
+  height: 100%; background: #1a56db;
+  border-radius: 10px; transition: width .4s ease;
+}
+.cl-log {
+  background: #0f172a;
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  font-family: 'Consolas', 'D2Coding', monospace;
+  font-size: 12px;
+  max-height: 340px; overflow-y: auto;
+  color: #94a3b8;
+  margin-top: 10px;
+}
+.cl-log-line { margin-bottom: 3px; line-height: 1.6; }
+.cl-log-line.ok   { color: #4ade80; }
+.cl-log-line.info { color: #60a5fa; }
+.cl-log-line.warn { color: #fbbf24; }
+.cl-log-line.err  { color: #f87171; }
+.cl-log-time      { color: #475569; margin-right: 8px; }
+
+/* ── 요약 카드 ───────────────────────────────────────────── */
+.cl-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-bottom: 16px;
+}
+.cl-stat {
+  background: #fff;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+}
+.cl-stat-label {
+  font-size: 11px; font-weight: 700;
+  color: var(--text-secondary);
+  margin-bottom: 5px;
+  text-transform: uppercase; letter-spacing: .5px;
+}
+.cl-stat-val  { font-size: 18px; font-weight: 800; color: var(--text-primary); }
+.cl-stat-sub  { font-size: 11px; color: var(--text-muted); margin-top: 3px; }
+
+/* ── 다운로드 카드 ───────────────────────────────────────── */
+.cl-dl-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+.cl-dl-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 16px;
+  display: flex; flex-direction: column; gap: 7px;
+  cursor: pointer;
+  transition: box-shadow .15s, border-color .15s;
+  background: #fff;
+}
+.cl-dl-card:hover { box-shadow: 0 4px 14px rgba(0,0,0,.08); border-color: #1a56db; }
+.cl-dl-card.gc    { border-left: 3px solid #0e7c3a; }
+.cl-dl-card.imed  { border-left: 3px solid #b45309; }
+.cl-dl-card.both  { border-left: 3px solid #1a56db; }
+.cl-dl-tag {
+  font-size: 10px; font-weight: 700;
+  padding: 2px 8px; border-radius: 20px;
+  display: inline-block; width: fit-content;
+}
+.cl-dl-tag.gc   { background: #e6f4ec; color: #0e7c3a; }
+.cl-dl-tag.imed { background: #fef3e2; color: #b45309; }
+.cl-dl-tag.both { background: #e8effd; color: #1a56db; }
+.cl-dl-name   { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+.cl-dl-sheets { font-size: 10px; color: var(--text-muted); line-height: 1.5; }
+
+/* ── 거래처 관리 테이블 ──────────────────────────────────── */
+.cl-vendor-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.cl-vendor-table th {
+  padding: 10px 14px;
+  text-align: left; font-weight: 700;
+  color: var(--text-secondary);
+  background: #f8fafc;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.cl-vendor-table td {
+  padding: 7px 14px;
+  border-bottom: 1px solid var(--border-soft);
+  vertical-align: middle;
+}
+.cl-vendor-table tr:last-child td { border-bottom: none; }
+.cl-vendor-table tr:hover td { background: #f8fafc; }
+.cl-vendor-table input[type=text],
+.cl-vendor-table input[type=number],
+.cl-vendor-table select {
+  width: 100%;
+  border: 1px solid var(--border-input);
+  border-radius: 6px;
+  padding: 5px 8px;
+  font-size: 13px;
+  background: #fff;
+  outline: none;
+}
+.cl-vendor-table input:focus,
+.cl-vendor-table select:focus { border-color: #1a56db; }
+
+/* ── 미리보기 테이블 ─────────────────────────────────────── */
+.cl-preview-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+}
+.cl-preview { width: 100%; border-collapse: collapse; font-size: 12px; }
+.cl-preview th {
+  background: #f1f5f9;
+  padding: 8px 12px;
+  text-align: left; font-weight: 700;
+  color: var(--text-secondary);
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+.cl-preview td {
+  padding: 7px 12px;
+  border-bottom: 1px solid var(--border-soft);
+  color: var(--text-primary);
+  white-space: nowrap;
+}
+.cl-preview tr:last-child td { border-bottom: none; }
+.cl-preview tr:hover td { background: #f8fafc; }
+.cl-preview .num { text-align: right; font-variant-numeric: tabular-nums; }
+.cl-preview .more { text-align: center; padding: 10px !important; color: var(--text-muted); font-style: italic; }
+.cl-tag-gc   { background: #e6f4ec; color: #0e7c3a; padding: 2px 7px; border-radius: 4px; font-weight: 700; font-size: 11px; }
+.cl-tag-imed { background: #fef3e2; color: #b45309; padding: 2px 7px; border-radius: 4px; font-weight: 700; font-size: 11px; }
+
+/* ── 섹션 전환 ───────────────────────────────────────────── */
+.cl-section { display: none; }
+.cl-section.active { display: block; }
+
+/* ── 인라인 유틸 ─────────────────────────────────────────── */
+.cl-info-box {
+  background: #eff6ff;
+  border: 1px solid #bfdbfe;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #1e40af;
+  margin-bottom: 14px;
+}
+.cl-warn-box {
+  background: #fffbeb;
+  border: 1px solid #fde68a;
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 13px;
+  color: #92400e;
+  margin-bottom: 14px;
+}
+.cl-divider { height: 1px; background: var(--border-soft); margin: 16px 0; }
+
+/* ── 반응형 ─────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .cl-summary-grid { grid-template-columns: repeat(2, 1fr); }
+  .cl-dl-grid      { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .cl-upload-grid,
+  .cl-summary-grid,
+  .cl-dl-grid      { grid-template-columns: 1fr; }
+  .cl-steps        { flex-direction: column; }
+  .cl-step         { border-right: none; border-bottom: 1px solid var(--border-soft); }
+}
+
+/* ── 모바일 자재코드 전용 ────────────────────────────────── */
+@media (max-width: 768px) {
+  /* 자재코드 탭만 표시 */
+  #tabClosing, #tabVendor, #tabHistory { display: none !important; }
+  #tabItem { border-bottom: 2px solid #1a56db; color: #1a56db; }
+
+  /* 자재코드 탭 - 추가 기능 숨김 */
+  #itemFileInput,
+  label[for="itemFileInput"],
+  #btnSaveItems,
+  #itemUploadPreview,
+  #itemSummaryRow { display: none !important; }
+
+  /* 헤더 버튼 영역 숨김 */
+  #tabItemContent .card-body > div:first-child > div:last-child { display: none !important; }
+
+  /* 초기 재고 업로드 카드 숨김 */
+  #tabItemContent .card + .card { display: none !important; }
+
+  /* 월마감/거래처/마감현황 탭 콘텐츠 숨김 */
+  #tabClosingContent, #tabVendorContent, #tabHistoryContent { display: none !important; }
+
+  /* 검색/필터 영역 */
+  #tabItemContent .card-body > div:nth-child(2) {
+    flex-wrap: wrap !important;
+    gap: 6px !important;
+  }
+  #tabItemContent .card-body > div:nth-child(2) > div { min-width: 0 !important; }
+  #itemFilterStatus { display: none !important; }
+
+  /* 테이블 - 상태/수정 컬럼 숨김 */
+  .cl-vendor-table thead tr th:nth-child(6),
+  .cl-vendor-table thead tr th:last-child,
+  #itemTbody tr td:nth-child(6),
+  #itemTbody tr td:last-child { display: none !important; }
+
+  /* 테이블 폰트/패딩 축소 */
+  .cl-vendor-table th, .cl-vendor-table td {
+    font-size: 12px !important;
+    padding: 6px 6px !important;
+  }
+
+  /* 구분 컬럼 너비 확보 */
+  .cl-vendor-table th:nth-child(3),
+  .cl-vendor-table td:nth-child(3) { width: 42px !important; min-width: 42px !important; }
+
+  /* 단가 우측 정렬 */
+  .cl-vendor-table td:nth-child(4),
+  .cl-vendor-table td:nth-child(5) { text-align: right !important; }
+
+  /* 페이지네이션 버튼 축소 */
+  #itemPagination button {
+    padding: 4px 7px !important;
+    font-size: 11px !important;
+    min-width: 28px !important;
+  }
+  #itemPagination { flex-wrap: wrap !important; }
+}
+
+/* ── 마감 현황 카드 ──────────────────────────────────────── */
+.hist-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+}
+.hist-card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 18px 16px;
+  display: flex; flex-direction: column; gap: 8px;
+  background: #fff;
+  transition: box-shadow .15s;
+  min-height: 110px;
+}
+.hist-card--done {
+  border-color: #bbf7d0;
+  background: #f0fdf4;
+}
+.hist-card--none {
+  background: #f8fafc;
+  opacity: .7;
+}
+.hist-card__top {
+  display: flex; justify-content: space-between; align-items: flex-start;
+}
+.hist-card__month {
+  font-size: 20px; font-weight: 800;
+  color: var(--text-primary);
+}
+.hist-card--none .hist-card__month { color: #94a3b8; }
+.hist-card__badge {
+  display: inline-block;
+  padding: 2px 10px; border-radius: 20px;
+  font-size: 11px; font-weight: 700;
+  width: fit-content;
+}
+.hist-card__badge--done { background: #dcfce7; color: #166534; }
+.hist-card__badge--none { background: #f1f5f9; color: #94a3b8; }
+.hist-card__meta {
+  display: flex; flex-direction: row; align-items: center;
+  justify-content: space-between; gap: 6px;
+  margin-top: auto;
+}
+.hist-card__date { font-size: 11px; color: #64748b; white-space: nowrap; }
+.hist-card__by   { font-size: 11px; color: #94a3b8; text-align: right; }
+.hist-card__del {
+  padding: 3px 7px;
+  border: 1px solid #fecaca; border-radius: 6px;
+  background: #fff; font-size: 13px; cursor: pointer;
+  color: #dc2626; line-height: 1;
+  transition: border-color .15s, background .15s;
+  flex-shrink: 0;
+}
+.hist-card__del:hover { border-color: #dc2626; background: #fef2f2; }
+
+/* ── 스켈레톤 ────────────────────────────────────────────── */
+.hist-card--skeleton {
+  border-color: var(--border);
+  background: #f8fafc;
+  pointer-events: none;
+}
+.skel {
+  background: linear-gradient(90deg, #e2e8f0 25%, #f1f5f9 50%, #e2e8f0 75%);
+  background-size: 200% 100%;
+  animation: skel-shimmer 1.4s infinite;
+  border-radius: 6px;
+}
+.skel--title  { height: 24px; width: 48px; }
+.skel--badge  { height: 18px; width: 56px; border-radius: 20px; }
+.skel--text   { height: 12px; width: 80%; margin-top: auto; }
+@keyframes skel-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* 탭/토글/버튼 아이콘(2026-06) — 이모지를 Tabler 아이콘으로 교체하면서
+   텍스트와의 간격이 좁아 보이지 않도록 보강. closing.html/statistics.html
+   둘 다 이 파일을 로드하므로 여기 한 곳에만 정의한다. #appBody 전체로
+   범위를 넓혀 탭뿐 아니라 본문 곳곳의 버튼/제목 아이콘도 포함한다. */
+#appBody .cl-tab i,
+.stat-seg-toggle-btn i,
+.stat-subtab-underline-btn i,
+#appBody i.ti {
+  margin-right: 5px;
+  vertical-align: -1px;
+}
+#appBody .cl-upload-icon i.ti {
+  margin-right: 0;
+}
+#appBody .cl-tab i,
+.stat-seg-toggle-btn i,
+.stat-subtab-underline-btn i {
+  font-size: 14px;
+}

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>가입 신청 · MSO관리팀 업무지원시스템</title>
+  <link rel="stylesheet" href="../../assets/css/common.css">
+  <link rel="stylesheet" href="../../assets/css/pages/auth.css" />
+</head>
+<body class="auth-page">
+  <main class="auth-shell">
+    <section class="auth-card">
+      <div class="auth-brand">
+        <div class="auth-brand-badge">+</div>
+        <div class="auth-brand-text">
+          <strong>MSO관리팀 업무지원시스템</strong>
+          <span>관리자 승인 후 계정이 활성화됩니다.</span>
+        </div>
+      </div>
+
+      <!-- 신청 폼 -->
+      <div id="formSection">
+        <h1 class="auth-title">가입 신청</h1>
+        <p class="auth-desc">아래 정보를 입력하면 관리자 검토 후 승인 처리됩니다.</p>
+
+        <div class="reg-form">
+          <div class="field-group">
+            <label for="regEmail">이메일(아이디) <span class="field-badge required">필수</span></label>
+            <input type="email" id="regEmail" placeholder="이메일 주소 입력 (로그인 아이디로 사용)" autocomplete="username" />
+          </div>
+
+          <div class="form-row">
+            <div class="field-group">
+              <label for="regName">이름 <span class="field-badge required">필수</span></label>
+              <input type="text" id="regName" placeholder="실명 입력" />
+            </div>
+            <div class="field-group">
+              <label for="regPhone">연락처 <span class="field-badge optional">선택</span></label>
+              <input type="text" id="regPhone" placeholder="010-0000-0000" />
+            </div>
+          </div>
+
+          <hr class="divider" />
+
+          <div class="form-row">
+            <div class="field-group">
+              <label for="regClinic">의원 <span class="field-badge required">필수</span></label>
+              <select id="regClinic">
+                <option value="">의원을 선택하세요</option>
+              </select>
+            </div>
+            <div class="field-group">
+              <label for="regTeam">팀 <span class="field-badge required">필수</span></label>
+              <select id="regTeam" disabled>
+                <option value="">팀을 선택하세요</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="field-group">
+            <label for="regMemo">신청 사유 <span class="field-badge optional">선택</span></label>
+            <input type="text" id="regMemo" placeholder="담당 업무나 신청 이유를 간략히 입력해 주세요" />
+            <p class="form-help">관리자 검토 시 참고됩니다.</p>
+          </div>
+
+          <div id="authMessage" class="auth-message"></div>
+
+          <button type="button" class="submit-btn" id="submitBtn">가입 신청하기</button>
+
+          <div class="login-link">
+            이미 계정이 있으신가요? <a href="../../index.html">로그인</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 신청 완료 상태 -->
+      <div id="successSection" class="success-state">
+        <div class="success-illustration">
+          <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="22" cy="22" r="22" fill="url(#sg)" fill-opacity="0.15"/>
+            <path d="M13 22.5L19.5 29L31 16" stroke="url(#sg)" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/>
+            <defs>
+              <linearGradient id="sg" x1="8" y1="8" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+                <stop stop-color="#22c55e"/>
+                <stop offset="1" stop-color="#2563eb"/>
+              </linearGradient>
+            </defs>
+          </svg>
+        </div>
+        <div class="success-badge">신청 접수 완료</div>
+        <h2>가입 신청이 완료되었습니다</h2>
+        <p>관리자 검토 후 승인 처리됩니다.<br>승인되면 등록하신 이메일로 로그인할 수 있습니다.</p>
+        <div class="success-password-notice">
+          <span class="success-password-label">초기 비밀번호</span>
+          <strong class="success-password-value">1111</strong>
+          <span class="success-password-desc">로그인 후 반드시 변경해 주세요.</span>
+        </div>
+        <a href="../../index.html" class="back-btn">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          로그인 페이지로
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <div id="globalLoading" aria-hidden="true">
+    <div class="global-loading__dialog">
+      <div class="global-loading__spinner"></div>
+      <div class="global-loading__text" id="globalLoadingText">처리 중...</div>
+    </div>
+  </div>
+
+  <script src="../../assets/js/core/config.js"></script>
+  <script src="../../assets/js/core/utils.js"></script>
+  <script src="../../assets/js/core/api.js"></script>
+  <script src="../../assets/js/core/org-select.js"></script>
+  <script src="../../assets/js/auth/register.js"></script>
+</body>
+</html>

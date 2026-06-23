@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>구매·사용 통계 | MSO관리팀 업무포털</title>
+  <link rel="stylesheet" href="../../assets/css/common.css" />
+  <link rel="stylesheet" href="../../assets/css/pages/closing.css" />
+  <link rel="stylesheet" href="../../assets/css/pages/statistics.css" />
+  <link rel="stylesheet" href="../../assets/font/tabler-icons/tabler-icons.min.css" />
+</head>
+<body class="portal-page">
+  <div class="container page-shell">
+
+    <!-- 헤더 -->
+    <section class="top-brand-bar portal-topbar">
+      <div class="top-brand-left">
+        <div class="top-brand-logo">+</div>
+        <div class="top-brand-texts">
+          <strong class="top-brand-title">MSO관리팀 업무지원 시스템</strong>
+          <span class="top-brand-sub">구매·사용 통계</span>
+        </div>
+      </div>
+      <div class="top-brand-actions portal-top-actions">
+        <a class="portal-header-btn portal-header-btn--secondary" href="../../portal.html">HOME</a>
+        <button type="button" id="logoutBtn" class="portal-header-btn portal-header-btn--secondary">로그아웃</button>
+      </div>
+    </section>
+
+    <!-- 메시지 박스 -->
+    <div id="messageBox" class="message-box"></div>
+
+    <!-- 권한 없음 -->
+    <div id="permissionDenied" class="card" style="display:none;">
+      <div class="empty-state" style="margin:8px 0;">
+        <div style="font-size:48px;margin-bottom:8px;">🔒</div>
+        <p class="empty-state-title">접근 권한이 없습니다</p>
+        <p class="empty-state-desc">관리자에게 statistics 권한을 요청하세요.</p>
+      </div>
+    </div>
+
+    <!-- 메인 앱 -->
+    <div id="appBody" style="display:none;">
+
+      <!-- 탭 -->
+      <div class="cl-tabs">
+        <button class="cl-tab active" id="tabDashboard" onclick="switchStatsTab('dashboard')"><i class="ti ti-chart-bar" aria-hidden="true"></i> 통계 조회</button>
+        <button class="cl-tab" id="tabUpload" onclick="switchStatsTab('upload')"><i class="ti ti-upload" aria-hidden="true"></i> 데이터 업로드</button>
+        <button class="cl-tab" id="tabVendor" onclick="switchStatsTab('vendor')"><i class="ti ti-building-store" aria-hidden="true"></i> 거래처 관리</button>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════ -->
+      <!-- 탭1: 통계 조회                                      -->
+      <!-- ══════════════════════════════════════════════════ -->
+      <div id="tabDashboardContent" class="cl-section active">
+
+        <!-- 공통 필터 바 (입고/사용 구분과 무관하게 항상 동일 적용) -->
+        <div class="stat-filter-bar">
+          <div class="stat-filter-field">
+            <label>의원</label>
+            <select id="statDashBranch">
+              <option value="">전체</option>
+              <option value="강남">강남의원</option>
+              <option value="강북">강북의원</option>
+              <option value="서울숲">서울숲의원</option>
+            </select>
+          </div>
+          <div class="stat-filter-field">
+            <label>검색구분</label>
+            <select id="statSearchType" onchange="updateSearchKeywordSuggestions()">
+              <option value="vendor">업체명</option>
+              <option value="dept">부서명</option>
+              <option value="itemType">자재구분</option>
+              <option value="itemName">품목명</option>
+              <option value="itemCode">품목코드</option>
+            </select>
+          </div>
+          <div class="stat-filter-field">
+            <label>시작월</label>
+            <input type="month" id="statDashYmFrom">
+          </div>
+          <div class="stat-filter-field">
+            <label>종료월</label>
+            <input type="month" id="statDashYmTo">
+          </div>
+          <div class="stat-filter-field stat-filter-field--search">
+            <label>검색어</label>
+            <div class="stat-filter-input-icon" style="position:relative;">
+              <i class="ti ti-search" aria-hidden="true"></i>
+              <input type="text" id="statSearchKeyword" placeholder="검색어 입력 (포함된 내용 검색)" autocomplete="off"
+                oninput="updateSearchKeywordSuggestions()"
+                onkeydown="if(event.key==='Enter'){hideAllSuggestionDropdowns_();runStatsDashboard();}"
+                onblur="setTimeout(()=>hideAllSuggestionDropdowns_(), 150)">
+              <div class="stat-suggest-dropdown" id="statSearchSuggestions"></div>
+            </div>
+          </div>
+          <button type="button" class="btn stat-filter-advanced" id="btnOpenAdvancedSearch" onclick="openAdvancedSearch()">
+            상세검색<span id="advancedSearchBadge" class="stat-advanced-badge" style="display:none;">0</span>
+          </button>
+          <button type="button" class="btn" onclick="resetAllSearchConditions()">초기화</button>
+          <button type="button" class="btn btn-primary stat-filter-submit" onclick="runStatsDashboard()">조회</button>
+        </div>
+
+        <!-- 상세검색 패널 (기본 숨김) -->
+        <div class="stat-advanced-panel" id="advancedSearchPanel" style="display:none;">
+          <div class="stat-advanced-header">
+            <strong>상세검색 조건</strong>
+            <button type="button" class="stat-advanced-close" onclick="closeAdvancedSearch()">✕</button>
+          </div>
+          <div id="advancedConditionRows"></div>
+          <div class="stat-advanced-footer">
+            <button type="button" class="btn" onclick="addAdvancedConditionRow()">+ 조건 추가</button>
+            <div style="flex:1;"></div>
+            <button type="button" class="btn btn-primary" onclick="applyAdvancedSearch()">적용</button>
+          </div>
+        </div>
+
+        <!-- 입고/사용 구분 + 관점 서브탭 + 기간비교 전용 컨트롤 (하나의 패널로 묶어 위계를 시각적으로 구분) -->
+        <div class="stat-scope-panel">
+          <div class="stat-seg-toggle">
+            <button class="stat-seg-toggle-btn active" id="recordTypePurchase" onclick="switchRecordType('purchase')"><i class="ti ti-truck-delivery" aria-hidden="true"></i> 입고조회</button>
+            <button class="stat-seg-toggle-btn" id="recordTypeUsage" onclick="switchRecordType('usage')"><i class="ti ti-clipboard-check" aria-hidden="true"></i> 사용조회</button>
+          </div>
+          <div class="stat-subtab-underline">
+            <button class="stat-subtab-underline-btn active" id="subtabBranch" onclick="switchStatsSubtab('branch')"><i class="ti ti-building-hospital" aria-hidden="true"></i> 의원별</button>
+            <button class="stat-subtab-underline-btn" id="subtabVendor" onclick="switchStatsSubtab('vendor')"><i class="ti ti-building-store" aria-hidden="true"></i> 거래처별</button>
+            <button class="stat-subtab-underline-btn" id="subtabDept" onclick="switchStatsSubtab('dept')"><i class="ti ti-building" aria-hidden="true"></i> 부서별</button>
+            <button class="stat-subtab-underline-btn" id="subtabItem" onclick="switchStatsSubtab('item')"><i class="ti ti-flask" aria-hidden="true"></i> 품목별</button>
+            <button class="stat-subtab-underline-btn" id="subtabTrend" onclick="switchStatsSubtab('trend')"><i class="ti ti-calendar-stats" aria-hidden="true"></i> 기간 비교</button>
+          </div>
+
+          <!-- 기간 비교 전용 컨트롤 (기간비교 서브탭에서만 표시) -->
+          <div class="stat-trend-controls" id="trendControlsPanel" style="display:none;">
+            <div class="stat-seg-toggle">
+              <button class="stat-seg-toggle-btn active" id="trendModeMonthly" onclick="switchTrendMode('monthly')">월별 추이</button>
+              <button class="stat-seg-toggle-btn" id="trendModeCompare" onclick="switchTrendMode('compare')">구간 비교</button>
+            </div>
+
+            <div id="trendCompareFields" style="display:none;">
+              <p class="stat-trend-compare-note">구간 비교에서는 상단 검색바의 기간 대신, 아래에서 지정한 두 구간을 사용합니다.</p>
+              <div class="stat-trend-compare-row">
+                <span class="stat-trend-compare-label">기준 구간</span>
+                <input type="month" id="trendBaseYmFrom" onchange="updateTrendQuickButtonState()">
+                <span style="color:var(--text-muted,#9aa5b1);">~</span>
+                <input type="month" id="trendBaseYmTo" onchange="updateTrendQuickButtonState()">
+              </div>
+              <div class="stat-trend-compare-row">
+                <span class="stat-trend-compare-label">비교 구간</span>
+                <input type="month" id="trendCompareYmFrom">
+                <span style="color:var(--text-muted,#9aa5b1);">~</span>
+                <input type="month" id="trendCompareYmTo">
+                <div class="stat-trend-quick-buttons">
+                  <button type="button" class="btn" onclick="applyTrendQuickRange('prevMonth')">전월</button>
+                  <button type="button" class="btn" onclick="applyTrendQuickRange('prevYear')">전년 동기</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 요약 카드 -->
+        <div class="stat-summary-grid" id="statsSummaryGrid"></div>
+
+        <!-- 기간 비교 그래프 (월별추이/구간비교 탭에서만 표시) -->
+        <div class="stat-panel stat-chart-panel" id="statsChartPanel" style="display:none;">
+          <canvas id="statsTrendChart"></canvas>
+        </div>
+
+        <!-- 상세 표 -->
+        <div class="stat-panel stat-result-panel">
+          <p class="stat-vat-note">※ 자재구분별 금액과 합계금액은 부가세가 포함된 금액입니다. 공급가액은 부가세 별도 금액입니다.</p>
+          <div id="statsResultArea">
+            <p style="color:var(--text-muted,#7b8794);font-size:13px;">조회 버튼을 눌러 결과를 확인하세요.</p>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ══════════════════════════════════════════════════ -->
+      <!-- 탭2: 데이터 업로드                                -->
+      <!-- ══════════════════════════════════════════════════ -->
+      <div id="tabUploadContent" class="cl-section">
+
+        <!-- 업로드 현황 -->
+        <div class="stat-panel" style="margin-bottom:14px;">
+          <strong style="font-size:13px;">현재 의원 업로드 현황</strong>
+          <div id="uploadStatusArea" style="margin-top:10px;">
+            <div class="stat-loading-row"><span class="stat-mini-spinner"></span>불러오는 중...</div>
+          </div>
+        </div>
+
+        <div class="stat-panel">
+          <strong style="font-size:14px;">과거 입고·사용현황 원본 업로드</strong>
+          <p style="font-size:12px;color:var(--text-muted,#7b8794);margin-top:6px;margin-bottom:18px;">
+            선택한 연도에 해당하는 데이터만 추출되어 저장됩니다. (파일에 다른 연도가 섞여 있어도 무시됩니다)<br>
+            같은 의원·연월·파일명으로 다시 업로드하면 기존 데이터는 자동 교체됩니다.
+          </p>
+
+          <div class="stat-filter-bar" style="margin-bottom:18px;">
+            <div class="stat-filter-field">
+              <label>의원</label>
+              <select id="statsBranch" onchange="loadUploadStatus()">
+                <option value="강남">강남의원</option>
+                <option value="강북">강북의원</option>
+                <option value="서울숲">서울숲의원</option>
+              </select>
+            </div>
+            <div class="stat-filter-field">
+              <label>연도</label>
+              <select id="statsYear" onchange="loadUploadStatus()"></select>
+            </div>
+          </div>
+
+          <p id="statsUploadPermNotice" class="stat-vat-note" style="display:none;">※ 데이터 업로드는 edit 권한 이상만 가능합니다. 조회 권한(view)으로는 업로드할 수 없습니다.</p>
+
+          <div class="cl-upload-grid">
+            <div class="cl-upload-zone" id="zone-purchase"
+              ondragover="statsDragOver(event,'zone-purchase')"
+              ondragleave="statsDragLeave('zone-purchase')"
+              ondrop="statsDropFile(event,'purchase')">
+              <input type="file" accept=".xlsx,.xls" onchange="statsHandleFile(this,'purchase')">
+              <div class="cl-upload-icon"><i class="ti ti-truck-delivery" aria-hidden="true"></i></div>
+              <div class="cl-upload-label">입고(구매) 파일</div>
+              <div class="cl-upload-hint">예: 26년 1월 입고 - 강남.xlsx</div>
+              <div class="cl-upload-status" id="status-purchase"></div>
+            </div>
+            <div class="cl-upload-zone" id="zone-usage"
+              ondragover="statsDragOver(event,'zone-usage')"
+              ondragleave="statsDragLeave('zone-usage')"
+              ondrop="statsDropFile(event,'usage')">
+              <input type="file" accept=".xlsx,.xls" onchange="statsHandleFile(this,'usage')">
+              <div class="cl-upload-icon"><i class="ti ti-clipboard-check" aria-hidden="true"></i></div>
+              <div class="cl-upload-label">사용현황 파일</div>
+              <div class="cl-upload-hint">예: 26년 1월 사용현황 - 강남.xlsx</div>
+              <div class="cl-upload-status" id="status-usage"></div>
+            </div>
+          </div>
+
+          <div style="margin-top:18px;display:flex;justify-content:flex-end;">
+            <button type="button" class="btn btn-primary" id="btnStatsUpload" disabled onclick="handleStatsUpload()">선택한 파일 업로드</button>
+          </div>
+
+          <!-- 업로드 진행 표시 -->
+          <div id="statsProgressBox" style="display:none;margin-top:14px;">
+            <div class="cl-progress-label">
+              <span id="statsProgressLabel">준비 중...</span>
+              <span id="statsProgressPct">0%</span>
+            </div>
+            <div class="cl-progress-bar">
+              <div class="cl-progress-fill" id="statsProgressFill" style="width:0%"></div>
+            </div>
+          </div>
+
+          <div class="cl-log" id="statsUploadResult"></div>
+        </div>
+
+      </div>
+
+      <!-- ══════════════════════════════════════════════════ -->
+      <!-- 탭3: 거래처 관리 (마감 모듈과 동일 데이터 소스 공유) -->
+      <!-- ══════════════════════════════════════════════════ -->
+      <div id="tabVendorContent" class="cl-section">
+        <div class="stat-panel">
+
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:10px;">
+              <div>
+                <strong style="font-size:14px;">거래처 마스터 관리</strong>
+                <p style="font-size:12px;color:var(--text-muted);margin-top:3px;">월마감 모듈과 동일한 거래처 마스터를 공유합니다. 사업자등록번호는 통계 화면의 거래처별 집계 기준으로 사용됩니다.</p>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+                <button class="btn" onclick="downloadVendorTemplate()" style="font-size:13px;padding:7px 14px;">📄 템플릿 다운로드</button>
+                <label for="vendorFileInput" class="btn" style="font-size:13px;padding:7px 14px;cursor:pointer;margin:0;">📂 엑셀 업로드</label>
+                <input type="file" id="vendorFileInput" accept=".xlsx,.xls" style="display:none;" onchange="handleVendorExcel(this)">
+                <button class="btn" onclick="addVendorRow()" style="font-size:13px;padding:7px 14px;">+ 행 추가</button>
+                <button class="btn btn-primary" id="btnSaveVendors" onclick="saveVendors()" style="font-size:13px;padding:7px 14px;">💾 저장</button>
+              </div>
+            </div>
+
+            <div style="overflow-x:auto;">
+              <table class="cl-vendor-table">
+                <thead>
+                  <tr>
+                    <th style="width:28%;">거래처명</th>
+                    <th style="width:18%;">사업자등록번호</th>
+                    <th style="width:9%;text-align:center;" title="동일 사업자번호 거래처 중 통계 화면에 표시될 현재 사용 명칭">대표</th>
+                    <th style="width:13%;text-align:center;">여신기간(일)</th>
+                    <th style="width:18%;text-align:center;">결제방법</th>
+                    <th style="width:8%;text-align:center;"></th>
+                  </tr>
+                </thead>
+                <tbody id="vendorTbody">
+                  <tr id="vendorLoadingRow">
+                    <td colspan="6" style="text-align:center;padding:20px;color:var(--text-muted);">불러오는 중...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p style="font-size:11px;color:var(--text-muted);margin-top:10px;">
+              ※ 거래처명은 입고/사용현황 파일의 <strong>공급업체</strong> 컬럼과 정확히 일치해야 통계 화면에서 사업자번호로 자동 매핑됩니다.
+            </p>
+
+            <div style="display:flex;align-items:center;gap:10px;margin-top:14px;padding-top:14px;border-top:1px solid var(--border-soft,#eaeff5);flex-wrap:wrap;">
+              <button class="btn" id="btnBackfillBizNo" onclick="backfillVendorBizNo()" style="font-size:13px;padding:7px 14px;">🔄 기존 데이터 사업자번호 재매핑</button>
+              <span style="font-size:12px;color:var(--text-muted);">거래처명을 추가/수정한 뒤, 이미 업로드된 데이터에도 사업자번호를 반영하려면 눌러주세요.</span>
+            </div>
+            <div id="backfillResult" style="margin-top:8px;font-size:12px;"></div>
+
+            <!-- 엑셀 업로드 미리보기 -->
+            <div id="vendorUploadPreview" style="display:none;margin-top:16px;">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                <span id="vendorUploadCount" style="font-size:13px;font-weight:700;"></span>
+                <span id="vendorUploadError" style="font-size:12px;color:#c0392b;font-weight:600;"></span>
+              </div>
+              <div class="cl-preview-wrap">
+                <table class="cl-preview" id="vendorUploadTable"></table>
+              </div>
+              <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+                <button class="btn" onclick="cancelVendorUpload()">취소</button>
+                <button class="btn btn-primary" id="btnApplyUpload" onclick="applyVendorUpload()">이 내용으로 적용</button>
+              </div>
+            </div>
+        </div>
+      </div><!-- /tabVendorContent -->
+
+    </div>
+  </div>
+
+  <!-- 품목 세부내역 모달 -->
+  <div id="itemDetailModal" class="stat-modal-overlay" style="display:none;" onmousedown="this._downOnOverlay = (event.target === this)" onclick="if(event.target===this && this._downOnOverlay) closeItemDetailModal()">
+    <div class="stat-modal-dialog stat-modal-dialog--wide">
+      <div class="stat-modal-header">
+        <strong id="itemDetailModalTitle">세부 내역</strong>
+        <button type="button" class="stat-advanced-close" onclick="closeItemDetailModal()">✕</button>
+      </div>
+      <div class="stat-modal-toolbar">
+        <div class="stat-filter-input-icon" style="flex:1;">
+          <span>🔍</span>
+          <input type="text" id="itemDetailModalSearch" placeholder="의원, 부서, 공급업체, 규격, LOT 등으로 재검색" autocomplete="off" oninput="filterItemDetailModal()">
+        </div>
+        <span id="itemDetailModalCount" class="stat-modal-count"></span>
+      </div>
+      <div id="itemDetailModalBody" class="stat-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- 전역 스피너 -->
+  <div id="globalLoading" aria-hidden="true">
+    <div class="global-loading__dialog">
+      <div class="global-loading__spinner" aria-hidden="true"></div>
+      <div class="global-loading__text" id="globalLoadingText">불러오는 중...</div>
+    </div>
+  </div>
+
+  <!-- 라이브러리 -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+  <script src="../../assets/libs/chart.umd.js"></script>
+
+  <!-- 공통 -->
+  <script src="../../assets/js/core/config.js"></script>
+  <script src="../../assets/js/core/api.js"></script>
+  <script src="../../assets/js/core/utils.js"></script>
+  <script src="../../assets/js/core/auth.js"></script>
+  <script src="../../assets/js/core/app-permission.js"></script>
+
+  <!-- 통계 모듈 -->
+  <script src="../../assets/js/statistics/stats-client.js"></script>
+  <script src="../../assets/js/statistics/stats-upload.js"></script>
+  <script src="../../assets/js/statistics/stats-vendor.js"></script>
+  <script src="../../assets/js/statistics/stats-main.js"></script>
+</body>
+</html>

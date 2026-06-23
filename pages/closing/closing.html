@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>월마감 자동화 | MSO관리팀 업무포털</title>
+  <link rel="stylesheet" href="../../assets/css/common.css" />
+  <link rel="stylesheet" href="../../assets/css/pages/closing.css" />
+  <link rel="stylesheet" href="../../assets/font/tabler-icons/tabler-icons.min.css" />
+</head>
+<body class="portal-page">
+  <div class="container page-shell">
+
+    <!-- 헤더 -->
+    <section class="top-brand-bar portal-topbar">
+      <div class="top-brand-left">
+        <div class="top-brand-logo">+</div>
+        <div class="top-brand-texts">
+          <strong class="top-brand-title">MSO관리팀 업무지원 시스템</strong>
+          <span class="top-brand-sub">월마감 자동화</span>
+        </div>
+      </div>
+      <div class="top-brand-actions portal-top-actions">
+        <a class="portal-header-btn portal-header-btn--secondary" href="../../portal.html">HOME</a>
+        <button type="button" id="logoutBtn" class="portal-header-btn portal-header-btn--secondary">로그아웃</button>
+      </div>
+    </section>
+
+    <!-- 메시지 박스 -->
+    <div id="messageBox" class="message-box"></div>
+
+    <!-- 권한 없음 -->
+    <div id="permissionDenied" class="card" style="display:none;">
+      <div class="empty-state" style="margin:8px 0;">
+        <i class="ti ti-lock" style="font-size:48px;margin-bottom:8px;display:block;" aria-hidden="true"></i>
+        <p class="empty-state-title">접근 권한이 없습니다</p>
+        <p class="empty-state-desc">관리자에게 closing 권한을 요청하세요.</p>
+      </div>
+    </div>
+
+    <!-- 메인 앱 -->
+    <div id="appBody" style="display:none;">
+
+      <!-- 탭: 월마감 자동화 / 거래처 관리 / 자재코드 관리 -->
+      <div class="cl-tabs">
+        <button class="cl-tab active" id="tabClosing" onclick="switchTab('closing')"><i class="ti ti-report-money" aria-hidden="true"></i> 월마감 자동화</button>
+        <button class="cl-tab" id="tabVendor"  onclick="switchTab('vendor')"><i class="ti ti-building-store" aria-hidden="true"></i> 거래처 관리</button>
+        <button class="cl-tab" id="tabItem"    onclick="switchTab('item')"><i class="ti ti-flask" aria-hidden="true"></i> 자재코드 관리</button>
+        <button class="cl-tab" id="tabHistory" onclick="switchTab('history')"><i class="ti ti-calendar-stats" aria-hidden="true"></i> 마감 현황</button>
+      </div>
+
+      <!-- ══════════════════════════════════════════════════ -->
+      <!-- 탭1: 월마감 자동화                                -->
+      <!-- ══════════════════════════════════════════════════ -->
+      <div id="tabClosingContent" class="cl-section active">
+
+        <!-- 스텝 바 -->
+        <div class="cl-steps" id="stepsBar">
+          <div class="cl-step active" id="step1">
+            <div class="cl-step-num">1</div>
+            <div class="cl-step-label">파일 업로드<br><span style="font-weight:400;font-size:11px;">Raw 데이터 2개</span></div>
+          </div>
+          <div class="cl-step" id="step2">
+            <div class="cl-step-num">2</div>
+            <div class="cl-step-label">마감 설정<br><span style="font-weight:400;font-size:11px;">연월 · 지점</span></div>
+          </div>
+          <div class="cl-step" id="step3">
+            <div class="cl-step-num">3</div>
+            <div class="cl-step-label">자동 처리<br><span style="font-weight:400;font-size:11px;">집계 · 분류</span></div>
+          </div>
+          <div class="cl-step" id="step4">
+            <div class="cl-step-num">4</div>
+            <div class="cl-step-label">산출물 다운로드<br><span style="font-weight:400;font-size:11px;">6개 파일 생성</span></div>
+          </div>
+        </div>
+
+        <!-- SECTION 1: 파일 업로드 -->
+        <div id="sec1" class="cl-section active">
+          <div class="card">
+            <div class="card-body">
+              <div class="cl-upload-grid">
+                <div class="cl-upload-zone" id="zone-ipgo"
+                  ondragover="dragOver(event,'zone-ipgo')"
+                  ondragleave="dragLeave('zone-ipgo')"
+                  ondrop="dropFile(event,'ipgo')">
+                  <input type="file" accept=".xlsx,.xls" onchange="handleFile(this,'ipgo')">
+                  <div class="cl-upload-icon"><i class="ti ti-truck-delivery" aria-hidden="true"></i></div>
+                  <div class="cl-upload-label">입고 파일</div>
+                  <div class="cl-upload-hint">예: 26년 5월 입고 - 서울숲.xlsx</div>
+                  <div class="cl-upload-status" id="status-ipgo"></div>
+                </div>
+                <div class="cl-upload-zone" id="zone-usage"
+                  ondragover="dragOver(event,'zone-usage')"
+                  ondragleave="dragLeave('zone-usage')"
+                  ondrop="dropFile(event,'usage')">
+                  <input type="file" accept=".xlsx,.xls" onchange="handleFile(this,'usage')">
+                  <div class="cl-upload-icon"><i class="ti ti-clipboard-check" aria-hidden="true"></i></div>
+                  <div class="cl-upload-label">사용현황 파일</div>
+                  <div class="cl-upload-hint">예: 26년 5월 사용현황 - 서울숲.xlsx</div>
+                  <div class="cl-upload-status" id="status-usage"></div>
+                </div>
+              </div>
+              <!-- 테스트 자료 다운로드 -->
+              <div style="margin-top:12px;padding:10px 12px;background:#f8f9fa;border-radius:8px;border:1px solid #e2e8f0;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                <span style="font-size:12px;color:#64748b;flex:1;"><i class="ti ti-flask" aria-hidden="true"></i> 테스트 자료 (서울숲 26년 5월)</span>
+                <a href="https://raw.githubusercontent.com/wizwon36/gc_imed_me/main/assets/test/26년 5월 입고 - 서울숲.xlsx"
+                   download="26년 5월 입고 - 서울숲.xlsx"
+                   class="btn" style="font-size:12px;padding:5px 12px;background:#e2e8f0;color:#334155;text-decoration:none;">
+                  <i class="ti ti-download" aria-hidden="true"></i> 입고 파일
+                </a>
+                <a href="https://raw.githubusercontent.com/wizwon36/gc_imed_me/main/assets/test/26년 5월 사용현황 - 서울숲.xlsx"
+                   download="26년 5월 사용현황 - 서울숲.xlsx"
+                   class="btn" style="font-size:12px;padding:5px 12px;background:#e2e8f0;color:#334155;text-decoration:none;">
+                  <i class="ti ti-download" aria-hidden="true"></i> 사용현황 파일
+                </a>
+              </div>
+              <div style="display:flex;justify-content:flex-end;margin-top:16px;">
+                <button class="btn btn-primary" id="btnNext1" onclick="goStep(2)" disabled>다음 →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 2: 마감 설정 -->
+        <div id="sec2" class="cl-section">
+          <div class="card">
+            <div class="card-body">
+              <div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap;">
+                <div class="cl-field">
+                  <label>마감 연월</label>
+                  <input type="month" id="inputMonth">
+                </div>
+                <div class="cl-field">
+                  <label>지점명</label>
+                  <select id="inputBranch" style="border:1px solid var(--border-input);border-radius:6px;padding:7px 11px;font-size:13px;min-width:140px;background:#fff;"></select>
+                </div>
+                <!-- GC케어 CC: 고정값(32073000) — UI 노출 불필요 -->
+                <input type="hidden" id="inputCC" value="32073000">
+                <div class="cl-field" style="flex:1;">
+                  <label>&nbsp;</label>
+                  <div class="cl-info-box" style="margin:0;">
+                    <strong>분류 기준:</strong> 자재구분이 <strong>소모품·시약 → GC케어</strong>, <strong>의약품 → 아이메드</strong>로 자동 분류됩니다.
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex;gap:10px;justify-content:flex-end;margin-top:16px;">
+                <button class="btn" onclick="goStep(1)">← 이전</button>
+                <button class="btn btn-primary" onclick="startProcessing()">처리 시작 →</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 3: 처리 중 -->
+        <div id="sec3" class="cl-section">
+          <div class="card">
+            <div class="card-body">
+              <div style="margin-bottom:10px;">
+                <div class="cl-progress-label">
+                  <span id="progressLabel">준비 중...</span>
+                  <span id="progressPct">0%</span>
+                </div>
+                <div class="cl-progress-bar">
+                  <div class="cl-progress-fill" id="progressFill" style="width:0%"></div>
+                </div>
+              </div>
+              <div class="cl-log" id="logBox"></div>
+              <div style="display:flex;justify-content:flex-end;margin-top:14px;">
+                <button id="btnGoResult" class="btn btn-primary" onclick="goStep(4); renderResults();" disabled style="opacity:0.4;cursor:not-allowed;">
+                  산출물 확인 →
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- SECTION 4: 결과 -->
+        <div id="sec4" class="cl-section">
+
+          <!-- 요약 -->
+          <div class="cl-summary-grid" id="summaryGrid"></div>
+
+          <!-- 미등록 거래처 에러 카드 -->
+          <div id="unregVendorsCard" class="card" style="display:none;margin-bottom:14px;border:1px solid #fde68a;background:#fffbeb;">
+            <div class="card-body">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                <i class="ti ti-alert-triangle" style="font-size:18px;" aria-hidden="true"></i>
+                <strong style="font-size:14px;color:#92400e;">거래처 관리 미등록 거래처</strong>
+              </div>
+              <div id="unregVendorsBody"></div>
+            </div>
+          </div>
+
+          <!-- 미등록 품목 에러 카드 -->
+          <div id="unregItemsCard" class="card" style="display:none;margin-bottom:14px;border:1px solid #fde68a;background:#fffbeb;">
+            <div class="card-body">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;">
+                <i class="ti ti-alert-triangle" style="font-size:18px;" aria-hidden="true"></i>
+                <strong style="font-size:14px;color:#92400e;">자재코드 마스터 미등록 품목</strong>
+              </div>
+              <div id="unregItemsBody"></div>
+            </div>
+          </div>
+
+          <!-- 미리보기 -->
+          <div class="card" style="margin-bottom:14px;">
+            <div class="card-body" style="padding-bottom:0;">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+                <strong style="font-size:13px;"><i class="ti ti-table" aria-hidden="true"></i> 입고 데이터 미리보기</strong>
+                <select id="previewFilter" onchange="renderPreview()" style="border:1px solid var(--border-input);border-radius:6px;padding:5px 10px;font-size:12px;">
+                  <option value="all">전체</option>
+                  <option value="GC케어">GC케어만</option>
+                  <option value="아이메드">아이메드만</option>
+                </select>
+              </div>
+            </div>
+            <div class="cl-preview-wrap" id="previewTable"></div>
+          </div>
+
+          <!-- 다운로드 -->
+          <div class="card">
+            <div class="card-body">
+              <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+                <strong style="font-size:13px;"><i class="ti ti-package" aria-hidden="true"></i> 산출물 다운로드</strong>
+                <button class="btn btn-primary" onclick="downloadAll()" style="padding:7px 16px;font-size:13px;"><i class="ti ti-download" aria-hidden="true"></i> 전체 다운로드</button>
+              </div>
+              <div class="cl-dl-grid" id="downloadGrid"></div>
+            </div>
+          </div>
+
+          <!-- 강남의원 전용: 세포치료 / 특수의약품 입력 -->
+          <div class="card" id="gangnamExtraCard" style="display:none;margin-top:14px;border:1px solid #d1fae5;background:#f0fdf4;">
+            <div class="card-body">
+              <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px;">
+                <i class="ti ti-pill" style="font-size:18px;" aria-hidden="true"></i>
+                <strong style="font-size:14px;color:#065f46;">강남의원 — 세포치료 / 특수의약품 당월 사용금액 입력</strong>
+              </div>
+              <p style="font-size:12px;color:#6b7280;margin-bottom:14px;">
+                시스템에서 자동 집계되지 않는 항목입니다. 마감 확정 전에 해당 월 사용금액을 입력하세요.<br>
+                입력값은 확정 시 연간 원재료비 시트에 반영됩니다.
+              </p>
+              <div style="display:flex;gap:24px;flex-wrap:wrap;">
+                <div class="cl-field">
+                  <label style="color:#065f46;">세포치료 사용금액 (원)</label>
+                  <input type="text" id="inputCellTherapy" placeholder="0"
+                    style="border:1px solid #6ee7b7;border-radius:6px;padding:7px 11px;font-size:13px;width:180px;text-align:right;"
+                    oninput="this.value=this.value.replace(/[^0-9]/g,'').replace(/\B(?=(\d{3})+(?!\d))/g,',')">
+                </div>
+                <div class="cl-field">
+                  <label style="color:#065f46;">특수의약품 사용금액 (원)</label>
+                  <input type="text" id="inputSpecialMed" placeholder="0"
+                    style="border:1px solid #6ee7b7;border-radius:6px;padding:7px 11px;font-size:13px;width:180px;text-align:right;"
+                    oninput="this.value=this.value.replace(/[^0-9]/g,'').replace(/\B(?=(\d{3})+(?!\d))/g,',')">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 마감 확정 -->
+          <div class="card" id="closingConfirmCard" style="margin-top:14px;border:1px solid #bfdbfe;background:#eff6ff;">
+            <div class="card-body">
+              <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;">
+                <div>
+                  <strong style="font-size:14px;color:#1e40af;"><i class="ti ti-pin" aria-hidden="true"></i> 마감 확정</strong>
+                  <p style="font-size:12px;color:#3b82f6;margin-top:4px;">
+                    산출물 내용이 맞으면 확정하세요. 품목별 기말 재고가 저장되어 다음 달 수불 기초값으로 자동 반영됩니다.
+                  </p>
+                  <p id="closingConfirmStatus" style="font-size:12px;color:#64748b;margin-top:4px;"></p>
+                </div>
+                <button class="btn btn-primary" id="btnClosingConfirm" onclick="confirmClosing()"
+                  style="white-space:nowrap;padding:9px 20px;background:#1d4ed8;flex-shrink:0;">
+                  <i class="ti ti-check" aria-hidden="true"></i> 마감 확정
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;justify-content:flex-end;margin-top:12px;">
+            <button class="btn" onclick="restart()"><i class="ti ti-refresh" aria-hidden="true"></i> 새 마감 시작</button>
+          </div>
+        </div>
+
+      </div><!-- /tabClosingContent -->
+
+
+      <!-- ══════════════════════════════════════════════════ -->
+      <!-- 탭2: 거래처 관리                                  -->
+      <!-- ══════════════════════════════════════════════════ -->
+      <div id="tabVendorContent" class="cl-section">
+        <div class="card">
+          <div class="card-body">
+
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+              <div>
+                <strong style="font-size:14px;">거래처 마스터 관리</strong>
+                <p style="font-size:12px;color:var(--text-muted);margin-top:3px;">SAP 입력양식에 사업자번호·여신기간이 자동 반영됩니다. 계정코드는 <strong>11301101</strong>로 고정 적용됩니다.</p>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+                <button class="btn" onclick="downloadVendorTemplate()" style="font-size:13px;padding:7px 14px;"><i class="ti ti-file-download" aria-hidden="true"></i> 템플릿 다운로드</button>
+                <label for="vendorFileInput" class="btn" style="font-size:13px;padding:7px 14px;cursor:pointer;margin:0;"><i class="ti ti-upload" aria-hidden="true"></i> 엑셀 업로드</label>
+                <input type="file" id="vendorFileInput" accept=".xlsx,.xls" style="display:none;" onchange="handleVendorExcel(this)">
+                <button class="btn" onclick="addVendorRow()" style="font-size:13px;padding:7px 14px;">+ 행 추가</button>
+                <button class="btn btn-primary" id="btnSaveVendors" onclick="saveVendors()" style="font-size:13px;padding:7px 14px;"><i class="ti ti-device-floppy" aria-hidden="true"></i> 저장</button>
+              </div>
+            </div>
+
+            <div style="overflow-x:auto;">
+              <table class="cl-vendor-table">
+                <thead>
+                  <tr>
+                    <th style="width:32%;">거래처명</th>
+                    <th style="width:22%;">사업자등록번호</th>
+                    <th style="width:14%;text-align:center;">여신기간(일)</th>
+                    <th style="width:18%;text-align:center;">결제방법</th>
+                    <th style="width:8%;text-align:center;"></th>
+                  </tr>
+                </thead>
+                <tbody id="vendorTbody">
+                  <tr id="vendorLoadingRow">
+                    <td colspan="6" style="text-align:center;padding:20px;color:var(--text-muted);">불러오는 중...</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+
+            <p style="font-size:11px;color:var(--text-muted);margin-top:10px;">
+              ※ 거래처명은 입고 파일의 <strong>공급업체</strong> 컬럼과 정확히 일치해야 자동 반영됩니다.
+            </p>
+
+            <!-- 엑셀 업로드 미리보기 -->
+            <div id="vendorUploadPreview" style="display:none;margin-top:16px;">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                <span id="vendorUploadCount" style="font-size:13px;font-weight:700;"></span>
+                <span id="vendorUploadError" style="font-size:12px;color:#c0392b;font-weight:600;"></span>
+              </div>
+              <div class="cl-preview-wrap">
+                <table class="cl-preview" id="vendorUploadTable"></table>
+              </div>
+              <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+                <button class="btn" onclick="cancelVendorUpload()">취소</button>
+                <button class="btn btn-primary" id="btnApplyUpload" onclick="applyVendorUpload()">이 내용으로 적용</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div><!-- /tabVendorContent -->
+
+      <!-- ══════════════════════════════════════════════════ -->
+      <!-- 탭3: 자재코드 관리                                 -->
+      <!-- ══════════════════════════════════════════════════ -->
+      <div id="tabItemContent" class="cl-section">
+        <div class="card">
+          <div class="card-body">
+
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+              <div>
+                <strong style="font-size:14px;">자재코드 마스터 관리</strong>
+                <p style="font-size:12px;color:var(--text-muted);margin-top:3px;">
+                  수불 집계표는 입고/사용 여부와 무관하게 이 목록 전체 기준으로 생성됩니다.
+                  시스템에서 받은 자재관리 파일을 그대로 업로드하세요.
+                </p>
+              </div>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;justify-content:flex-end;">
+                <label for="itemFileInput" class="btn" style="font-size:13px;padding:7px 14px;cursor:pointer;margin:0;"><i class="ti ti-upload" aria-hidden="true"></i> 자재관리 파일 업로드</label>
+                <input type="file" id="itemFileInput" accept=".xlsx,.xls" style="display:none;" onchange="handleItemExcel(this)">
+                <button class="btn btn-primary" id="btnSaveItems" onclick="saveItems()" style="font-size:13px;padding:7px 14px;"><i class="ti ti-device-floppy" aria-hidden="true"></i> 저장</button>
+              </div>
+            </div>
+
+            <!-- 요약 통계 -->
+            <div id="itemSummaryRow" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:16px;">
+              <div style="background:#f8fafc;border:1px solid var(--border);border-radius:8px;padding:10px 16px;min-width:90px;text-align:center;">
+                <div style="font-size:11px;color:var(--text-muted);margin-bottom:3px;">전체</div>
+                <div id="itemCntTotal" style="font-size:20px;font-weight:800;color:var(--text-primary);">-</div>
+              </div>
+              <div style="background:#e6f4ec;border:1px solid #bbf7d0;border-radius:8px;padding:10px 16px;min-width:90px;text-align:center;">
+                <div style="font-size:11px;color:#0e7c3a;margin-bottom:3px;">시약</div>
+                <div id="itemCntSiyak" style="font-size:20px;font-weight:800;color:#0e7c3a;">-</div>
+              </div>
+              <div style="background:#e8effd;border:1px solid #bfdbfe;border-radius:8px;padding:10px 16px;min-width:90px;text-align:center;">
+                <div style="font-size:11px;color:#1a56db;margin-bottom:3px;">소모품</div>
+                <div id="itemCntSomoum" style="font-size:20px;font-weight:800;color:#1a56db;">-</div>
+              </div>
+              <div style="background:#fef3e2;border:1px solid #fde68a;border-radius:8px;padding:10px 16px;min-width:90px;text-align:center;">
+                <div style="font-size:11px;color:#b45309;margin-bottom:3px;">의약품</div>
+                <div id="itemCntUiyak" style="font-size:20px;font-weight:800;color:#b45309;">-</div>
+              </div>
+              <div style="background:#f1f5f9;border:1px solid var(--border);border-radius:8px;padding:10px 16px;min-width:90px;text-align:center;">
+                <div style="font-size:11px;color:var(--text-muted);margin-bottom:3px;">폐기</div>
+                <div id="itemCntDisused" style="font-size:20px;font-weight:800;color:#64748b;">-</div>
+              </div>
+            </div>
+
+            <!-- 검색 / 필터 -->
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap;">
+              <select id="itemFilterType" onchange="onItemSearch()" style="border:1px solid var(--border-input);border-radius:6px;padding:7px 10px;font-size:13px;">
+                <option value="all">전체 구분</option>
+                <option value="시약">시약</option>
+                <option value="소모품">소모품</option>
+                <option value="의약품">의약품</option>
+              </select>
+              <select id="itemFilterStatus" onchange="onItemSearch()" style="border:1px solid var(--border-input);border-radius:6px;padding:7px 10px;font-size:13px;">
+                <option value="all">전체 상태</option>
+                <option value="사용">사용</option>
+                <option value="폐기">폐기</option>
+              </select>
+              <div style="position:relative;flex:1;min-width:200px;">
+                <input type="text" id="itemSearchInput" placeholder="자재코드 또는 자재명 검색..."
+                  onkeydown="if(event.key==='Enter')onItemSearch()"
+                  style="width:100%;border:1px solid var(--border-input);border-radius:6px;padding:7px 12px 7px 32px;font-size:13px;">
+                <i class="ti ti-search" style="position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text-muted);font-size:14px;" aria-hidden="true"></i>
+              </div>
+              <button class="btn btn-primary" onclick="onItemSearch()" style="padding:7px 14px;font-size:13px;">검색</button>
+              <span id="itemSearchResult" style="font-size:12px;color:var(--text-muted);white-space:nowrap;"></span>
+            </div>
+
+            <!-- 테이블 -->
+            <div style="overflow-x:auto;">
+              <table class="cl-vendor-table">
+                <thead>
+                  <tr>
+                    <th style="width:12%;">자재코드</th>
+                    <th style="width:36%;">자재명</th>
+                    <th style="width:8%;text-align:center;">구분</th>
+                    <th style="width:10%;text-align:right;">입고단가</th>
+                    <th style="width:10%;text-align:right;">산출단가</th>
+                    <th style="width:8%;text-align:center;">상태</th>
+                    <th style="width:6%;text-align:center;"></th>
+                  </tr>
+                </thead>
+                <tbody id="itemTbody">
+                  <tr><td colspan="5" style="text-align:center;padding:20px;color:var(--text-muted);">불러오는 중...</td></tr>
+                </tbody>
+              </table>
+            </div>
+
+            <!-- 페이지네이션 -->
+            <div id="itemPagination" style="display:flex;align-items:center;justify-content:center;gap:6px;margin-top:14px;flex-wrap:wrap;"></div>
+
+            <p style="font-size:11px;color:var(--text-muted);margin-top:10px;">
+              ※ 자재코드는 입고/사용현황 파일의 <strong>자재코드</strong> 컬럼과 일치해야 수불에 반영됩니다.
+              상태가 <strong>폐기</strong>인 품목은 수불 집계표에서 제외됩니다.
+            </p>
+
+            <!-- 업로드 미리보기 -->
+            <div id="itemUploadPreview" style="display:none;margin-top:16px;">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                <span id="itemUploadCount" style="font-size:13px;font-weight:700;"></span>
+                <span id="itemUploadError"  style="font-size:12px;color:#c0392b;font-weight:600;"></span>
+              </div>
+              <div style="display:flex;gap:12px;margin-bottom:8px;font-size:12px;color:var(--text-muted);">
+                <span id="itemUploadStat"></span>
+              </div>
+              <div class="cl-preview-wrap">
+                <table class="cl-preview" id="itemUploadTable"></table>
+              </div>
+              <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+                <button class="btn" onclick="cancelItemUpload()">취소</button>
+                <button class="btn btn-primary" id="btnApplyItemUpload" onclick="applyItemUpload()">이 내용으로 적용</button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- 초기 재고 업로드 카드 -->
+        <div class="card" style="margin-top:14px;border:1px solid #e2e8f0;">
+          <div class="card-body">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+              <div>
+                <strong style="font-size:14px;"><i class="ti ti-truck-delivery" aria-hidden="true"></i> 초기 재고 업로드 (수불부)</strong>
+                <p style="font-size:12px;color:var(--text-muted);margin-top:3px;">
+                  기존 수불부 파일의 특정 월 기말 재고를 <code>closing_stock</code>에 저장합니다.
+                  다음 달 마감 시 기초값으로 자동 반영됩니다.
+                </p>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
+                <div style="display:flex;flex-direction:column;gap:4px;">
+                  <label style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;">저장 연월</label>
+                  <input type="month" id="stockInitYm" style="border:1px solid var(--border-input);border-radius:6px;padding:7px 11px;font-size:13px;">
+                </div>
+                <div style="display:flex;flex-direction:column;gap:4px;">
+                  <label style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;">지점명</label>
+                  <select id="stockInitBranch" style="border:1px solid var(--border-input);border-radius:6px;padding:7px 11px;font-size:13px;min-width:100px;"></select>
+                </div>
+                <div style="display:flex;flex-direction:column;gap:4px;">
+                  <label style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;">시트 선택</label>
+                  <select id="stockInitSheet" style="border:1px solid var(--border-input);border-radius:6px;padding:7px 11px;font-size:13px;min-width:160px;">
+                    <option value="">파일 업로드 후 선택</option>
+                  </select>
+                </div>
+                <div style="margin-top:18px;display:flex;gap:8px;">
+                  <label for="stockInitFileInput" class="btn" style="font-size:13px;padding:7px 14px;cursor:pointer;margin:0;"><i class="ti ti-upload" aria-hidden="true"></i> 수불부 파일</label>
+                  <input type="file" id="stockInitFileInput" accept=".xlsx,.xls" style="display:none;" onchange="handleStockInitFile(this)">
+                </div>
+              </div>
+            </div>
+
+            <!-- 미리보기 -->
+            <div id="stockInitPreview" style="display:none;">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                <span id="stockInitCount" style="font-size:13px;font-weight:700;"></span>
+                <span style="font-size:12px;color:var(--text-muted);">기말 수량·금액이 0이 아닌 품목만 표시</span>
+              </div>
+              <div class="cl-preview-wrap">
+                <table class="cl-preview" id="stockInitTable"></table>
+              </div>
+              <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+                <button class="btn" onclick="cancelStockInit()">취소</button>
+                <button class="btn btn-primary" id="btnSaveStockInit" onclick="saveStockInit()"><i class="ti ti-device-floppy" aria-hidden="true"></i> 초기 재고 저장</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 초기 월별 사용 데이터 업로드 카드 -->
+        <div class="card" style="margin-top:14px;border:1px solid #e2e8f0;">
+          <div class="card-body">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;">
+              <div>
+                <strong style="font-size:14px;"><i class="ti ti-chart-line" aria-hidden="true"></i> 연간 원재료비 초기 데이터 업로드</strong>
+                <p style="font-size:12px;color:var(--text-muted);margin-top:3px;">
+                  기존 보고 파일의 4번째 시트(연간 원재료비)에서 월별 사용 데이터를 가져옵니다.
+                  <strong>GC케어 파일</strong>과 <strong>아이메드 파일</strong>을 각각 업로드해야 합니다.
+                  최초 1회만 실행하면 이후 마감 확정 시 자동으로 누적됩니다.
+                </p>
+              </div>
+              <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;justify-content:flex-end;">
+                <div style="display:flex;flex-direction:column;gap:4px;">
+                  <label style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;">지점명</label>
+                  <select id="usageInitBranch" style="border:1px solid var(--border-input);border-radius:6px;padding:7px 11px;font-size:13px;min-width:100px;"></select>
+                </div>
+                <div style="margin-top:18px;display:flex;gap:6px;">
+                  <label for="usageInitFileInputGC" class="btn" style="font-size:13px;padding:7px 14px;cursor:pointer;margin:0;background:var(--gc-color,#4A86C8);color:#fff;"><i class="ti ti-upload" aria-hidden="true"></i> GC케어 업로드</label>
+                  <input type="file" id="usageInitFileInputGC" accept=".xlsx,.xls" style="display:none;" onchange="handleUsageInitFile(this,'GC케어')">
+                  <label for="usageInitFileInputImed" class="btn" style="font-size:13px;padding:7px 14px;cursor:pointer;margin:0;background:var(--imed-color,#C8774A);color:#fff;"><i class="ti ti-upload" aria-hidden="true"></i> 아이메드 업로드</label>
+                  <input type="file" id="usageInitFileInputImed" accept=".xlsx,.xls" style="display:none;" onchange="handleUsageInitFile(this,'아이메드')">
+                </div>
+              </div>
+            </div>
+
+            <!-- 미리보기 -->
+            <div id="usageInitPreview" style="display:none;">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px;">
+                <span id="usageInitCount" style="font-size:13px;font-weight:700;"></span>
+                <span id="usageInitTypeInfo" style="font-size:12px;color:var(--text-muted);"></span>
+              </div>
+              <div class="cl-preview-wrap">
+                <table class="cl-preview" id="usageInitTable"></table>
+              </div>
+              <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px;">
+                <button class="btn" onclick="cancelUsageInit()">취소</button>
+                <button class="btn btn-primary" id="btnSaveUsageInit" onclick="saveUsageInit()"><i class="ti ti-device-floppy" aria-hidden="true"></i> 저장</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- /tabItemContent -->
+
+      <!-- ══════════════════════════════════════════════════ -->
+      <!-- 탭4: 마감 현황                                    -->
+      <!-- ══════════════════════════════════════════════════ -->
+      <div id="tabHistoryContent" class="cl-section">
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+          <h2 style="margin:0;font-size:16px;font-weight:700;"><i class="ti ti-calendar-stats" aria-hidden="true"></i> 마감 현황</h2>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <select id="historyYearSelect" onchange="loadClosingHistory()" style="border:1px solid #ddd;border-radius:6px;padding:5px 10px;font-size:13px;"></select>
+            <select id="historyBranchSelect" onchange="loadClosingHistory()" style="border:1px solid #ddd;border-radius:6px;padding:5px 10px;font-size:13px;"></select>
+            <button onclick="loadClosingHistory()" style="padding:5px 14px;border:1px solid #ddd;border-radius:6px;background:#fff;font-size:13px;cursor:pointer;"><i class="ti ti-refresh" aria-hidden="true"></i> 새로고침</button>
+          </div>
+        </div>
+        <div id="historyTableWrap">
+          <div style="text-align:center;color:#999;padding:40px;">연도와 지점을 선택하세요.</div>
+        </div>
+      </div><!-- /tabHistoryContent -->
+
+  </div><!-- /container -->
+
+  <!-- 전역 스피너 -->
+  <div id="globalLoading" aria-hidden="true">
+    <div class="global-loading__dialog">
+      <div class="global-loading__spinner" aria-hidden="true"></div>
+      <div class="global-loading__text" id="globalLoadingText">불러오는 중...</div>
+    </div>
+  </div>
+
+  <!-- ExcelJS -->
+  <script src="https://cdn.jsdelivr.net/npm/exceljs@4.4.0/dist/exceljs.min.js"></script>
+  <!-- JSZip (수불부 zip 조작용) -->
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <!-- SheetJS (파싱용) -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <!-- FileSaver -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+
+  <script src="../../assets/js/core/config.js"></script>
+  <script src="../../assets/js/core/api.js"></script>
+  <script src="../../assets/js/core/utils.js"></script>
+  <script src="../../assets/js/core/auth.js"></script>
+  <script src="../../assets/js/core/app-permission.js"></script>
+  <script src="../../assets/js/closing/closing-write.js"></script>
+  <script src="../../assets/js/closing/closing-admin.js"></script>
+  <script src="../../assets/js/closing/closing-main.js"></script>
+</body>
+</html>

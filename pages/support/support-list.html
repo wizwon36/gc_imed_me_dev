@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>내 수정요청 - MSO관리팀 업무포털</title>
+  <link rel="stylesheet" href="../../assets/css/common.css" />
+  <style>
+    .form-control-sm {
+      height: 38px; padding: 0 12px;
+      border: 1.5px solid var(--border); border-radius: var(--radius-sm);
+      font-size: 14px; background: var(--surface); color: var(--text-primary);
+    }
+    .support-filter-bar {
+      display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap;
+    }
+    .support-list { display: flex; flex-direction: column; gap: 10px; }
+
+    /* ── 카드 ── */
+    .support-card {
+      background: var(--surface);
+      border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      cursor: pointer;
+      transition: box-shadow 0.15s, transform 0.1s;
+    }
+    .support-card:hover {
+      box-shadow: 0 4px 16px rgba(47,109,246,0.10);
+      transform: translateY(-1px);
+    }
+    /* 상태별 왼쪽 컬러 바 */
+    .support-card-bar {
+      height: 4px;
+      width: 100%;
+    }
+    .support-card--PENDING     .support-card-bar { background: #f59e0b; }
+    .support-card--IN_PROGRESS .support-card-bar { background: #2563eb; }
+    .support-card--COMPLETED   .support-card-bar { background: #10b981; }
+    .support-card--REJECTED    .support-card-bar { background: #ef4444; }
+
+    .support-card-body { padding: 16px 20px; }
+
+    /* 뱃지 줄 */
+    .support-card-badges {
+      display: flex; align-items: center; gap: 6px;
+      flex-wrap: wrap; margin-bottom: 8px;
+    }
+    /* 제목 */
+    .support-card-title {
+      font-size: 15px; font-weight: 800;
+      color: var(--text-primary);
+      margin-bottom: 6px;
+      line-height: 1.4;
+    }
+    /* 본문 미리보기 */
+    .support-card-preview {
+      font-size: 13px; color: var(--text-secondary);
+      overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+      margin-bottom: 10px;
+    }
+    .support-card-meta {
+      font-size: 12px; color: var(--text-muted);
+    }
+    .support-card-reply {
+      margin-top: 10px;
+      padding: 10px 12px;
+      background: var(--success-bg);
+      border: 1px solid #a7f3d0;
+      border-radius: var(--radius-sm);
+    }
+    .support-card-reply-label {
+      font-size: 11px; font-weight: 700;
+      color: var(--success-text); margin-bottom: 4px;
+      display: flex; align-items: center; gap: 5px;
+    }
+
+    /* ── 뱃지 공통 ── */
+    .support-badge {
+      display: inline-flex; align-items: center;
+      padding: 3px 10px; border-radius: 999px;
+      font-size: 11px; font-weight: 700; white-space: nowrap;
+    }
+    .support-badge--app     { background: #eff6ff; color: #1d4ed8; }
+    .support-badge--cat     { background: #f5f3ff; color: #6d28d9; }
+    .support-badge--PENDING     { background: #fffbeb; color: #92400e; }
+    .support-badge--IN_PROGRESS { background: #eff6ff; color: #1e40af; }
+    .support-badge--COMPLETED   { background: #ecfdf5; color: #065f46; }
+    .support-badge--REJECTED    { background: #fef2f2; color: #991b1b; }
+
+    /* ── 모달 ── */
+    .support-modal { position: fixed; inset: 0; z-index: 9000; display: none; }
+    .support-modal-backdrop {
+      position: absolute; inset: 0;
+      background: rgba(0,0,0,0.45);
+    }
+    .support-modal-box {
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: min(600px, calc(100vw - 32px));
+      max-height: 85vh;
+      background: var(--surface);
+      border-radius: var(--radius-xl);
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+      display: flex; flex-direction: column;
+      overflow: hidden;
+    }
+    .support-modal-topbar { height: 5px; width: 100%; flex-shrink: 0; }
+    .support-modal-topbar--PENDING     { background: #f59e0b; }
+    .support-modal-topbar--IN_PROGRESS { background: #2563eb; }
+    .support-modal-topbar--COMPLETED   { background: #10b981; }
+    .support-modal-topbar--REJECTED    { background: #ef4444; }
+
+    .support-modal-header {
+      display: flex; align-items: flex-start; justify-content: space-between;
+      padding: 20px 24px 12px; flex-shrink: 0;
+      border-bottom: 1px solid var(--border);
+    }
+    .support-modal-header-left { flex: 1; min-width: 0; }
+    .support-modal-badges { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+    .support-modal-title {
+      font-size: 17px; font-weight: 800;
+      color: var(--text-primary); margin: 0;
+      line-height: 1.4; word-break: break-word;
+    }
+    .support-modal-close {
+      background: none; border: none; cursor: pointer;
+      font-size: 20px; color: var(--text-muted);
+      padding: 4px 8px; margin-left: 12px; flex-shrink: 0;
+      border-radius: 6px;
+    }
+    .support-modal-close:hover { background: var(--hover); }
+    .support-modal-body { padding: 20px 24px; overflow-y: auto; }
+
+    /* 모달 섹션 구분 */
+    .support-modal-section {
+      margin-bottom: 18px;
+    }
+    .support-detail-label {
+      font-size: 11px; font-weight: 700;
+      color: var(--text-muted); text-transform: uppercase;
+      letter-spacing: 0.05em; margin-bottom: 4px;
+    }
+    .support-detail-content {
+      font-size: 14px; line-height: 1.7;
+      white-space: pre-wrap; word-break: break-word;
+      color: var(--text-primary);
+      border: 1px solid var(--border-soft);
+      border-radius: var(--radius-sm);
+      padding: 12px 14px;
+      background: var(--background);
+    }
+    .support-meta-row {
+      display: flex; align-items: center; gap: 16px;
+      flex-wrap: wrap;
+    }
+    .support-meta-item {
+      display: flex; align-items: center; gap: 5px;
+      font-size: 12px; color: var(--text-muted);
+    }
+    .support-meta-item strong { color: var(--text-secondary); font-weight: 600; }
+
+    /* 답변 박스 */
+    .support-reply-box {
+      padding: 16px;
+      background: var(--success-bg);
+      border: 1px solid #a7f3d0;
+      border-radius: var(--radius-md);
+    }
+    .support-reply-box-title {
+      font-size: 12px; font-weight: 700;
+      color: var(--success-text); margin-bottom: 8px;
+      display: flex; align-items: center; gap: 5px;
+    }
+    .support-reply-box-content {
+      font-size: 14px; white-space: pre-wrap;
+      color: var(--text-primary); line-height: 1.6;
+    }
+
+    /* ── 스켈레톤 ── */
+    @keyframes shimmer {
+      0%   { background-position: -600px 0; }
+      100% { background-position:  600px 0; }
+    }
+    .sk {
+      background: linear-gradient(90deg,#f0f2f5 25%,#e4e6ea 50%,#f0f2f5 75%);
+      background-size: 600px 100%;
+      animation: shimmer 1.4s infinite linear;
+      border-radius: 8px;
+    }
+    .sk-card {
+      background: var(--surface); border: 1.5px solid var(--border);
+      border-radius: var(--radius-lg); padding: 18px 20px; margin-bottom: 10px;
+    }
+    .sk-badge-row { display:flex; gap:8px; margin-bottom:10px; }
+    .sk-badge  { height:22px; width:64px; border-radius:999px; }
+    .sk-title  { height:18px; width:55%; border-radius:6px; margin-bottom:8px; }
+    .sk-text   { height:13px; width:80%; border-radius:6px; }
+    .sk-text-sm{ height:12px; width:40%; border-radius:6px; margin-top:8px; }
+  </style>
+</head>
+<body class="portal-page">
+  <div class="container page-shell">
+
+    <section class="top-brand-bar portal-topbar portal-hero-card">
+      <div class="top-brand-left">
+        <div class="top-brand-logo">+</div>
+        <div class="top-brand-texts">
+          <strong class="top-brand-title">내 수정요청</strong>
+          <span class="top-brand-sub">접수한 수정요청 내역을 확인합니다</span>
+        </div>
+      </div>
+      <div class="top-brand-actions portal-top-actions">
+        <a class="portal-header-btn portal-header-btn--primary" href="support-form.html">새 요청 등록</a>
+        <a class="portal-header-btn portal-header-btn--secondary" href="../../portal.html">HOME</a>
+      </div>
+    </section>
+
+    <div id="messageBox" class="message-box"></div>
+
+    <!-- 필터 -->
+    <div class="support-filter-bar">
+      <select id="filterApp" class="form-control-sm">
+        <option value="">전체 카테고리</option>
+      </select>
+      <select id="filterStatus" class="form-control-sm">
+        <option value="">전체 상태</option>
+        <option value="PENDING">접수</option>
+        <option value="IN_PROGRESS">처리중</option>
+        <option value="COMPLETED">완료</option>
+        <option value="REJECTED">반려</option>
+      </select>
+      <button type="button" id="filterBtn" class="btn" style="min-height:38px;padding:0 16px;font-size:14px;">조회</button>
+    </div>
+
+    <!-- 목록 -->
+    <div id="requestList" class="support-list">
+      <!-- 스켈레톤 -->
+      <div class="sk-card" id="skCard1">
+        <div class="sk-badge-row">
+          <div class="sk sk-badge"></div>
+          <div class="sk sk-badge"></div>
+          <div class="sk sk-badge"></div>
+        </div>
+        <div class="sk sk-title"></div>
+        <div class="sk sk-text"></div>
+        <div class="sk sk-text-sm"></div>
+      </div>
+      <div class="sk-card" id="skCard2">
+        <div class="sk-badge-row">
+          <div class="sk sk-badge"></div>
+          <div class="sk sk-badge"></div>
+          <div class="sk sk-badge"></div>
+        </div>
+        <div class="sk sk-title"></div>
+        <div class="sk sk-text"></div>
+        <div class="sk sk-text-sm"></div>
+      </div>
+    </div>
+    <div id="emptyBox" class="empty-box" style="display:none;">접수된 요청이 없습니다.</div>
+
+    <!-- 상세 모달 -->
+    <div id="detailModal" class="support-modal" style="display:none;" role="dialog" aria-modal="true">
+      <div class="support-modal-backdrop" id="modalBackdrop"></div>
+      <div class="support-modal-box">
+        <div class="support-modal-header">
+          <div class="support-modal-header-left" id="modalHeaderLeft"></div>
+          <button type="button" class="support-modal-close" id="modalClose">✕</button>
+        </div>
+        <div class="support-modal-body" id="modalBody"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div id="globalLoading" aria-hidden="true">
+    <div class="global-loading__dialog">
+      <div class="global-loading__spinner" aria-hidden="true"></div>
+      <div class="global-loading__text" id="globalLoadingText">불러오는 중...</div>
+    </div>
+  </div>
+
+  <script src="../../assets/js/core/config.js"></script>
+  <script src="../../assets/js/core/api.js"></script>
+  <script src="../../assets/js/core/utils.js"></script>
+  <script src="../../assets/js/core/auth.js"></script>
+  <script src="../../assets/js/support/support-list.js"></script>
+</body>
+</html>

@@ -556,7 +556,6 @@ async function loadEquipmentList(nextPage) {
 
   try {
     if (typeof clearMessage === 'function') clearMessage();
-    if (typeof showGlobalLoading === 'function') showGlobalLoading('장비 목록을 불러오는 중...');
 
     if (equipmentListState._initialLoad) {
       var urlParams = getListQueryParams();
@@ -610,7 +609,6 @@ async function loadEquipmentList(nextPage) {
     }
   } finally {
     equipmentListState.loading = false;
-    if (typeof hideGlobalLoading === 'function') hideGlobalLoading();
   }
 }
 

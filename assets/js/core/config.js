@@ -1,7 +1,16 @@
 const CONFIG = {
   APP_NAME: 'MSO관리팀 업무지원 시스템',
   API_BASE_URL: 'https://script.google.com/macros/s/AKfycbwTAZvXeT5rwXyB8HnwypmiLIuGag85HoUj0uRRpw6c7LoAOQYDUWl09d_yU3mWMp50/exec',
-  SITE_BASE_URL: 'https://wizwon36.github.io/gc_imed_me',
+
+  // SITE_BASE_URL — 저장소 이름에 관계없이 현재 접속 URL에서 자동으로 결정
+  // 운영(gc_imed_me):     https://wizwon36.github.io/gc_imed_me
+  // dev(gc_imed_me_dev):  https://wizwon36.github.io/gc_imed_me_dev
+  // 로컬(file://):        빈 문자열로 폴백
+  SITE_BASE_URL: (function () {
+    if (location.protocol === 'file:') return '';
+    const parts = location.pathname.split('/').filter(Boolean);
+    return location.origin + (parts.length ? '/' + parts[0] : '');
+  })(),
 
   // 의료장비 앱 오픈 허용 의원 목록 — 신규 의원 추가 시 여기만 수정
   EQUIPMENT_ALLOWED_CLINICS: ['서울숲의원'],

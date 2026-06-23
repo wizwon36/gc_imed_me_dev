@@ -11,14 +11,7 @@
     if (new URLSearchParams(location.search).get('shell') === '1')
       document.documentElement.classList.add('in-shell');
   </script>
-  <style>
-    /* 로딩 중 컨텐츠 숨김 — JS가 준비되면 .is-ready 클래스 추가로 표시 */
-    body:not(.is-ready) .eq-filter-bar,
-    body:not(.is-ready) .eq-toolbar,
-    body:not(.is-ready) .eq-content {
-      visibility: hidden;
-    }
-  </style>
+
   <style>
     @media print {
       @page { size: A4 portrait; margin: 0; }

@@ -197,13 +197,14 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  overflow: visible;
+  overflow: hidden;   /* 내부는 감추되 eq-page 자체가 스크롤 */
 }
 
 .equipment-list-grid {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  flex-shrink: 0;
 }
 
 /* 카드 뷰 숨김 */

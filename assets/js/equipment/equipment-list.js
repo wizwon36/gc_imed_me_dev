@@ -510,8 +510,13 @@ async function loadEquipmentList(nextPage) {
         ? equipmentListState.page + 1
         : equipmentListState.page;
     } else {
-      equipmentListState.totalCount = Number(result.total_count || result.count || 0);
-      equipmentListState.totalPages = Number(result.total_pages || 1);
+      equipmentListState.totalCount = Number(result.total_count || result.count || result.totalCount || 0);
+      // GAS API가 total_pages / totalPages / pageCount 등 다양한 키로 내려올 수 있음
+      var rawTotal = result.total_pages || result.totalPages || result.page_count || result.pageCount || 0;
+      if (!rawTotal && equipmentListState.totalCount > 0) {
+        rawTotal = Math.ceil(equipmentListState.totalCount / equipmentListState.pageSize);
+      }
+      equipmentListState.totalPages = Math.max(1, Number(rawTotal));
     }
 
     renderEquipmentList(Array.isArray(result.data) ? result.data : []);

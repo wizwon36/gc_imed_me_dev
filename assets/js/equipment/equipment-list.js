@@ -132,6 +132,7 @@ function fillStatusFilterOptions() {
 
 function fillPageSizeOptions() {
   var target = document.getElementById('page_size');
+  if (!target || target.type === 'hidden') return; // hidden이면 무시
   if (!target) return;
 
   target.innerHTML =
@@ -242,9 +243,6 @@ function buildEquipmentRow(item) {
 
   return (
     '<tr class="equipment-tbl-row">' +
-      '<td class="equipment-tbl-cell tbl-td--check">' +
-        '<input type="checkbox" class="bulk-item-check" data-id="' + escapeHtml(item.equipment_id || '') + '" />' +
-      '</td>' +
       '<td class="equipment-tbl-cell equipment-tbl-cell--name">' + escapeHtml(item.equipment_name || '-') + '</td>' +
       '<td class="equipment-tbl-cell equipment-tbl-cell--id">' + escapeHtml(item.equipment_id || '-') + '</td>' +
       '<td class="equipment-tbl-cell">' + escapeHtml(item.model_name || '-') + '</td>' +
@@ -290,9 +288,6 @@ function renderEquipmentList(items) {
       '<table class="equipment-table">' +
         '<thead>' +
           '<tr>' +
-            '<th class="equipment-tbl-th tbl-th--check">' +
-              '<input type="checkbox" id="bulkCheckAll" title="전체 선택" />' +
-            '</th>' +
             '<th class="equipment-tbl-th equipment-tbl-th--name">장비명</th>' +
             '<th class="equipment-tbl-th equipment-tbl-th--id">장비번호</th>' +
             '<th class="equipment-tbl-th equipment-tbl-th--model">모델명</th>' +
@@ -311,6 +306,7 @@ function renderEquipmentList(items) {
     '</div>';
 
   container.innerHTML = cardsHtml + tableHtml;
+
 }
 
 function renderRecentPagination() {
@@ -515,7 +511,7 @@ async function initListFilters() {
   var teamEl;
 
   equipmentListState.page = query.page > 0 ? query.page : 1;
-  equipmentListState.pageSize = 15; // 고정
+  equipmentListState.pageSize = 20; // 고정
 
   fillStatusFilterOptions();
 
@@ -640,8 +636,7 @@ function bindListEvents() {
       setValue('status', '');
       setValue('manufacturer', '');
 
-      equipmentListState.pageSize = Number(getValue('page_size') || equipmentListState.pageSize || 20) || 20;
-      setValue('page_size', String(equipmentListState.pageSize));
+      // pageSize 고정 — UI 없음
 
       await loadEquipmentList(1);
     });

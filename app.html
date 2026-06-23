@@ -400,14 +400,75 @@ function updateActiveMenu(page, tab) {
 
   if (matched) {
     matched.classList.add('active');
-    // flyout 방식 — CSS hover로 열리므로 JS open 클래스 불필요
+    // flyout 내부 버튼도 active 동기화는 다음 hover 시 자동 반영
   }
 }
 
-// ── 아코디언 토글 — flyout 방식으로 전환, onclick은 유지(호환) ──
+// ── Flyout 메뉴 (portal 방식) ──────────────────────────────
+let _flyout = null;
+let _flyoutTimer = null;
+let _currentMenuId = null;
+
+function showFlyout(menuId, triggerEl) {
+  hideFlyout();
+  const submenu = document.getElementById(`menu-${menuId}`);
+  if (!submenu) return;
+
+  _currentMenuId = menuId;
+
+  // flyout 엘리먼트 생성 (body에 append)
+  const flyout = document.createElement('div');
+  flyout.className = 'sb-flyout';
+  flyout.id = 'sbFlyout';
+
+  // 서브메뉴 버튼들 복사
+  const items = submenu.querySelectorAll('.sb-sub-item');
+  items.forEach(item => {
+    const btn = item.cloneNode(true);
+    // onclick 속성 복사
+    const origOnclick = item.getAttribute('onclick');
+    if (origOnclick) {
+      btn.setAttribute('onclick', origOnclick);
+    }
+    // active 클래스 동기화
+    if (item.classList.contains('active')) btn.classList.add('active');
+    flyout.appendChild(btn);
+  });
+
+  document.body.appendChild(flyout);
+  _flyout = flyout;
+
+  // 위치 계산 — 트리거 우측, 수직 중앙
+  const rect = triggerEl.getBoundingClientRect();
+  const flyH = flyout.offsetHeight;
+  let top = rect.top + (rect.height / 2) - (flyH / 2);
+
+  // 화면 밖으로 나가지 않게
+  const maxTop = window.innerHeight - flyH - 8;
+  top = Math.max(8, Math.min(top, maxTop));
+
+  flyout.style.left = (rect.right + 4) + 'px';
+  flyout.style.top  = top + 'px';
+
+  // flyout에 마우스 올라오면 유지
+  flyout.addEventListener('mouseenter', () => {
+    clearTimeout(_flyoutTimer);
+  });
+  flyout.addEventListener('mouseleave', () => {
+    _flyoutTimer = setTimeout(hideFlyout, 120);
+  });
+}
+
+function hideFlyout() {
+  if (_flyout) {
+    _flyout.remove();
+    _flyout = null;
+  }
+  _currentMenuId = null;
+}
+
+// 아코디언 토글 — 클릭 시 첫 서브 아이템 이동 (호환용)
 function toggleMenu(menuId) {
-  // flyout은 CSS hover로 동작 — JS 토글 불필요
-  // 단, 클릭 시 첫 번째 서브 아이템으로 이동
   const submenu = document.getElementById(`menu-${menuId}`);
   if (!submenu) return;
   const first = submenu.querySelector('.sb-sub-item');
@@ -432,6 +493,26 @@ function doLogout() {
   window.auth?.logout?.();
   location.replace(`${CONFIG.SITE_BASE_URL}/index.html`);
 }
+
+// ── Flyout 이벤트 바인딩 ─────────────────────────────────────
+document.querySelectorAll('.sb-item-parent').forEach(btn => {
+  const menuId = btn.dataset.menu;
+  if (!menuId) return;
+
+  btn.addEventListener('mouseenter', () => {
+    clearTimeout(_flyoutTimer);
+    showFlyout(menuId, btn);
+  });
+
+  btn.addEventListener('mouseleave', () => {
+    _flyoutTimer = setTimeout(hideFlyout, 120);
+  });
+});
+
+// 다른 곳 클릭 시 flyout 닫기
+document.addEventListener('click', (e) => {
+  if (_flyout && !_flyout.contains(e.target)) hideFlyout();
+});
 
 // ── 브라우저 뒤로가기/앞으로가기 ────────────────────────────
 window.addEventListener('popstate', e => {

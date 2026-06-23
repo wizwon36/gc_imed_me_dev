@@ -84,21 +84,7 @@
   </style>
 </head>
 <body class="equipment-list-page">
-  <!-- 페이지 초기 로딩 스피너 — JS 실행 전 표시, globalLoading이 뜨면 자동으로 가려짐 -->
-  <div id="pageInitSpinner" style="
-    position:fixed;inset:0;z-index:99998;
-    background:#fff;
-    display:flex;align-items:center;justify-content:center;
-  ">
-    <div style="
-      width:32px;height:32px;
-      border:3px solid #e5e7eb;
-      border-top-color:#2563eb;
-      border-radius:50%;
-      animation:initSpin 0.7s linear infinite;
-    "></div>
-  </div>
-  <style>@keyframes initSpin { to { transform: rotate(360deg); } }</style>
+
   <div class="eq-page">
 
     <!-- 필터 바 -->
@@ -173,7 +159,7 @@
   <script src="../../assets/libs/tabulator/tabulator.min.js"></script>
   <script src="../../assets/js/equipment/equipment-list.js"></script>
 
-  <div id="globalLoading" aria-hidden="true">
+  <div id="globalLoading" class="is-open" aria-hidden="true">
     <div class="global-loading__dialog">
       <div class="global-loading__spinner" aria-hidden="true"></div>
       <div class="global-loading__text" id="globalLoadingText">불러오는 중...</div>

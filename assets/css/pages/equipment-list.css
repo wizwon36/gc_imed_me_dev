@@ -197,11 +197,15 @@
   flex: 1;
   min-height: 0;
   gap: 0;
+  overflow: hidden;
 }
 
 .equipment-list-grid {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* 카드 뷰 숨김 */
@@ -209,10 +213,8 @@
 
 /* ── 테이블 래퍼 ── */
 .equipment-table-wrap {
-  /* CSS calc로 정확한 높이 고정 — JS 계산 불필요 */
-  /* 100vh - shell(48) - page-padding(20) - filterbar(46) - gap×2(16) - pagination(42) = 100vh - 172px */
-  height: calc(100vh - 172px);
-  flex-shrink: 0;
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
   border: 1px solid #e5e7eb;
   border-radius: 8px;

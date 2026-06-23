@@ -41,7 +41,7 @@ html, body { height: 100%; overflow: hidden; }
   background: var(--sb-bg);
   display: flex;
   flex-direction: column;
-  overflow: visible; /* flyout을 위해 visible */
+  overflow: hidden;
   z-index: 200;
   flex-shrink: 0;
   transition: transform 0.25s ease;
@@ -115,11 +115,10 @@ html, body { height: 100%; overflow: hidden; }
 .sb-nav {
   flex: 1;
   overflow-y: auto;
-  overflow-x: visible; /* flyout이 사이드바 밖으로 나오도록 */
+  overflow-x: hidden;
   padding: 6px 0;
   scrollbar-width: thin;
   scrollbar-color: rgba(255,255,255,0.12) transparent;
-  position: relative;
 }
 
 .sb-nav::-webkit-scrollbar { width: 3px; }
@@ -200,41 +199,27 @@ html, body { height: 100%; overflow: hidden; }
   overflow: hidden;
 }
 
-/* 서브메뉴 — hover 시 우측 flyout */
-.sb-submenu {
-  display: none; /* JS open 클래스로 제어 안 함 — hover로만 */
-  position: absolute;
-  left: var(--sb-width);
-  top: 0;
+/* 서브메뉴 — JS portal 방식 (body에 append, 위치 동적 계산) */
+.sb-submenu { display: none; } /* 원본은 숨김 */
+
+/* flyout 팝업 — JS가 body에 동적 생성 */
+.sb-flyout {
+  position: fixed;
+  z-index: 9999;
   min-width: 160px;
   background: #1a2744;
-  border: 1px solid rgba(255,255,255,0.10);
+  border: 1px solid rgba(255,255,255,0.12);
   border-radius: 8px;
-  box-shadow: 4px 4px 16px rgba(0,0,0,0.35);
+  box-shadow: 6px 6px 20px rgba(0,0,0,0.4);
   padding: 4px 0;
-  z-index: 300;
-  white-space: nowrap;
+  pointer-events: auto;
 }
-
-/* 부모 아이템에 relative + hover 시 submenu 표시 */
-.sb-item-parent {
-  position: relative;
-}
-
-.sb-item-parent:hover > .sb-submenu,
-.sb-submenu:hover {
-  display: block;
-}
-
-/* open 클래스 무시 — hover 방식으로 통일 */
-.sb-submenu.open { display: none; }
-.sb-item-parent:hover > .sb-submenu { display: block !important; }
 
 .sb-sub-item {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 7px 14px;
+  padding: 7px 16px;
   font-size: 12px;
   font-weight: 500;
   color: var(--sb-text);

@@ -48,9 +48,6 @@
         <i class="ti ti-chevron-right sb-item-arrow" aria-hidden="true"></i>
       </button>
       <div class="sb-submenu" id="menu-equipment">
-        <button class="sb-sub-item" data-page="equipment/dashboard" onclick="navigate('equipment/dashboard')">
-          <i class="ti ti-layout-dashboard" aria-hidden="true"></i> 대시보드
-        </button>
         <button class="sb-sub-item" data-page="equipment/list" onclick="navigate('equipment/list')">
           <i class="ti ti-list" aria-hidden="true"></i> 장비 목록
         </button>
@@ -235,7 +232,6 @@
 
 // ── 메뉴 정의 ───────────────────────────────────────────────
 const MENU_META = {
-  'equipment/dashboard':          { app: '의료장비 관리', page: '대시보드' },
   'equipment/list':               { app: '의료장비 관리', page: '장비 목록' },
   'equipment/form':               { app: '의료장비 관리', page: '장비 등록·수정' },
   'equipment/detail':             { app: '의료장비 관리', page: '장비 상세' },
@@ -293,7 +289,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // URL 파라미터 또는 기본 페이지로 시작
   const params  = new URLSearchParams(location.search);
-  const initPage = params.get('page') || 'equipment/dashboard';
+  const initPage = params.get('page') || 'equipment/list';
   const initTab  = params.get('tab')  || '';
   navigate(initPage, initTab, true);
 });

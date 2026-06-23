@@ -3,99 +3,78 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>의료장비 관리시스템</title>
-  <link rel="stylesheet" href="../../assets/css/common.css?v=20260427q" />
-  <link rel="stylesheet" href="../../assets/css/pages/equipment-dashboard.css?v=20260427q" />
+  <title>의료장비 관리 · 대시보드</title>
+  <link rel="stylesheet" href="../../assets/css/common.css" />
+  <link rel="stylesheet" href="../../assets/css/pages/equipment-dashboard.css" />
+  <link rel="stylesheet" href="../../assets/font/tabler-icons/tabler-icons.min.css" />
+  <script>
+    if (new URLSearchParams(location.search).get('shell') === '1')
+      document.documentElement.classList.add('in-shell');
+  </script>
 </head>
-<body class="portal-page dashboard-page">
-  <div class="container page-shell dashboard-page-shell">
-    <section class="top-brand-bar portal-topbar portal-hero-card dashboard-topbar">
-      <div class="top-brand-left">
-        <div class="top-brand-logo">+</div>
-        <div class="top-brand-texts">
-          <strong class="top-brand-title">MSO관리팀 업무지원 시스템</strong>
-          <span class="top-brand-sub">의료장비 관리</span>
-        </div>
-      </div>
-
-      <div class="top-brand-actions portal-top-actions dashboard-top-actions">
-        <a class="portal-header-btn portal-header-btn--secondary" href="../../portal.html">HOME</a>
-        <a class="portal-header-btn portal-header-btn--secondary" href="list.html">장비목록</a>
-        <button
-          type="button"
-          id="logoutBtn"
-          class="portal-header-btn portal-header-btn--secondary"
-        >
-          로그아웃
-        </button>
-      </div>
-    </section>
+<body class="dashboard-page">
+  <div class="page-wrap">
 
     <div id="messageBox" class="message-box"></div>
 
+    <!-- KPI -->
     <section class="dashboard-kpi-grid dashboard-kpi-grid--portal">
       <article class="dashboard-kpi-card">
         <div class="dashboard-kpi-label">전체 장비</div>
         <div class="dashboard-kpi-value" id="totalCount">0</div>
       </article>
-    
       <article class="dashboard-kpi-card">
         <div class="dashboard-kpi-label">사용중</div>
         <div class="dashboard-kpi-value" id="inUseCount">0</div>
       </article>
-    
       <article class="dashboard-kpi-card">
         <div class="dashboard-kpi-label">수리중</div>
         <div class="dashboard-kpi-value" id="repairingCount">0</div>
       </article>
-    
       <article class="dashboard-kpi-card">
         <div class="dashboard-kpi-label">점검중</div>
         <div class="dashboard-kpi-value" id="inspectingCount">0</div>
       </article>
     </section>
 
-    <!-- PC 전용 액션 바 -->
+    <!-- 액션 바 (PC) -->
     <div class="dashboard-action-bar" id="dashboardActionBar">
       <span class="dashboard-action-bar-label">빠른 작업</span>
-      <a class="dashboard-action-bar-btn dashboard-action-bar-btn--primary" id="dashboardActionBarCreate" href="form.html">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 1v12M1 7h12" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg>
-        장비 등록
+      <a class="dashboard-action-bar-btn dashboard-action-bar-btn--primary"
+         id="dashboardActionBarCreate" href="form.html">
+        <i class="ti ti-plus" aria-hidden="true"></i> 장비 등록
       </a>
       <a class="dashboard-action-bar-btn" id="dashboardActionBarList" href="list.html">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="1" y="1" width="12" height="12" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M4 5h6M4 7.5h6M4 10h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        장비 조회
+        <i class="ti ti-list" aria-hidden="true"></i> 장비 조회
       </a>
-      <button type="button" class="dashboard-action-bar-btn" id="dashboardActionBarExport" style="display:none;">
-        <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7 1v8M4 6l3 3 3-3" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><path d="M2 10v1.5A1.5 1.5 0 003.5 13h7a1.5 1.5 0 001.5-1.5V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
-        장비대장 다운로드
+      <button type="button" class="dashboard-action-bar-btn"
+              id="dashboardActionBarExport" style="display:none;">
+        <i class="ti ti-download" aria-hidden="true"></i> 장비대장 다운로드
       </button>
       <div class="dashboard-action-bar-search" id="dashboardActionBarSearchWrap">
         <div class="dashboard-action-bar-search-inner">
-          <svg class="dashboard-action-bar-search-icon" width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M10 10l2.5 2.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-          <input
-            type="text"
-            id="dashboardQuickSearch"
+          <i class="ti ti-search dashboard-action-bar-search-icon" aria-hidden="true"></i>
+          <input type="text" id="dashboardQuickSearch"
             class="dashboard-action-bar-search-input"
             placeholder="장비명, 모델명, 시리얼 검색..."
-            autocomplete="off"
-            maxlength="100"
-          />
-          <button type="button" class="dashboard-action-bar-search-clear" id="dashboardQuickSearchClear" aria-label="검색어 지우기" style="display:none;">
-            <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2l8 8M10 2L2 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+            autocomplete="off" maxlength="100" />
+          <button type="button" class="dashboard-action-bar-search-clear"
+                  id="dashboardQuickSearchClear" aria-label="검색어 지우기" style="display:none;">
+            <i class="ti ti-x" aria-hidden="true"></i>
           </button>
         </div>
-        <button type="button" class="dashboard-action-bar-search-btn" id="dashboardQuickSearchBtn" aria-label="검색">
-          <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.7"/><path d="M10 10l2.5 2.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
-          검색
+        <button type="button" class="dashboard-action-bar-search-btn"
+                id="dashboardQuickSearchBtn" aria-label="검색">
+          <i class="ti ti-search" aria-hidden="true"></i> 검색
         </button>
       </div>
     </div>
 
+    <!-- 패널 영역 -->
     <section class="dashboard-panels-carousel-wrap dashboard-panels-section">
       <div class="dashboard-panel-dots" id="dashboardPanelDots" aria-label="대시보드 패널 탐색">
-        <button type="button" class="dashboard-panel-dot is-active" data-index="0" aria-label="빠른 작업"></button>
-        <button type="button" class="dashboard-panel-dot" data-index="1" aria-label="부서별 상태 현황"></button>
+        <button type="button" class="dashboard-panel-dot is-active" data-index="0" aria-label="부서별 상태 현황"></button>
+        <button type="button" class="dashboard-panel-dot" data-index="1" aria-label="빠른 작업"></button>
         <button type="button" class="dashboard-panel-dot" data-index="2" aria-label="유지보수 만료 예정"></button>
         <button type="button" class="dashboard-panel-dot" data-index="3" aria-label="최근 30일 이내 수리된 장비"></button>
         <button type="button" class="dashboard-panel-dot" data-index="4" aria-label="최근 30일 이내 등록된 장비"></button>
@@ -103,6 +82,8 @@
 
       <div id="dashboardPanelsScroll" class="dashboard-panels-scroll">
         <div class="dashboard-panels-grid">
+
+          <!-- 패널 0: 부서별 상태 현황 -->
           <article class="card dashboard-panel dashboard-panel--portal dashboard-panel--heatmap" id="panelCard0">
             <div class="section-head dashboard-section-head">
               <div>
@@ -117,6 +98,7 @@
             </div>
           </article>
 
+          <!-- 패널 1: 빠른 작업 (모바일 전용) -->
           <article class="card dashboard-panel dashboard-panel--portal dashboard-panel--actions" id="panelCard1">
             <div class="section-head dashboard-section-head">
               <div>
@@ -125,47 +107,48 @@
                 <div class="sub-text dashboard-section-desc">자주 사용하는 화면으로 바로 이동합니다.</div>
               </div>
             </div>
-
-            <!-- 모바일 전용 검색창 -->
             <div class="dashboard-mobile-search" id="dashboardMobileSearchWrap">
               <div class="dashboard-mobile-search-inner">
-                <svg class="dashboard-mobile-search-icon" width="15" height="15" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.5"/><path d="M10 10l2.5 2.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
-                <input
-                  type="text"
-                  id="dashboardMobileSearch"
+                <i class="ti ti-search dashboard-mobile-search-icon" aria-hidden="true"></i>
+                <input type="text" id="dashboardMobileSearch"
                   class="dashboard-mobile-search-input"
                   placeholder="장비명, 모델명, 시리얼 검색..."
-                  autocomplete="off"
-                  maxlength="100"
-                />
-                <button type="button" class="dashboard-mobile-search-clear" id="dashboardMobileSearchClear" aria-label="검색어 지우기" style="display:none;">
-                  <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M2 2l8 8M10 2L2 10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+                  autocomplete="off" maxlength="100" />
+                <button type="button" class="dashboard-mobile-search-clear"
+                        id="dashboardMobileSearchClear" aria-label="검색어 지우기" style="display:none;">
+                  <i class="ti ti-x" aria-hidden="true"></i>
                 </button>
               </div>
-              <button type="button" class="dashboard-mobile-search-btn" id="dashboardMobileSearchBtn" aria-label="검색">
-                <svg width="15" height="15" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="6" cy="6" r="4.5" stroke="currentColor" stroke-width="1.7"/><path d="M10 10l2.5 2.5" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+              <button type="button" class="dashboard-mobile-search-btn"
+                      id="dashboardMobileSearchBtn" aria-label="검색">
+                <i class="ti ti-search" aria-hidden="true"></i>
               </button>
             </div>
-
             <div class="dashboard-action-grid dashboard-action-grid--enhanced dashboard-action-grid--portal">
-              <a class="dashboard-action-card dashboard-action-card--primary" id="dashboardCreateEquipmentAction" href="form.html">
-                <span class="dashboard-action-icon" aria-hidden="true">＋</span>
+              <a class="dashboard-action-card dashboard-action-card--primary"
+                 id="dashboardCreateEquipmentAction" href="form.html">
+                <span class="dashboard-action-icon" aria-hidden="true">
+                  <i class="ti ti-plus"></i>
+                </span>
                 <div class="dashboard-action-body">
                   <div class="dashboard-action-title">장비 등록</div>
                   <div class="dashboard-action-desc">등록 바로가기</div>
                 </div>
               </a>
-            
               <a class="dashboard-action-card" id="dashboardActionCardList" href="list.html">
-                <span class="dashboard-action-icon" aria-hidden="true">📋</span>
+                <span class="dashboard-action-icon" aria-hidden="true">
+                  <i class="ti ti-list"></i>
+                </span>
                 <div class="dashboard-action-body">
                   <div class="dashboard-action-title">장비 조회</div>
                   <div class="dashboard-action-desc">조회 / 이력 / 라벨</div>
                 </div>
               </a>
-
-              <button type="button" class="dashboard-action-card" id="dashboardExportBtn" style="display:none; text-align:left;">
-                <span class="dashboard-action-icon" aria-hidden="true">📥</span>
+              <button type="button" class="dashboard-action-card"
+                      id="dashboardExportBtn" style="display:none; text-align:left;">
+                <span class="dashboard-action-icon" aria-hidden="true">
+                  <i class="ti ti-download"></i>
+                </span>
                 <div class="dashboard-action-body">
                   <div class="dashboard-action-title">장비대장 다운로드</div>
                   <div class="dashboard-action-desc">전체 장비 다운로드</div>
@@ -174,6 +157,7 @@
             </div>
           </article>
 
+          <!-- 패널 2: 유지보수 만료 예정 -->
           <article class="card dashboard-panel dashboard-panel--portal dashboard-panel--maintenance" id="panelCard2">
             <div class="section-head dashboard-section-head">
               <div>
@@ -196,6 +180,7 @@
             </div>
           </article>
 
+          <!-- 패널 3: 최근 수리 -->
           <article class="card dashboard-panel dashboard-panel--portal dashboard-panel--records dashboard-panel--repair" id="panelCard3">
             <div class="section-head dashboard-section-head">
               <div>
@@ -211,6 +196,7 @@
             </div>
           </article>
 
+          <!-- 패널 4: 최근 등록 -->
           <article class="card dashboard-panel dashboard-panel--portal dashboard-panel--records dashboard-panel--registered" id="panelCard4">
             <div class="section-head dashboard-section-head">
               <div>
@@ -225,10 +211,12 @@
               최근 30일 이내 등록 장비가 없습니다.
             </div>
           </article>
+
         </div>
       </div>
     </section>
-  </div>
+
+  </div><!-- /page-wrap -->
 
   <script src="../../assets/js/core/config.js"></script>
   <script src="../../assets/js/core/api.js"></script>
@@ -237,12 +225,6 @@
   <script src="../../assets/js/core/app-permission.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
   <script src="../../assets/js/equipment/dashboard.js"></script>
-  <script>
-    document.getElementById('logoutBtn')?.addEventListener('click', () => {
-      try { showGlobalLoading('로그아웃 중...'); } catch (e) {}
-      window.auth.logout();
-    });
-  </script>
 
   <div id="globalLoading" aria-hidden="true">
     <div class="global-loading__dialog">

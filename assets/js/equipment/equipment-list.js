@@ -331,7 +331,7 @@ function renderEquipmentList(items) {
       hozAlign: 'center', headerHozAlign: 'center',
       formatter: function(cell) {
         var v = cell.getValue() || '';
-        return v ? '<span class="tab-mfr">' + escapeHtml(v) + '</span>' : '<span style="color:#9ca3af">—</span>';
+        return v ? '<span class="tab-mfr">' + escapeHtml(v) + '</span>' : '<span style="color:#9ca3af">-</span>';
       }
     },
     {

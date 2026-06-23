@@ -197,16 +197,13 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  overflow: hidden;
-  justify-content: flex-start; /* 테이블이 적어도 위에서 시작 */
+  overflow: visible;
 }
 
 .equipment-list-grid {
-  flex: 1;
-  min-height: 0;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
+  flex-shrink: 0;
 }
 
 /* 카드 뷰 숨김 */
@@ -393,6 +390,17 @@
 .pagination-btn:hover { background: #f3f4f6; border-color: #d1d5db; }
 .pagination-btn.is-active { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
 .pagination-btn:disabled { opacity: 0.4; cursor: default; }
+
+.pagination-ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 26px;
+  font-size: 12px;
+  color: #9ca3af;
+  user-select: none;
+}
 
 /* ── 모바일 ── */
 @media (max-width: 768px) {

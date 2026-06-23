@@ -1,9 +1,7 @@
 /* ============================================================
- * equipment-list.css — 장비 목록 (그리드 카드)
- * Shell SPA 전면 재작성
+ * equipment-list.css — 장비 목록 (데이터 테이블)
  * ============================================================ */
 
-/* ── 페이지 구조 ── */
 .equipment-list-page {
   background: #f0f2f5;
   min-height: 100vh;
@@ -15,7 +13,7 @@
   height: calc(100vh - 48px);
   overflow: hidden;
   padding: 12px 16px;
-  gap: 10px;
+  gap: 8px;
   box-sizing: border-box;
 }
 
@@ -37,37 +35,38 @@
   gap: 6px;
   flex: 1;
   min-width: 0;
-  flex-wrap: nowrap;
 }
 
-/* 검색어 */
+/* 검색어 — 아이콘 겹침 수정 */
 .eq-filter-keyword {
   position: relative;
   display: flex;
   align-items: center;
-  flex: 1;
-  min-width: 160px;
+  flex: 1.5;
+  min-width: 180px;
 }
 
 .eq-filter-icon {
   position: absolute;
   left: 9px;
-  font-size: 14px;
+  font-size: 13px;
   color: #9ca3af;
   pointer-events: none;
+  z-index: 1;
+  line-height: 1;
 }
 
 .eq-filter-input {
   width: 100%;
   height: 32px;
-  padding: 0 10px 0 30px;
+  padding: 0 10px 0 30px; /* 아이콘 너비만큼 왼쪽 패딩 */
   border: 1px solid #d1d5db;
   border-radius: 6px;
   background: #f9fafb;
   font-size: 12px;
   color: #111827;
   outline: none;
-  transition: border-color 0.15s, background 0.15s;
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
 }
 
 .eq-filter-input:focus {
@@ -90,19 +89,25 @@
   outline: none;
   cursor: pointer;
   white-space: nowrap;
-  min-width: 80px;
-  max-width: 120px;
+  flex: 1;
+  min-width: 72px;
+  max-width: 110px;
   transition: border-color 0.15s;
   appearance: none;
   -webkit-appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239ca3af' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 8px center;
+  background-position: right 7px center;
 }
 
 .eq-filter-select:focus { border-color: #2563eb; background-color: #fff; }
 
-/* 버튼 */
+/* 텍스트 인풋 (제조사) */
+input.eq-filter-select {
+  background-image: none;
+  padding-right: 8px;
+}
+
 .eq-filter-btn {
   height: 32px;
   padding: 0 12px;
@@ -117,7 +122,6 @@
 
 .eq-filter-btn i { font-size: 13px; }
 
-/* 장비 등록 버튼 */
 .eq-register-btn {
   height: 32px;
   padding: 0 14px;
@@ -131,8 +135,6 @@
   text-decoration: none;
 }
 
-.eq-register-btn i { font-size: 13px; }
-
 /* ── 툴바 ── */
 .eq-toolbar {
   display: flex;
@@ -140,6 +142,7 @@
   justify-content: space-between;
   gap: 10px;
   flex-shrink: 0;
+  min-height: 28px;
 }
 
 .eq-toolbar-left,
@@ -162,8 +165,8 @@
 }
 
 .eq-select-sm {
-  height: 28px;
-  padding: 0 22px 0 8px;
+  height: 26px;
+  padding: 0 20px 0 7px;
   border: 1px solid #d1d5db;
   border-radius: 5px;
   font-size: 11px;
@@ -175,7 +178,7 @@
   -webkit-appearance: none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='7' viewBox='0 0 10 7'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%239ca3af' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
-  background-position: right 7px center;
+  background-position: right 6px center;
 }
 
 .eq-page-size-wrap {
@@ -190,181 +193,177 @@
   white-space: nowrap;
 }
 
-/* ── 콘텐츠 영역 (스크롤 허용) ── */
+/* ── 콘텐츠 영역 ── */
 .eq-content {
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
-  overflow-x: hidden;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding-bottom: 4px;
-}
-
-.eq-content::-webkit-scrollbar { width: 4px; }
-.eq-content::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
-
-/* ── 장비 그리드 ── */
-.equipment-list-grid {
-  display: contents; /* 직접 자식 없음 — equipment-cards-wrap이 그리드 */
-}
-
-/* JS가 생성하는 카드 래퍼 — 항상 그리드로 표시 */
-.equipment-cards-wrap {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0,1fr));
-  gap: 10px;
-}
-
-/* 테이블 뷰는 완전히 숨김 — 그리드 카드로 통일 */
-.equipment-table-wrap { display: none !important; }
-
-/* ── 장비 카드 ── */
-.equipment-card {
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 0;
-  overflow: hidden;
-  transition: box-shadow 0.15s, border-color 0.15s, transform 0.15s;
-  display: flex;
-  flex-direction: column;
-}
-
-.equipment-card:hover {
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  border-color: #d1d5db;
-  transform: translateY(-1px);
-}
-
-/* 카드 헤더 */
-.equipment-card-head {
-  display: flex;
-  align-items: flex-start;
-  justify-content: space-between;
   gap: 8px;
-  padding: 12px 14px 8px;
-  border-bottom: 1px solid #f3f4f6;
-}
-
-.equipment-card-title-wrap { min-width: 0; flex: 1; }
-
-.equipment-card-title {
-  font-size: 13px;
-  font-weight: 700;
-  color: #111827;
-  margin: 0;
-  white-space: nowrap;
   overflow: hidden;
-  text-overflow: ellipsis;
-  line-height: 1.3;
 }
 
-.equipment-card-sub {
-  font-size: 10px;
-  color: #9ca3af;
-  margin-top: 2px;
-  font-family: 'Consolas', monospace;
-}
-
-/* 카드 바디 */
-.equipment-card-grid {
+/* ── 장비 목록 그리드 (테이블) ── */
+.equipment-list-grid {
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 0;
-  padding: 8px 14px;
+}
+
+/* 카드 뷰 완전 숨김 */
+.equipment-cards-wrap { display: none !important; }
+
+/* 테이블 뷰 항상 표시 */
+.equipment-table-wrap {
   flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: auto;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #fff;
 }
 
-.equipment-card-row {
-  display: grid;
-  grid-template-columns: 52px 1fr;
-  gap: 6px;
-  align-items: baseline;
-  padding: 3px 0;
-  border-bottom: 1px solid #f9fafb;
+.equipment-table-wrap::-webkit-scrollbar { width: 4px; height: 4px; }
+.equipment-table-wrap::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
+
+.equipment-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 800px;
+  font-size: 12px;
 }
 
-.equipment-card-row:last-child { border-bottom: none; }
-
-.equipment-card-label {
-  font-size: 10px;
-  color: #9ca3af;
-  font-weight: 600;
-  white-space: nowrap;
-}
-
-.equipment-card-value {
+/* 헤더 */
+.equipment-tbl-th {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+  padding: 9px 12px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
   font-size: 11px;
+  font-weight: 700;
+  color: #4b5563;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.equipment-tbl-th:first-child { padding: 9px 10px; width: 36px; }
+
+/* 체크박스 열 */
+.tbl-th--check,
+.tbl-td--check {
+  width: 36px;
+  text-align: center;
+  padding: 0 8px !important;
+}
+
+.equipment-tbl-th--name { min-width: 160px; }
+.equipment-tbl-th--actions { min-width: 120px; text-align: right; }
+
+/* 행 */
+.equipment-tbl-row {
+  border-bottom: 1px solid #f3f4f6;
+  transition: background 0.1s;
+}
+
+.equipment-tbl-row:last-child { border-bottom: none; }
+.equipment-tbl-row:hover { background: #f8faff; }
+
+/* 셀 */
+.equipment-tbl-cell {
+  padding: 8px 12px;
+  vertical-align: middle;
   color: #374151;
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
+  max-width: 160px;
 }
 
-/* 카드 액션 */
-.equipment-card-actions {
+.equipment-tbl-cell:first-child { padding: 8px; text-align: center; }
+
+/* 장비명 셀 */
+.equipment-tbl-cell--name { max-width: none; }
+
+.equipment-tbl-name {
+  font-size: 12px;
+  font-weight: 600;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.equipment-tbl-id {
+  font-size: 10px;
+  color: #9ca3af;
+  font-family: 'Consolas', monospace;
+  margin-top: 1px;
+}
+
+/* 시리얼 셀 */
+.equipment-tbl-cell--serial {
+  font-family: 'Consolas', monospace;
+  font-size: 11px;
+}
+
+/* 상태 셀 */
+.equipment-tbl-cell--status { text-align: center; }
+
+/* 액션 셀 */
+.equipment-tbl-cell--actions { text-align: right; max-width: none; }
+
+.equipment-tbl-actions {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 14px;
-  border-top: 1px solid #f3f4f6;
-  background: #f9fafb;
+  justify-content: flex-end;
+  gap: 4px;
 }
 
-.equipment-card-actions-left { display: flex; gap: 6px; flex: 1; }
-.equipment-card-actions-right { margin-left: auto; }
-
-.equipment-card-actions .btn,
-.equipment-card-actions .btn-primary {
-  height: 26px;
-  padding: 0 10px;
-  font-size: 11px;
-  border-radius: 5px;
-  font-weight: 600;
-}
-
-/* tbl-btn도 동일하게 (JS가 tbl-btn 클래스 사용) */
+/* ── 테이블 버튼 ── */
 .tbl-btn {
   display: inline-flex;
   align-items: center;
-  height: 26px;
-  padding: 0 10px;
+  height: 24px;
+  padding: 0 8px;
   border: 1px solid #d1d5db;
-  border-radius: 5px;
+  border-radius: 4px;
   font-size: 11px;
   font-weight: 600;
   color: #374151;
   background: #fff;
   cursor: pointer;
   text-decoration: none;
-  transition: background 0.12s, border-color 0.12s;
+  transition: background 0.1s, border-color 0.1s;
   white-space: nowrap;
 }
 
-.tbl-btn:hover { background: #f3f4f6; }
+.tbl-btn:hover { background: #f3f4f6; border-color: #9ca3af; }
 
 .tbl-btn--primary {
-  background: #2563eb;
-  border-color: #2563eb;
+  background: #111827;
+  border-color: #111827;
   color: #fff;
 }
 
-.tbl-btn--primary:hover { background: #1d4ed8; border-color: #1d4ed8; }
+.tbl-btn--primary:hover { background: #1f2937; border-color: #1f2937; }
 
-/* 상태 뱃지 (common.css 보완) */
+/* ── 상태 뱃지 ── */
 .status-badge {
   display: inline-flex;
   align-items: center;
-  height: 20px;
-  padding: 0 7px;
-  border-radius: 4px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 3px;
   font-size: 10px;
   font-weight: 700;
   border: 1px solid transparent;
   white-space: nowrap;
-  flex-shrink: 0;
 }
 
 .is-in-use     { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
@@ -373,61 +372,69 @@
 .is-stored     { background: #f9fafb; color: #374151; border-color: #e5e7eb; }
 .is-disposed   { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
 
-/* 빈 상태 */
+/* ── 빈 상태 ── */
 .equipment-list-grid .empty-box {
-  grid-column: 1 / -1;
+  margin: 0;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  min-height: 160px;
 }
 
-/* 페이지네이션 */
+/* ── 페이지네이션 ── */
 .pagination-area {
   flex-shrink: 0;
-  padding-bottom: 8px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 0;
 }
 
-/* ── 태블릿 ── */
-@media (max-width: 1200px) {
-  .equipment-cards-wrap {
-    grid-template-columns: repeat(3, minmax(0,1fr));
-  }
+.pagination-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 6px;
+  border: 1px solid #e5e7eb;
+  border-radius: 5px;
+  background: #fff;
+  color: #374151;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.1s;
 }
 
-@media (max-width: 900px) {
-  .equipment-cards-wrap {
-    grid-template-columns: repeat(2, minmax(0,1fr));
-  }
-
-  .eq-filter-form {
-    flex-wrap: wrap;
-  }
-
-  .eq-filter-keyword { flex: 1 1 100%; }
-
-  .eq-filter-select {
-    flex: 1 1 calc(50% - 3px);
-    max-width: none;
-  }
-}
+.pagination-btn:hover { background: #f3f4f6; border-color: #d1d5db; }
+.pagination-btn.is-active { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
+.pagination-btn:disabled { opacity: 0.4; cursor: default; }
 
 /* ── 모바일 ── */
-@media (max-width: 600px) {
-  .eq-page { padding: 10px 12px; gap: 8px; }
+@media (max-width: 768px) {
+  .eq-page { padding: 10px 12px; }
 
-  .eq-filter-bar {
-    flex-wrap: wrap;
-    gap: 6px;
-    padding: 8px;
-  }
-
-  .eq-filter-form { flex-wrap: wrap; gap: 6px; }
-  .eq-filter-keyword { flex: 1 1 100%; }
+  .eq-filter-form { flex-wrap: wrap; }
+  .eq-filter-keyword { flex: 1 1 100%; min-width: 0; }
   .eq-filter-select { flex: 1 1 calc(50% - 3px); max-width: none; min-width: 0; }
   .eq-filter-btn { flex: 1; justify-content: center; }
   .eq-register-btn { width: 100%; justify-content: center; }
 
-  .equipment-cards-wrap { grid-template-columns: 1fr; }
+  /* 모바일에서는 카드로 전환 */
+  .equipment-cards-wrap { display: grid !important; grid-template-columns: 1fr; gap: 8px; }
+  .equipment-table-wrap { display: none !important; }
 
-  .equipment-card-grid { gap: 0; }
-  .equipment-card-row  { grid-template-columns: 48px 1fr; }
-
-  .eq-toolbar { flex-wrap: wrap; }
+  .equipment-card { border: 1px solid #e5e7eb; border-radius: 8px; overflow: hidden; background: #fff; }
+  .equipment-card-head { display: flex; align-items: flex-start; justify-content: space-between; padding: 10px 12px 8px; border-bottom: 1px solid #f3f4f6; gap: 8px; }
+  .equipment-card-title { font-size: 13px; font-weight: 700; color: #111827; margin: 0; }
+  .equipment-card-sub { font-size: 10px; color: #9ca3af; margin-top: 1px; }
+  .equipment-card-grid { display: flex; flex-direction: column; padding: 8px 12px; gap: 0; }
+  .equipment-card-row { display: grid; grid-template-columns: 52px 1fr; gap: 6px; padding: 3px 0; border-bottom: 1px solid #f9fafb; }
+  .equipment-card-row:last-child { border-bottom: none; }
+  .equipment-card-label { font-size: 10px; color: #9ca3af; font-weight: 600; }
+  .equipment-card-value { font-size: 11px; color: #374151; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .equipment-card-actions { display: flex; gap: 6px; padding: 8px 12px; border-top: 1px solid #f3f4f6; background: #f9fafb; }
+  .equipment-card-actions-right { margin-left: auto; }
+  .equipment-card-actions .tbl-btn { height: 28px; font-size: 12px; }
 }

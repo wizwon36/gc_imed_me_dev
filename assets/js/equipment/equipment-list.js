@@ -486,7 +486,10 @@ async function loadEquipmentList(nextPage) {
       // URL에 필터가 없으면 소속 의원/팀으로 기본 필터 적용
       if (!urlParams.keyword && !urlParams.clinic_code && !urlParams.team_code && !urlParams.status && !urlParams.manufacturer) {
         urlParams.clinic_code = equipmentListState.userClinicCode || '';
-        urlParams.team_code   = equipmentListState.userTeamCode   || '';
+        // admin은 팀 필터 없이 의원 전체 조회, 일반 user만 팀 필터 적용
+        if (!equipmentListState.isAdmin) {
+          urlParams.team_code = equipmentListState.userTeamCode || '';
+        }
       }
       filters = urlParams;
     } else {

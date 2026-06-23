@@ -192,20 +192,16 @@
    100vh - 48(shell topbar) - 10(pt) - 10(pb) - 8(gap1) - 46(filterbar) - 8(gap2) - 22(toolbar) - 8(gap3) - 30(pagination) = 100vh - 190px
 */
 .eq-content {
-  flex: 1;
-  min-height: 0;
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-height: 0;
   gap: 0;
-  overflow: visible; /* 페이지네이션 잘리지 않게 */
 }
 
 .equipment-list-grid {
-  flex: 1;
-  min-height: 0;
   display: flex;
   flex-direction: column;
-  overflow: visible;
 }
 
 /* 카드 뷰 숨김 */
@@ -213,9 +209,11 @@
 
 /* ── 테이블 래퍼 ── */
 .equipment-table-wrap {
-  flex: 1;           /* 남은 공간 채움 */
-  min-height: 100px;
-  overflow: hidden;  /* 내부 테이블만 스크롤 없이 채움 */
+  /* CSS calc로 정확한 높이 고정 — JS 계산 불필요 */
+  /* 100vh - shell(48) - page-padding(20) - filterbar(46) - gap×2(16) - pagination(42) = 100vh - 172px */
+  height: calc(100vh - 172px);
+  flex-shrink: 0;
+  overflow: hidden;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   background: #fff;

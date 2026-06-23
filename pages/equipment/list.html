@@ -11,6 +11,12 @@
     if (new URLSearchParams(location.search).get('shell') === '1')
       document.documentElement.classList.add('in-shell');
   </script>
+  <style>
+    .eq-filter-bar, .eq-toolbar, .eq-content { opacity: 0; transition: opacity 0.2s; }
+    body.page-ready .eq-filter-bar,
+    body.page-ready .eq-toolbar,
+    body.page-ready .eq-content { opacity: 1; }
+  </style>
 
   <style>
     @media print {

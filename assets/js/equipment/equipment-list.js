@@ -283,7 +283,7 @@ function getActionButtons(item) {
     btns += '<a class="tbl-btn tbl-btn--primary" href="form.html?id=' + id + '&shell=1">수정</a>';
   }
   if (equipmentListState.canEdit) {
-    btns += '<button class="tbl-btn" onclick="printSingleLabel('' + id + '')">라벨</button>';
+    btns += '<button class="tbl-btn" onclick="printSingleLabel(\'' + id + '\')">라벨</button>';
   }
   return btns;
 }

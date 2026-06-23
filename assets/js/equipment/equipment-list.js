@@ -553,8 +553,8 @@ async function loadEquipmentList(nextPage) {
 
   try {
     if (typeof clearMessage === 'function') clearMessage();
-    // Tabulator 로딩 overlay
-    if (_tabulatorInstance) _tabulatorInstance.alert('불러오는 중...');
+    // Tabulator 로딩 overlay (초기화 완료 후에만)
+    if (_tabulatorInstance && _tabulatorInstance.initialized) _tabulatorInstance.alert('불러오는 중...');
 
     if (equipmentListState._initialLoad) {
       var urlParams = getListQueryParams();
@@ -608,7 +608,7 @@ async function loadEquipmentList(nextPage) {
     }
   } finally {
     equipmentListState.loading = false;
-    if (_tabulatorInstance) _tabulatorInstance.clearAlert();
+    if (_tabulatorInstance && _tabulatorInstance.initialized) _tabulatorInstance.clearAlert();
   }
 }
 

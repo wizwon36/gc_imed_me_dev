@@ -26,10 +26,8 @@
 
     <!-- 사용자 -->
     <div class="sb-user">
-      <div class="sb-avatar" id="sbAvatar">--</div>
       <div class="sb-user-info">
-        <div class="sb-user-name" id="sbUserName">로딩 중...</div>
-        <div class="sb-user-clinic" id="sbUserClinic"></div>
+        <div class="sb-user-line" id="sbUserLine">로딩 중...</div>
       </div>
     </div>
 
@@ -196,11 +194,7 @@
         <span class="shell-breadcrumb-page" id="breadcrumbPage"></span>
       </div>
       <div class="shell-topbar-right">
-        <div class="shell-user-chip">
-          <span id="topbarUserName">—</span>
-          <span style="color:#d1d5db">·</span>
-          <strong id="topbarClinic">—</strong>
-        </div>
+        <!-- 사용자 정보 제거 — 사이드바에 표시 -->
       </div>
     </header>
 
@@ -299,14 +293,10 @@ function renderUserInfo(user) {
   const name   = user.user_name || user.name || user.email || '—';
   const clinic = user.clinic_name || '';
 
-  // 아바타 이니셜
-  const initials = name.slice(0, 2);
-  document.getElementById('sbAvatar').textContent = initials;
-  document.getElementById('sbUserName').textContent = name;
-  document.getElementById('sbUserClinic').textContent = clinic;
-
-  document.getElementById('topbarUserName').textContent = name;
-  document.getElementById('topbarClinic').textContent = clinic;
+  // 사이드바 한 줄 표기: 이름 · 소속의원
+  const line = clinic ? name + ' · ' + clinic : name;
+  const lineEl = document.getElementById('sbUserLine');
+  if (lineEl) lineEl.textContent = line;
 }
 
 // ── 페이지 이동 ───────────────────────────────────────────────

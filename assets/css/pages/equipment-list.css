@@ -11,8 +11,8 @@
   flex-direction: column;
   height: calc(100vh - 48px); /* shell topbar */
   overflow: hidden;
-  padding: 10px 16px;
-  gap: 8px;
+  padding: 6px 16px 6px;
+  gap: 6px;
   box-sizing: border-box;
 }
 
@@ -29,7 +29,7 @@
   border-radius: 8px;
   padding: 7px 12px;
   flex-shrink: 0;
-  height: 46px;
+  height: 42px;
   box-sizing: border-box;
 }
 
@@ -357,7 +357,7 @@
   align-items: center;
   gap: 3px;
   box-sizing: border-box;
-  padding-top: 6px;   /* 테이블과 간격 */
+  padding-top: 4px;
 }
 
 .pagination-btn {

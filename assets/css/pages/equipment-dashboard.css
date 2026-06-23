@@ -10,33 +10,36 @@
 }
 
 .page-wrap {
-  padding: 16px 20px 24px;
+  padding: 12px 16px;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  max-width: 1440px;
-  margin: 0 auto;
+  gap: 10px;
+  height: calc(100vh - 48px); /* shell topbar 높이 제외 */
+  overflow: hidden;
+  box-sizing: border-box;
 }
 
 /* ── KPI 그리드 ── */
 .dashboard-kpi-grid--portal {
   display: grid;
   grid-template-columns: repeat(4, minmax(0,1fr));
-  gap: 10px;
+  gap: 8px;
+  flex-shrink: 0;
 }
 
 .dashboard-kpi-card {
   background: #fff;
   border: 1px solid #e5e7eb;
-  border-radius: 10px;
-  padding: 14px 16px;
+  border-radius: 8px;
+  padding: 10px 14px;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: 76px;
+  min-height: 60px;
   position: relative;
   overflow: hidden;
   transition: box-shadow 0.15s, transform 0.15s;
+  flex-shrink: 0;
 }
 
 .dashboard-kpi-card:hover {
@@ -55,11 +58,11 @@
   color: #6b7280;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
 }
 
 .dashboard-kpi-value {
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 800;
   color: #111827;
   letter-spacing: -0.03em;
@@ -73,8 +76,9 @@
   gap: 8px;
   background: #eef3ff;
   border: 1px solid #d1d5db;
-  border-radius: 8px;
-  padding: 8px 14px;
+  border-radius: 7px;
+  padding: 6px 12px;
+  flex-shrink: 0;
 }
 
 .dashboard-action-bar-label {
@@ -202,13 +206,25 @@
 .dashboard-action-bar-search-btn i { font-size: 13px; }
 
 /* ── 패널 그리드 ── */
-.dashboard-panels-carousel-wrap { width: 100%; }
-.dashboard-panels-scroll { width: 100%; }
+.dashboard-panels-carousel-wrap {
+  width: 100%;
+  flex: 1;
+  min-height: 0; /* flex 자식이 부모를 넘치지 않게 */
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-panels-scroll {
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
 
 .dashboard-panels-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0,1fr));
-  gap: 14px;
+  gap: 12px;
+  height: 100%;
 }
 
 .dashboard-panel-dots { display: none; }
@@ -219,9 +235,10 @@
   flex-direction: column;
   background: #fff;
   border: 1px solid #e5e7eb;
-  border-radius: 12px;
+  border-radius: 10px;
   overflow: hidden;
   transition: box-shadow 0.2s;
+  min-height: 0; /* 그리드 안에서 넘치지 않게 */
 }
 .dashboard-panel--portal:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
 
@@ -233,9 +250,9 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 10px;
+  gap: 8px;
   flex-shrink: 0;
-  padding: 14px 18px 12px;
+  padding: 10px 16px 9px;
   background: #f8faff;
   border-bottom: 1px solid #f3f4f6;
 }
@@ -266,7 +283,7 @@
   align-items: center;
   height: 18px;
   padding: 0 7px;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
   border-radius: 4px;
   background: #dbeafe;
   color: #1d4ed8;
@@ -277,7 +294,7 @@
 
 .dashboard-section-title {
   margin: 0;
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 700;
   color: #111827;
   letter-spacing: -0.01em;
@@ -303,13 +320,13 @@
 .dashboard-section-head ~ .heatmap-wrap,
 .dashboard-section-head ~ .dashboard-action-grid--portal,
 .dashboard-section-head ~ .dashboard-action-grid--enhanced {
-  padding: 12px 18px 16px;
+  padding: 10px 16px 12px;
 }
 
-.dashboard-panel--heatmap .heatmap-wrap { padding: 10px 18px 16px; }
+.dashboard-panel--heatmap .heatmap-wrap { padding: 8px 16px 12px; }
 
 .dashboard-section-head ~ .empty-box {
-  margin: 12px 18px 16px;
+  margin: 10px 16px 12px;
 }
 
 .dashboard-section-head ~ .dashboard-list-stack,
@@ -322,7 +339,8 @@
 .dashboard-panel--maintenance .dashboard-list-stack,
 .dashboard-panel--registered .dashboard-list-stack,
 .dashboard-panel--repair .dashboard-list-stack {
-  max-height: 340px;
+  flex: 1;
+  min-height: 0;
   overflow-y: auto;
   overflow-x: hidden;
   padding: 0 !important;
@@ -364,9 +382,9 @@
   display: grid;
   grid-template-columns: minmax(0,1fr) auto;
   align-items: center;
-  gap: 10px;
-  min-height: 64px;
-  padding: 10px 14px;
+  gap: 8px;
+  min-height: 52px;
+  padding: 8px 14px;
   border-bottom: 1px solid #f3f4f6;
   background: #fff;
   text-decoration: none;

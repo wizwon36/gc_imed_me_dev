@@ -535,6 +535,8 @@ async function loadEquipmentList(nextPage) {
       console.error(error);
     }
   } finally {
+    // 성공/실패 무관하게 반드시 컨텐츠 표시
+    document.body.classList.add('is-ready');
     equipmentListState.loading = false;
     if (typeof hideGlobalLoading === 'function') {
       hideGlobalLoading();

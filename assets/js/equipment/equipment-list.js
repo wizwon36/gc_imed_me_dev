@@ -344,16 +344,31 @@ function renderFullPagination() {
     return;
   }
 
-  start = Math.max(1, page - 2);
-  end = Math.min(totalPages, page + 2);
+  // 페이지 번호 목록 생성 (현재 ±3, 양 끝 항상 표시, ... 처리)
+  var pageNums = [];
+  var WINDOW = 3; // 현재 페이지 기준 좌우 표시 개수
 
-  for (i = start; i <= end; i += 1) {
-    pages.push(
-      '<button type="button" class="pagination-btn ' + (i === page ? 'is-active' : '') + '" data-page="' + i + '">' +
-        i +
-      '</button>'
-    );
+  function addPage(n) {
+    if (n < 1 || n > totalPages) return;
+    if (pageNums[pageNums.length - 1] === n) return;
+    pageNums.push(n);
   }
+
+  addPage(1);
+  if (page - WINDOW > 2) pageNums.push('...');
+  for (i = Math.max(2, page - WINDOW); i <= Math.min(totalPages - 1, page + WINDOW); i++) addPage(i);
+  if (page + WINDOW < totalPages - 1) pageNums.push('...');
+  if (totalPages > 1) addPage(totalPages);
+
+  pageNums.forEach(function(n) {
+    if (n === '...') {
+      pages.push('<span class="pagination-ellipsis">…</span>');
+    } else {
+      pages.push(
+        '<button type="button" class="pagination-btn ' + (n === page ? 'is-active' : '') + '" data-page="' + n + '">' + n + '</button>'
+      );
+    }
+  });
 
   container.innerHTML =
     '<button type="button" class="pagination-btn" data-page="' + Math.max(1, page - 1) + '" ' + (page <= 1 ? 'disabled' : '') + '>이전</button>' +

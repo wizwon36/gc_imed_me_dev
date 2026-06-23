@@ -201,27 +201,14 @@
 }
 
 .equipment-list-grid {
-  display: flex;
-  flex-direction: column;
   flex: 1;
   min-height: 0;
-  /* overflow 없음 */
+  display: flex;
+  flex-direction: column;
 }
 
 /* 카드 뷰 숨김 */
 .equipment-cards-wrap { display: none !important; }
-
-/* ── 테이블 래퍼 — flex:1로 남은 공간 채움 ── */
-.equipment-table-wrap {
-  flex: 1;
-  min-height: 0;
-  overflow: hidden; /* 테이블 래퍼만 overflow hidden */
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  background: #fff;
-  display: flex;
-  flex-direction: column;
-}
 
 /* ── 테이블 ── */
 .equipment-table {

@@ -1,5 +1,186 @@
 <!DOCTYPE html>
-<html><head><meta charset="UTF-8">
-<meta http-equiv="refresh" content="0;url=list.html">
-<script>location.replace('list.html');</script>
-</head><body></body></html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>의료장비 관리 · 대시보드</title>
+  <link rel="stylesheet" href="../../assets/css/common.css" />
+  <link rel="stylesheet" href="../../assets/css/pages/equipment-dashboard.css" />
+  <link rel="stylesheet" href="../../assets/font/tabler-icons/tabler-icons.min.css" />
+  <script>
+    if (new URLSearchParams(location.search).get('shell') === '1')
+      document.documentElement.classList.add('in-shell');
+  </script>
+</head>
+<body class="dashboard-page">
+<div class="db-page">
+
+  <!-- KPI -->
+  <div class="db-kpi-row">
+    <div class="db-kpi-card db-kpi-card--blue">
+      <div class="db-kpi-label"><i class="ti ti-stethoscope"></i> 전체 장비</div>
+      <div class="db-kpi-value" id="kpiTotal">—</div>
+    </div>
+    <div class="db-kpi-card db-kpi-card--green">
+      <div class="db-kpi-label"><i class="ti ti-activity"></i> 사용중</div>
+      <div class="db-kpi-value" id="kpiInUse">—</div>
+    </div>
+    <div class="db-kpi-card db-kpi-card--orange">
+      <div class="db-kpi-label"><i class="ti ti-tool"></i> 수리중</div>
+      <div class="db-kpi-value" id="kpiRepair">—</div>
+    </div>
+    <div class="db-kpi-card db-kpi-card--purple">
+      <div class="db-kpi-label"><i class="ti ti-calendar-event"></i> 만료 임박</div>
+      <div class="db-kpi-value" id="kpiExpiring">—</div>
+    </div>
+  </div>
+
+  <!-- 메인 패널 -->
+  <div class="db-panels">
+
+    <!-- 좌: 부서별 현황 -->
+    <div class="db-card">
+      <div class="db-card-head">
+        <span class="db-card-title">부서별 장비 현황</span>
+        <a class="db-card-link" href="list.html">목록 보기 →</a>
+      </div>
+      <div class="db-dept-list" id="deptList">
+        <div class="empty-box">불러오는 중...</div>
+      </div>
+    </div>
+
+    <!-- 우: 유지보수 만료 예정 -->
+    <div class="db-card">
+      <div class="db-card-head">
+        <span class="db-card-title">유지보수 만료 예정 <span class="db-card-sub">60일 이내</span></span>
+      </div>
+      <div class="db-maint-list" id="maintList">
+        <div class="empty-box">불러오는 중...</div>
+      </div>
+    </div>
+
+  </div><!-- /db-panels -->
+
+  <!-- 하단: 빠른 작업 -->
+  <div class="db-quick-row" id="dbQuickRow" style="display:none;">
+    <a class="db-quick-btn db-quick-btn--primary" href="form.html" id="dbCreateBtn">
+      <i class="ti ti-plus"></i> 장비 등록
+    </a>
+    <a class="db-quick-btn" href="list.html">
+      <i class="ti ti-list"></i> 장비 목록
+    </a>
+  </div>
+
+</div>
+
+  <script src="../../assets/js/core/config.js"></script>
+  <script src="../../assets/js/core/api.js"></script>
+  <script src="../../assets/js/core/utils.js"></script>
+  <script src="../../assets/js/core/auth.js"></script>
+  <script src="../../assets/js/core/app-permission.js"></script>
+  <script>
+  'use strict';
+
+  (async function() {
+    var user = window.auth && window.auth.getSession && window.auth.getSession();
+    if (!user) { location.replace(CONFIG.SITE_BASE_URL + '/index.html'); return; }
+
+    // 권한 확인
+    var canEdit = false;
+    if (window.appPermission) {
+      var ok = await window.appPermission.requirePermission('equipment', ['view','edit','admin']);
+      if (!ok) return;
+      canEdit = await window.appPermission.hasPermission('equipment', ['edit','admin']);
+    }
+
+    if (canEdit) {
+      var qr = document.getElementById('dbQuickRow');
+      if (qr) qr.style.display = '';
+    }
+
+    await loadDashboard(user);
+  })();
+
+  async function loadDashboard(user) {
+    try {
+      var email = user.email || user.user_email || '';
+      var res = await apiGet('getEquipmentDashboard', { request_user_email: email });
+
+      if (!res || res.error) throw new Error(res && res.error || '조회 실패');
+
+      renderKpi(res);
+      renderDept(res.by_team || []);
+      renderMaint(res.expiring || []);
+    } catch(e) {
+      document.getElementById('deptList').innerHTML =
+        '<div class="empty-box">데이터를 불러오지 못했습니다.</div>';
+      document.getElementById('maintList').innerHTML =
+        '<div class="empty-box">데이터를 불러오지 못했습니다.</div>';
+    }
+  }
+
+  function renderKpi(res) {
+    setText('kpiTotal',    res.total    || 0);
+    setText('kpiInUse',    res.in_use   || 0);
+    setText('kpiRepair',   res.repairing || 0);
+    setText('kpiExpiring', res.expiring_count || 0);
+  }
+
+  function setText(id, val) {
+    var el = document.getElementById(id);
+    if (el) el.textContent = val;
+  }
+
+  function renderDept(list) {
+    var el = document.getElementById('deptList');
+    if (!list.length) { el.innerHTML = '<div class="empty-box">데이터 없음</div>'; return; }
+
+    var max = Math.max.apply(null, list.map(function(d) { return d.cnt || 0; }));
+    el.innerHTML = list.map(function(d) {
+      var pct = max > 0 ? Math.round((d.cnt / max) * 100) : 0;
+      return '<div class="db-dept-row">' +
+        '<div class="db-dept-label">' + esc(d.team_name || d.clinic_name || '—') + '</div>' +
+        '<div class="db-dept-bar-wrap">' +
+          '<div class="db-dept-bar" style="width:' + pct + '%"></div>' +
+        '</div>' +
+        '<div class="db-dept-count">' + (d.cnt || 0) + '</div>' +
+      '</div>';
+    }).join('');
+  }
+
+  function renderMaint(list) {
+    var el = document.getElementById('maintList');
+    if (!list.length) {
+      el.innerHTML = '<div class="empty-box">만료 예정 장비가 없습니다.</div>';
+      return;
+    }
+
+    el.innerHTML = list.map(function(d) {
+      var days = d.days_left;
+      var cls  = days <= 7  ? 'db-dday db-dday--urgent'
+               : days <= 30 ? 'db-dday db-dday--warn'
+               :              'db-dday';
+      var label = days === 0 ? 'D-DAY' : 'D-' + days;
+      return '<div class="db-maint-row">' +
+        '<div class="db-maint-info">' +
+          '<div class="db-maint-name">' + esc(d.equipment_name) + '</div>' +
+          '<div class="db-maint-meta">' + esc(d.team_name || '') + ' · ' + (d.maintenance_end_date || '') + '</div>' +
+        '</div>' +
+        '<span class="' + cls + '">' + label + '</span>' +
+      '</div>';
+    }).join('');
+  }
+
+  function esc(str) {
+    return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+  </script>
+
+  <div id="globalLoading" aria-hidden="true">
+    <div class="global-loading__dialog">
+      <div class="global-loading__spinner"></div>
+      <div class="global-loading__text" id="globalLoadingText">불러오는 중...</div>
+    </div>
+  </div>
+</body>
+</html>

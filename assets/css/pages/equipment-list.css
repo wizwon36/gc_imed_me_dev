@@ -197,7 +197,7 @@
   display: flex;
   flex-direction: column;
   gap: 0;
-  overflow: hidden;   /* 내부는 감추되 eq-page 자체가 스크롤 */
+  overflow: visible; /* 페이지네이션 잘리지 않게 */
 }
 
 .equipment-list-grid {
@@ -205,15 +205,17 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
+  overflow: visible;
 }
 
 /* 카드 뷰 숨김 */
 .equipment-cards-wrap { display: none !important; }
 
-/* ── 테이블 래퍼 — JS가 height를 데이터 수 기반으로 주입 ── */
+/* ── 테이블 래퍼 ── */
 .equipment-table-wrap {
-  flex: 0 0 auto; /* 데이터 수만큼만 차지 */
-  overflow: hidden;
+  flex: 1;           /* 남은 공간 채움 */
+  min-height: 100px;
+  overflow: hidden;  /* 내부 테이블만 스크롤 없이 채움 */
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   background: #fff;
@@ -368,7 +370,7 @@
   align-items: center;
   gap: 3px;
   box-sizing: border-box;
-  margin-top: 6px;
+  padding-top: 6px;   /* 테이블과 간격 */
 }
 
 .pagination-btn {

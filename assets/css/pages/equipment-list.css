@@ -198,6 +198,7 @@
   flex-direction: column;
   gap: 0;
   overflow: hidden;
+  justify-content: flex-start; /* 테이블이 적어도 위에서 시작 */
 }
 
 .equipment-list-grid {
@@ -211,10 +212,9 @@
 /* 카드 뷰 숨김 */
 .equipment-cards-wrap { display: none !important; }
 
-/* ── 테이블 래퍼 ── */
+/* ── 테이블 래퍼 — JS가 height를 데이터 수 기반으로 주입 ── */
 .equipment-table-wrap {
-  flex: 1;
-  min-height: 0;
+  flex: 0 0 auto; /* 데이터 수만큼만 차지 */
   overflow: hidden;
   border: 1px solid #e5e7eb;
   border-radius: 8px;

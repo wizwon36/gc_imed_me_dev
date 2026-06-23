@@ -443,6 +443,37 @@ function syncListQueryParams(filters) {
   });
 }
 
+var EQUIPMENT_LIST_CACHE_KEY = 'gc_imed_equipment_list_state';
+
+function saveListState() {
+  try {
+    var state = {
+      filters: getCurrentFilters(),
+      page:    equipmentListState.page,
+      ts:      Date.now()
+    };
+    sessionStorage.setItem(EQUIPMENT_LIST_CACHE_KEY, JSON.stringify(state));
+  } catch(e) {}
+}
+
+function loadListState() {
+  try {
+    var raw = sessionStorage.getItem(EQUIPMENT_LIST_CACHE_KEY);
+    if (!raw) return null;
+    var state = JSON.parse(raw);
+    // 30분 이상 지난 캐시는 무시
+    if (Date.now() - state.ts > 30 * 60 * 1000) {
+      sessionStorage.removeItem(EQUIPMENT_LIST_CACHE_KEY);
+      return null;
+    }
+    return state;
+  } catch(e) { return null; }
+}
+
+function clearListState() {
+  try { sessionStorage.removeItem(EQUIPMENT_LIST_CACHE_KEY); } catch(e) {}
+}
+
 async function loadEquipmentList(nextPage) {
   var filters;
   var requestParams;
@@ -843,6 +874,16 @@ document.addEventListener('DOMContentLoaded', async function() {
     equipmentListState.userClinicCode = String(equipmentListState.user.clinic_code || '').trim();
     equipmentListState.userTeamCode   = String(equipmentListState.user.team_code   || '').trim();
 
+    // 뒤로가기 복귀 감지 — performance.navigation 또는 sessionStorage
+    var isBackNav = (
+      (window.performance && window.performance.navigation &&
+       window.performance.navigation.type === 2) ||
+      (window.performance && window.performance.getEntriesByType &&
+       window.performance.getEntriesByType('navigation')[0] &&
+       window.performance.getEntriesByType('navigation')[0].type === 'back_forward')
+    );
+    equipmentListState._isBackNav = isBackNav;
+
     // 권한 3개 + org 데이터 병렬 호출 (기존 순차 → Promise.all)
     var permResults = await Promise.all([
       window.appPermission && typeof window.appPermission.requirePermission === 'function'
@@ -869,11 +910,29 @@ document.addEventListener('DOMContentLoaded', async function() {
     equipmentListState.isAppAdmin  = (String(appPerm || '').trim().toLowerCase() === 'admin');
 
     applyListPermissionUi();
-
-    // initListFilters(org 데이터 포함)와 loadEquipmentList 병렬 실행은 불가
-    // (filters가 준비돼야 load 가능) — 단 initListFilters 내부의 두 API 호출은 병렬화
     await initListFilters();
     bindListEvents();
+
+    // 뒤로가기 복귀 시 캐시 필터 복원
+    if (equipmentListState._isBackNav) {
+      var cached = loadListState();
+      if (cached && cached.filters) {
+        // 필터 폼에 캐시 값 세팅
+        var f = cached.filters;
+        if (f.keyword)    setValue('keyword',    f.keyword);
+        if (f.status)     setValue('status',     f.status);
+        if (f.clinic_code) {
+          var clinicEl = document.getElementById('clinic_code');
+          if (clinicEl && !clinicEl.disabled) setValue('clinic_code', f.clinic_code);
+        }
+        if (f.team_code) {
+          var teamEl = document.getElementById('team_code');
+          if (teamEl && !teamEl.disabled) setValue('team_code', f.team_code);
+        }
+        equipmentListState.page = cached.page || 1;
+      }
+    }
+
     await loadEquipmentList(equipmentListState.page);
 
     var exportBtn = document.getElementById('exportExcelBtn');

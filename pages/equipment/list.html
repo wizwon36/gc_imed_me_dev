@@ -73,10 +73,9 @@
 
     <div id="messageBox" class="message-box"></div>
 
-    <!-- 툴바 -->
-    <div class="eq-toolbar">
+    <!-- 툴바 — 검색결과 텍스트 제거, 라벨/검수 버튼만 유지 -->
+    <div class="eq-toolbar" id="eqToolbar" style="display:none;">
       <div class="eq-toolbar-left">
-        <span class="eq-summary" id="listSummary">불러오는 중...</span>
         <button type="button" class="btn btn-sm" id="bulkLabelBtn" style="display:none;">
           <i class="ti ti-tag" aria-hidden="true"></i> 라벨 출력 (<span id="bulkLabelCount">0</span>)
         </button>
@@ -92,6 +91,8 @@
         </button>
       </div>
     </div>
+    <!-- listSummary — JS 호환용, 숨김 -->
+    <span id="listSummary" style="display:none;"></span>
 
     <!-- 장비 목록 -->
     <div class="eq-content">

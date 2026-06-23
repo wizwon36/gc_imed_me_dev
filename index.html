@@ -3,59 +3,89 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>MSO관리팀 업무지원시스템</title>
+  <title>로그인 · MSO관리팀 업무지원 시스템</title>
   <link rel="stylesheet" href="assets/css/common.css">
-  <link rel="stylesheet" href="assets/css/pages/auth.css" />
+  <link rel="stylesheet" href="assets/css/pages/auth.css">
+  <link rel="stylesheet" href="assets/font/tabler-icons/tabler-icons.min.css">
 </head>
 <body class="auth-page">
-  <main class="auth-shell">
-    <section class="auth-card">
-      <div class="auth-brand">
-        <div class="auth-brand-badge">+</div>
-        <div class="auth-brand-text">
-          <strong>MSO관리팀 업무지원시스템</strong>
-          <span>로그인 후 사용할 앱을 선택할 수 있습니다.</span>
+
+  <div class="auth-layout">
+
+    <!-- 좌측 브랜드 패널 -->
+    <div class="auth-panel">
+      <div class="auth-panel-inner">
+        <div class="auth-panel-logo">
+          <span>+</span>
+        </div>
+        <h1 class="auth-panel-title">MSO관리팀<br>업무지원 시스템</h1>
+        <p class="auth-panel-desc">
+          의료장비 관리, 월마감, 업무일정,<br>
+          정도관리 등 업무 전반을 지원합니다.
+        </p>
+        <div class="auth-panel-apps">
+          <div class="auth-app-chip"><i class="ti ti-stethoscope"></i> 의료장비</div>
+          <div class="auth-app-chip"><i class="ti ti-report-money"></i> 월마감</div>
+          <div class="auth-app-chip"><i class="ti ti-chart-line"></i> 정도관리</div>
+          <div class="auth-app-chip"><i class="ti ti-clipboard-list"></i> 업무일정</div>
+          <div class="auth-app-chip"><i class="ti ti-chart-bar"></i> 통계</div>
+          <div class="auth-app-chip"><i class="ti ti-photo"></i> 사인물</div>
         </div>
       </div>
-      
-      <!--
-      <h1 class="auth-title">로그인</h1>
-      <p class="auth-desc">등록된 아이디와 비밀번호로 로그인해 주세요.</p>
-      -->
-      
-      <div class="auth-form">
-        <div class="field-group">
-          <label for="userEmail">이메일</label>
-          <input type="email" id="userEmail" placeholder="이메일 주소 입력" autocomplete="username">
+    </div>
+
+    <!-- 우측 로그인 폼 -->
+    <div class="auth-form-panel">
+      <div class="auth-form-wrap">
+
+        <div class="auth-form-header">
+          <h2 class="auth-form-title">로그인</h2>
+          <p class="auth-form-sub">계정 정보를 입력하세요</p>
         </div>
 
-        <div class="field-group">
-          <label for="userPassword">비밀번호</label>
-          <input type="password" id="userPassword" placeholder="비밀번호 입력" autocomplete="current-password">
-        </div>
+        <div class="auth-form">
+          <div class="auth-field">
+            <label for="userEmail">이메일</label>
+            <div class="auth-input-wrap">
+              <i class="ti ti-mail"></i>
+              <input type="email" id="userEmail"
+                placeholder="이메일 주소"
+                autocomplete="username">
+            </div>
+          </div>
 
-        <button type="button" class="auth-submit-btn" id="loginBtn">로그인</button>
-        <div id="authMessage" class="auth-message"></div>
-        <div style="text-align:center; margin-top:4px; font-size:13px; color:#667085;">
-          계정이 없으신가요?
-          <a href="pages/auth/register.html" style="color:#2563eb; font-weight:700; text-decoration:none;">가입 신청</a>
-        </div>
-        <!-- 캐시 초기화 -->
-        <div style="text-align:center; margin-top:10px;">
-          <button type="button" id="clearCacheBtn"
-            style="background:none;border:none;font-size:12px;color:#94a3b8;cursor:pointer;padding:4px 8px;border-radius:6px;transition:color 0.15s;"
-            onmouseover="this.style.color='#64748b'" onmouseout="this.style.color='#94a3b8'">
-            접속 문제가 있나요? 캐시 초기화
+          <div class="auth-field">
+            <label for="userPassword">비밀번호</label>
+            <div class="auth-input-wrap">
+              <i class="ti ti-lock"></i>
+              <input type="password" id="userPassword"
+                placeholder="비밀번호"
+                autocomplete="current-password">
+            </div>
+          </div>
+
+          <div id="authMessage" class="auth-message"></div>
+
+          <button type="button" class="auth-btn" id="loginBtn">
+            로그인
           </button>
-        </div>
-      </div>
-    </section>
-  </main>
 
-  <script src="assets/js/core/config.js"></script>
-  <script src="assets/js/core/utils.js"></script>
-  <script src="assets/js/core/api.js"></script>
-  <script src="assets/js/core/auth.js"></script>
+          <div class="auth-links">
+            <span>계정이 없으신가요?</span>
+            <a href="pages/auth/register.html">가입 신청</a>
+          </div>
+
+          <div class="auth-cache-reset">
+            <button type="button" id="clearCacheBtn">
+              <i class="ti ti-refresh"></i> 접속 문제 · 캐시 초기화
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
 
   <div id="globalLoading" aria-hidden="true">
     <div class="global-loading__dialog">
@@ -63,5 +93,10 @@
       <div class="global-loading__text" id="globalLoadingText">로딩 중...</div>
     </div>
   </div>
+
+  <script src="assets/js/core/config.js"></script>
+  <script src="assets/js/core/utils.js"></script>
+  <script src="assets/js/core/api.js"></script>
+  <script src="assets/js/core/auth.js"></script>
 </body>
 </html>

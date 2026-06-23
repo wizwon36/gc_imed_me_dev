@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MSO관리팀 업무지원 시스템</title>
+  <link rel="stylesheet" href="assets/css/common.css" />
+  <link rel="stylesheet" href="assets/css/shell.css" />
+  <link rel="stylesheet" href="assets/font/tabler-icons/tabler-icons.min.css" />
+</head>
+<body>
+
+<div class="app-shell">
+
+  <!-- ── 사이드바 ── -->
+  <nav class="sidebar" id="sidebar" role="navigation" aria-label="메인 메뉴">
+
+    <!-- 브랜드 -->
+    <div class="sb-brand">
+      <div class="sb-brand-logo">+</div>
+      <div class="sb-brand-text">
+        <div class="sb-brand-title">MSO관리팀 업무지원 시스템</div>
+        <div class="sb-brand-sub" id="sbVersion">v2.0</div>
+      </div>
+    </div>
+
+    <!-- 사용자 -->
+    <div class="sb-user">
+      <div class="sb-avatar" id="sbAvatar">--</div>
+      <div class="sb-user-info">
+        <div class="sb-user-name" id="sbUserName">로딩 중...</div>
+        <div class="sb-user-clinic" id="sbUserClinic"></div>
+      </div>
+    </div>
+
+    <!-- 네비게이션 -->
+    <div class="sb-nav" id="sbNav">
+
+      <!-- 업무 도구 -->
+      <div class="sb-section-label">업무 도구</div>
+
+      <!-- 의료장비 관리 (아코디언) -->
+      <button class="sb-item sb-item-parent" data-menu="equipment" onclick="toggleMenu('equipment')">
+        <div class="sb-item-inner">
+          <i class="ti ti-stethoscope" aria-hidden="true"></i>
+          <span>의료장비 관리</span>
+        </div>
+        <i class="ti ti-chevron-right sb-item-arrow" aria-hidden="true"></i>
+      </button>
+      <div class="sb-submenu" id="menu-equipment">
+        <button class="sb-sub-item" data-page="equipment/dashboard" onclick="navigate('equipment/dashboard')">
+          <i class="ti ti-layout-dashboard" aria-hidden="true"></i> 대시보드
+        </button>
+        <button class="sb-sub-item" data-page="equipment/list" onclick="navigate('equipment/list')">
+          <i class="ti ti-list" aria-hidden="true"></i> 장비 목록
+        </button>
+      </div>
+
+      <!-- 월마감(구매) (아코디언) -->
+      <button class="sb-item sb-item-parent" data-menu="closing" onclick="toggleMenu('closing')">
+        <div class="sb-item-inner">
+          <i class="ti ti-report-money" aria-hidden="true"></i>
+          <span>월마감(구매)</span>
+        </div>
+        <i class="ti ti-chevron-right sb-item-arrow" aria-hidden="true"></i>
+      </button>
+      <div class="sb-submenu" id="menu-closing">
+        <button class="sb-sub-item" data-page="closing/closing" data-tab="closing" onclick="navigate('closing/closing','closing')">
+          <i class="ti ti-refresh" aria-hidden="true"></i> 마감 자동화
+        </button>
+        <button class="sb-sub-item" data-page="closing/closing" data-tab="vendor" onclick="navigate('closing/closing','vendor')">
+          <i class="ti ti-building-store" aria-hidden="true"></i> 거래처 관리
+        </button>
+        <button class="sb-sub-item" data-page="closing/closing" data-tab="item" onclick="navigate('closing/closing','item')">
+          <i class="ti ti-flask" aria-hidden="true"></i> 자재코드 관리
+        </button>
+        <button class="sb-sub-item" data-page="closing/closing" data-tab="history" onclick="navigate('closing/closing','history')">
+          <i class="ti ti-calendar-stats" aria-hidden="true"></i> 마감 현황
+        </button>
+      </div>
+
+      <!-- 구매·사용 통계 (아코디언) -->
+      <button class="sb-item sb-item-parent" data-menu="statistics" onclick="toggleMenu('statistics')">
+        <div class="sb-item-inner">
+          <i class="ti ti-chart-bar" aria-hidden="true"></i>
+          <span>구매·사용 통계</span>
+        </div>
+        <i class="ti ti-chevron-right sb-item-arrow" aria-hidden="true"></i>
+      </button>
+      <div class="sb-submenu" id="menu-statistics">
+        <button class="sb-sub-item" data-page="statistics/statistics" data-tab="dashboard" onclick="navigate('statistics/statistics','dashboard')">
+          <i class="ti ti-chart-bar" aria-hidden="true"></i> 통계 조회
+        </button>
+        <button class="sb-sub-item" data-page="statistics/statistics" data-tab="upload" onclick="navigate('statistics/statistics','upload')">
+          <i class="ti ti-upload" aria-hidden="true"></i> 데이터 업로드
+        </button>
+      </div>
+
+      <!-- 단일 앱들 -->
+      <button class="sb-item" data-page="lj-chart/lj-chart" onclick="navigate('lj-chart/lj-chart')">
+        <i class="ti ti-chart-line" aria-hidden="true"></i> 정도관리(LJ)
+      </button>
+
+      <!-- 업무일정 관리 (아코디언) -->
+      <button class="sb-item sb-item-parent" data-menu="task" onclick="toggleMenu('task')">
+        <div class="sb-item-inner">
+          <i class="ti ti-clipboard-list" aria-hidden="true"></i>
+          <span>업무일정 관리</span>
+        </div>
+        <i class="ti ti-chevron-right sb-item-arrow" aria-hidden="true"></i>
+      </button>
+      <div class="sb-submenu" id="menu-task">
+        <button class="sb-sub-item" data-page="task-manager/task-manager" data-tab="weekly" onclick="navigate('task-manager/task-manager','weekly')">
+          <i class="ti ti-calendar-week" aria-hidden="true"></i> 주간 업무
+        </button>
+        <button class="sb-sub-item" data-page="task-manager/task-manager" data-tab="journal" onclick="navigate('task-manager/task-manager','journal')">
+          <i class="ti ti-notebook" aria-hidden="true"></i> 업무 일지
+        </button>
+        <button class="sb-sub-item" data-page="task-manager/task-manager" data-tab="team" onclick="navigate('task-manager/task-manager','team')">
+          <i class="ti ti-users-group" aria-hidden="true"></i> 팀 일지
+        </button>
+      </div>
+
+      <button class="sb-item" data-page="signage/signage-form" onclick="navigate('signage/signage-form')">
+        <i class="ti ti-photo" aria-hidden="true"></i> 사인물 신청
+      </button>
+
+      <button class="sb-item" data-page="procurement/procurement" onclick="navigate('procurement/procurement')">
+        <i class="ti ti-book-2" aria-hidden="true"></i> 구매규정
+      </button>
+
+      <button class="sb-item" data-page="regulation/regulation-list" onclick="navigate('regulation/regulation-list')">
+        <i class="ti ti-book" aria-hidden="true"></i> 규정 조회
+      </button>
+
+      <div class="sb-divider"></div>
+
+      <!-- 지원 -->
+      <div class="sb-section-label">지원</div>
+
+      <button class="sb-item" data-page="support/support-form" onclick="navigate('support/support-form')">
+        <i class="ti ti-tool" aria-hidden="true"></i> 수정요청
+      </button>
+
+      <button class="sb-item" data-page="support/support-list" onclick="navigate('support/support-list')">
+        <i class="ti ti-list-check" aria-hidden="true"></i> 요청 내역
+      </button>
+
+      <!-- 관리자 (권한 있을 때만 표시) -->
+      <div id="adminSection" style="display:none">
+        <div class="sb-divider"></div>
+        <div class="sb-section-label">관리자</div>
+
+        <button class="sb-item" data-page="admin/users" onclick="navigate('admin/users')">
+          <i class="ti ti-users" aria-hidden="true"></i> 사용자 관리
+        </button>
+
+        <button class="sb-item" data-page="admin/notice-admin" onclick="navigate('admin/notice-admin')">
+          <i class="ti ti-speakerphone" aria-hidden="true"></i> 공지사항 관리
+        </button>
+
+        <button class="sb-item" data-page="admin/support-admin" onclick="navigate('admin/support-admin')">
+          <i class="ti ti-settings" aria-hidden="true"></i> 수정요청 관리
+          <span class="sb-badge" id="sbSupportBadge" style="display:none">0</span>
+        </button>
+
+        <button class="sb-item" data-page="admin/logs" onclick="navigate('admin/logs')">
+          <i class="ti ti-list-details" aria-hidden="true"></i> 시스템 로그
+        </button>
+      </div>
+
+    </div><!-- /sb-nav -->
+
+    <!-- 하단 로그아웃 -->
+    <div class="sb-footer">
+      <button class="sb-logout" onclick="doLogout()">
+        <i class="ti ti-logout" aria-hidden="true"></i>
+        <span>로그아웃</span>
+      </button>
+    </div>
+
+  </nav><!-- /sidebar -->
+
+  <!-- 모바일 오버레이 -->
+  <div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
+
+  <!-- ── 메인 콘텐츠 ── -->
+  <div class="shell-main">
+
+    <!-- 상단바 -->
+    <header class="shell-topbar">
+      <button class="shell-topbar-hamburger" id="hamburgerBtn"
+              onclick="openSidebar()" aria-label="메뉴 열기">
+        <i class="ti ti-menu-2" aria-hidden="true"></i>
+      </button>
+      <div class="shell-breadcrumb">
+        <span class="shell-breadcrumb-app" id="breadcrumbApp">—</span>
+        <span class="shell-breadcrumb-sep" id="breadcrumbSep" style="display:none">›</span>
+        <span class="shell-breadcrumb-page" id="breadcrumbPage"></span>
+      </div>
+      <div class="shell-topbar-right">
+        <div class="shell-user-chip">
+          <span id="topbarUserName">—</span>
+          <span style="color:#d1d5db">·</span>
+          <strong id="topbarClinic">—</strong>
+        </div>
+      </div>
+    </header>
+
+    <!-- iframe 콘텐츠 영역 -->
+    <div class="shell-content">
+      <div class="shell-loading" id="shellLoading">
+        <div class="shell-loading-spinner"></div>
+        <div class="shell-loading-text">페이지 로딩 중...</div>
+      </div>
+      <iframe
+        class="shell-iframe"
+        id="shellFrame"
+        src=""
+        title="콘텐츠 영역"
+        allow="downloads"
+      ></iframe>
+    </div>
+
+  </div><!-- /shell-main -->
+
+</div><!-- /app-shell -->
+
+<script src="assets/js/core/config.js"></script>
+<script src="assets/js/core/utils.js"></script>
+<script src="assets/js/core/api.js"></script>
+<script src="assets/js/core/auth.js"></script>
+<script>
+'use strict';
+
+// ── 메뉴 정의 ───────────────────────────────────────────────
+const MENU_META = {
+  'equipment/dashboard':          { app: '의료장비 관리', page: '대시보드' },
+  'equipment/list':               { app: '의료장비 관리', page: '장비 목록' },
+  'equipment/form':               { app: '의료장비 관리', page: '장비 등록·수정' },
+  'equipment/detail':             { app: '의료장비 관리', page: '장비 상세' },
+  'equipment/history-form':       { app: '의료장비 관리', page: '이력 등록' },
+  'equipment/inventory-form':     { app: '의료장비 관리', page: '재고조사 등록' },
+  'equipment/label-print':        { app: '의료장비 관리', page: 'QR 라벨 출력' },
+  'closing/closing':              { app: '월마감(구매)', page: '' },
+  'statistics/statistics':        { app: '구매·사용 통계', page: '' },
+  'lj-chart/lj-chart':           { app: '정도관리(LJ)', page: '' },
+  'task-manager/task-manager':    { app: '업무일정 관리', page: '' },
+  'signage/signage-form':         { app: '사인물 신청', page: '' },
+  'procurement/procurement':      { app: '구매규정', page: '' },
+  'regulation/regulation-list':  { app: '규정 조회', page: '' },
+  'support/support-form':         { app: '수정요청', page: '새 요청' },
+  'support/support-list':         { app: '수정요청', page: '요청 내역' },
+  'admin/users':                  { app: '관리자', page: '사용자 관리' },
+  'admin/notice-admin':           { app: '관리자', page: '공지사항 관리' },
+  'admin/support-admin':          { app: '관리자', page: '수정요청 관리' },
+  'admin/logs':                   { app: '관리자', page: '시스템 로그' },
+};
+
+const TAB_META = {
+  'closing': {
+    closing: '마감 자동화', vendor: '거래처 관리',
+    item: '자재코드 관리', history: '마감 현황',
+  },
+  'statistics': {
+    dashboard: '통계 조회', upload: '데이터 업로드',
+  },
+  'task-manager': {
+    weekly: '주간 업무', journal: '업무 일지',
+    team: '팀 일지', search: '검색',
+  },
+};
+
+// ── 현재 상태 ────────────────────────────────────────────────
+let currentPage = '';
+let currentTab  = '';
+
+// ── 초기화 ───────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const user = window.auth?.getSession?.();
+  if (!user) {
+    location.replace(`${CONFIG.SITE_BASE_URL}/index.html`);
+    return;
+  }
+
+  // 사용자 정보 표시
+  renderUserInfo(user);
+
+  // 관리자 메뉴 표시
+  if (String(user.role || '').toLowerCase() === 'admin') {
+    document.getElementById('adminSection').style.display = '';
+  }
+
+  // URL 파라미터 또는 기본 페이지로 시작
+  const params  = new URLSearchParams(location.search);
+  const initPage = params.get('page') || 'equipment/dashboard';
+  const initTab  = params.get('tab')  || '';
+  navigate(initPage, initTab, true);
+});
+
+// ── 사용자 정보 렌더링 ───────────────────────────────────────
+function renderUserInfo(user) {
+  const name   = user.user_name || user.name || user.email || '—';
+  const clinic = user.clinic_name || '';
+
+  // 아바타 이니셜
+  const initials = name.slice(0, 2);
+  document.getElementById('sbAvatar').textContent = initials;
+  document.getElementById('sbUserName').textContent = name;
+  document.getElementById('sbUserClinic').textContent = clinic;
+
+  document.getElementById('topbarUserName').textContent = name;
+  document.getElementById('topbarClinic').textContent = clinic;
+}
+
+// ── 페이지 이동 ───────────────────────────────────────────────
+function navigate(page, tab, skipHistory) {
+  const frame   = document.getElementById('shellFrame');
+  const loading = document.getElementById('shellLoading');
+
+  currentPage = page;
+  currentTab  = tab || '';
+
+  // URL 업데이트
+  if (!skipHistory) {
+    const qs = tab ? `?page=${page}&tab=${tab}` : `?page=${page}`;
+    history.pushState({ page, tab }, '', qs);
+  }
+
+  // 브레드크럼 업데이트
+  updateBreadcrumb(page, tab);
+
+  // 사이드바 활성 표시
+  updateActiveMenu(page, tab);
+
+  // iframe URL 결정
+  let url = `${CONFIG.SITE_BASE_URL}/pages/${page}.html?shell=1`;
+  if (tab) url += `&tab=${tab}`;
+
+  // 로딩 표시
+  loading.classList.remove('hidden');
+
+  frame.onload = () => {
+    loading.classList.add('hidden');
+
+    // iframe 내부에 탭 전환 신호 전달
+    if (tab) {
+      try {
+        const iframeWin = frame.contentWindow;
+        // 각 앱의 탭 전환 함수 호출 시도
+        const appKey = page.split('/')[0];
+        if (appKey === 'closing' && iframeWin.switchTab) {
+          iframeWin.switchTab(tab);
+        } else if (appKey === 'statistics' && iframeWin.switchStatsTab) {
+          iframeWin.switchStatsTab(tab);
+        } else if (appKey === 'task-manager' && iframeWin.switchTaskTab) {
+          iframeWin.switchTaskTab(tab);
+        }
+      } catch(e) { /* cross-origin 무시 */ }
+    }
+  };
+
+  frame.src = url;
+
+  // 모바일이면 사이드바 닫기
+  if (window.innerWidth <= 768) closeSidebar();
+}
+
+// ── 브레드크럼 ───────────────────────────────────────────────
+function updateBreadcrumb(page, tab) {
+  const meta = MENU_META[page] || { app: page, page: '' };
+  const appKey = page.split('/')[0];
+
+  let pageName = meta.page;
+  if (tab && TAB_META[appKey]?.[tab]) {
+    pageName = TAB_META[appKey][tab];
+  }
+
+  document.getElementById('breadcrumbApp').textContent = meta.app;
+
+  const sepEl  = document.getElementById('breadcrumbSep');
+  const pageEl = document.getElementById('breadcrumbPage');
+
+  if (pageName) {
+    sepEl.style.display  = '';
+    pageEl.textContent = pageName;
+  } else {
+    sepEl.style.display  = 'none';
+    pageEl.textContent = '';
+  }
+}
+
+// ── 사이드바 활성 상태 ───────────────────────────────────────
+function updateActiveMenu(page, tab) {
+  // 모든 활성 제거
+  document.querySelectorAll('.sb-item.active, .sb-sub-item.active').forEach(el => {
+    el.classList.remove('active');
+  });
+
+  // 매칭되는 항목 활성화
+  let matched = null;
+  if (tab) {
+    matched = document.querySelector(
+      `.sb-sub-item[data-page="${page}"][data-tab="${tab}"]`
+    );
+  }
+  if (!matched) {
+    matched = document.querySelector(
+      `.sb-sub-item[data-page="${page}"]`
+    ) || document.querySelector(
+      `.sb-item[data-page="${page}"]`
+    );
+  }
+
+  if (matched) {
+    matched.classList.add('active');
+
+    // 부모 아코디언 자동 열기
+    const submenu = matched.closest('.sb-submenu');
+    if (submenu) {
+      submenu.classList.add('open');
+      const menuId = submenu.id.replace('menu-', '');
+      const parent = document.querySelector(`.sb-item-parent[data-menu="${menuId}"]`);
+      if (parent) parent.classList.add('open');
+    }
+  }
+}
+
+// ── 아코디언 토글 ────────────────────────────────────────────
+function toggleMenu(menuId) {
+  const submenu = document.getElementById(`menu-${menuId}`);
+  const btn     = document.querySelector(`.sb-item-parent[data-menu="${menuId}"]`);
+  if (!submenu || !btn) return;
+
+  const isOpen = submenu.classList.contains('open');
+
+  // 다른 서브메뉴 닫기 (선택 사항 — 현재 활성 항목 포함된 것은 유지)
+  document.querySelectorAll('.sb-submenu.open').forEach(el => {
+    if (el !== submenu) {
+      const hasActive = el.querySelector('.sb-sub-item.active');
+      if (!hasActive) {
+        el.classList.remove('open');
+        const pid = el.id.replace('menu-', '');
+        const pb  = document.querySelector(`.sb-item-parent[data-menu="${pid}"]`);
+        if (pb) pb.classList.remove('open');
+      }
+    }
+  });
+
+  submenu.classList.toggle('open', !isOpen);
+  btn.classList.toggle('open', !isOpen);
+}
+
+// ── 모바일 사이드바 ─────────────────────────────────────────
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('mobile-open');
+  document.getElementById('sbOverlay').classList.add('mobile-open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sbOverlay').classList.remove('mobile-open');
+  document.body.style.overflow = '';
+}
+
+// ── 로그아웃 ─────────────────────────────────────────────────
+function doLogout() {
+  window.auth?.logout?.();
+  location.replace(`${CONFIG.SITE_BASE_URL}/index.html`);
+}
+
+// ── 브라우저 뒤로가기/앞으로가기 ────────────────────────────
+window.addEventListener('popstate', e => {
+  if (e.state?.page) {
+    navigate(e.state.page, e.state.tab || '', true);
+  }
+});
+
+// ── iframe 내부에서 navigate 요청 수신 ──────────────────────
+// 각 페이지에서 parent.shellNavigate(page, tab) 로 호출 가능
+window.shellNavigate = navigate;
+</script>
+
+</body>
+</html>

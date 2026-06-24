@@ -436,10 +436,9 @@ function renderEquipmentList(items) {
       var correctRowH = Math.floor(viewH / equipmentListState.pageSize);
       correctRowH = Math.max(26, Math.min(correctRowH, 38));
       if (correctRowH !== params.api.getGridOption('rowHeight')) {
-        var currentData = _gridInstance.getGridOption('rowData') || [];
-        _gridInstance.destroy();
-        _gridInstance = null;
-        renderEquipmentList(currentData);
+        params.api.setGridOption('rowHeight', correctRowH);
+        params.api.resetRowHeights();
+        _gridInstance._rowH = correctRowH;
       }
     }
   };

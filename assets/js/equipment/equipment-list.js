@@ -398,13 +398,15 @@ function renderEquipmentList(items) {
   };
 
   // rowHeight 계산 — 먼저 계산 후 기존 인스턴스와 비교
-  // Math.round: 소수점 버림 누적으로 생기는 하단 여백 최소화
-  // 상한 제거: 배율·OS 차이로 rowH가 38px 초과할 수 있음
+  // Math.floor로 행 높이를 보수적으로 계산하고,
+  // 남는 픽셀(remainder)은 headerHeight에 흡수시켜 하단 여백/잘림 방지
   var gridH   = el.clientHeight || 761;
-  var headerH = 34;
-  var dataH   = gridH - headerH;
-  var rowH    = Math.round(dataH / equipmentListState.pageSize);
+  var baseH   = 34;
+  var dataH   = gridH - baseH;
+  var rowH    = Math.floor(dataH / equipmentListState.pageSize);
   rowH = Math.max(26, rowH);
+  var remainder = dataH - (rowH * equipmentListState.pageSize);
+  var headerH = baseH + remainder;  // 남는 픽셀을 헤더에 흡수
 
   if (_gridInstance) {
     if (_gridInstance._rowH === rowH) {
@@ -421,7 +423,7 @@ function renderEquipmentList(items) {
     defaultColDef: defaultColDef,
     rowData: items,
     rowHeight: rowH,
-    headerHeight: 33,
+    headerHeight: headerH,
     suppressPaginationPanel: true,
     suppressScrollOnNewData: true,
     suppressHorizontalScroll: true,
@@ -436,11 +438,12 @@ function renderEquipmentList(items) {
       var viewport = el.querySelector('.ag-body-viewport');
       if (!viewport) return;
       var viewH = viewport.clientHeight;
-      // Math.round + 상한 제거 — 초기 계산과 동일한 기준 적용
-      var correctRowH = Math.round(viewH / equipmentListState.pageSize);
+      var correctRowH = Math.floor(viewH / equipmentListState.pageSize);
       correctRowH = Math.max(26, correctRowH);
+      var rem = viewH - (correctRowH * equipmentListState.pageSize);
       if (correctRowH !== params.api.getGridOption('rowHeight')) {
         params.api.setGridOption('rowHeight', correctRowH);
+        params.api.setGridOption('headerHeight', baseH + rem);
         params.api.resetRowHeights();
         _gridInstance._rowH = correctRowH;
       }

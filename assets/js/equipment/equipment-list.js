@@ -376,6 +376,17 @@ function renderEquipmentList(items) {
       }
     },
     {
+      title: '유지보수만료', field: 'maintenance_end_date', width: 100,
+      hozAlign: 'center', headerHozAlign: 'center',
+      formatter: function(cell) {
+        var v = cell.getValue() || '';
+        if (!v) return '<span style="color:#9ca3af">—</span>';
+        var days = Math.ceil((new Date(v) - new Date()) / 86400000);
+        var color = days <= 30 ? '#b91c1c' : days <= 60 ? '#c2410c' : '#374151';
+        return '<span style="color:' + color + ';font-size:11px;">' + escapeHtml(v) + '</span>';
+      }
+    },
+    {
       title: '위치', field: 'location', width: 80,
       hozAlign: 'center', headerHozAlign: 'center',
       formatter: function(cell) { return escapeHtml(cell.getValue() || '—'); }

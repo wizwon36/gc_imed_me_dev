@@ -273,11 +273,9 @@ function adjustRowHeight() {
 
   var headerEl = el.querySelector('.tabulator-header');
   var headerH  = headerEl ? headerEl.offsetHeight : 32;
-  // eq-content 높이 기준 (paginationArea는 eq-content 밖으로 분리됨)
-  // border 2px + 여유 2px = 4px 추가로 빼서 마지막 줄 잘림 방지
   var eqContentH = content ? content.clientHeight : el.clientHeight;
-  var availH   = eqContentH - headerH - 2; // tabulator border 상하 1px씩
-  var rowH     = Math.floor(availH / equipmentListState.pageSize);
+  // pageSize + 1로 나눠서 행 높이를 조금 작게 → 마지막 줄 절대 잘리지 않음
+  var rowH = Math.floor((eqContentH - headerH) / (equipmentListState.pageSize + 1));
   rowH = Math.max(26, Math.min(rowH, 52));
   _tabulatorInstance.options.rowHeight = rowH;
   _tabulatorInstance.redraw(true);

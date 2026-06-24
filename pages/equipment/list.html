@@ -38,8 +38,8 @@
     /* AG Grid 커스텀 */
     #equipmentGrid { flex: 1; min-height: 0; height: 100%; }
     .ag-theme-alpine {
-      --ag-font-size: 12px;
-      --ag-font-family: inherit;
+      --ag-font-size: 11px;
+      --ag-font-family: "Pretendard", "Noto Sans KR", sans-serif;
       --ag-header-background-color: #f8fafc;
       --ag-header-foreground-color: #4b5563;
       --ag-border-color: #e5e7eb;
@@ -47,9 +47,10 @@
       --ag-background-color: #fff;
       --ag-odd-row-background-color: #fff;
       --ag-row-hover-color: #f0f5ff;
-      --ag-cell-horizontal-padding: 10px;
+      --ag-cell-horizontal-padding: 8px;
     }
-    .ag-theme-alpine .ag-root-wrapper { border-radius: 8px; }
+    .ag-theme-alpine .ag-root-wrapper { border-radius: 8px; overflow: hidden; }
+    .ag-theme-alpine .ag-body-viewport { overflow-x: hidden !important; }
     .ag-theme-alpine .ag-header { font-size: 11px; }
     .ag-theme-alpine .ag-header-cell-label { justify-content: center; font-weight: 700; }
     .ag-left-header .ag-header-cell-label { justify-content: flex-start !important; }

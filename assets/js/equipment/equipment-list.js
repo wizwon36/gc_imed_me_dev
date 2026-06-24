@@ -266,13 +266,19 @@ function buildEquipmentRow(item) {
 
 function adjustRowHeight() {
   if (!_tabulatorInstance) return;
-  var el = document.getElementById('equipmentGrid');
-  if (!el) return;
-  var totalH = el.clientHeight;
+  var el       = document.getElementById('equipmentGrid');
+  var content  = document.querySelector('.eq-content');
+  var pagin    = document.querySelector('.pagination-area');
+  if (!el || !content) return;
+
+  var paginH  = pagin ? pagin.offsetHeight : 34;
+  var totalH  = content.clientHeight - paginH;  // pagination 제외한 실제 그리드 높이
+
+  // Tabulator 높이도 맞춰서 설정
+  _tabulatorInstance.setHeight(totalH);
+
   var headerEl = el.querySelector('.tabulator-header');
-  var headerH = headerEl ? headerEl.offsetHeight : 32;
-  var rowCount = _tabulatorInstance.getDataCount();
-  if (rowCount <= 0) return;
+  var headerH  = headerEl ? headerEl.offsetHeight : 32;
   var rowH = Math.floor((totalH - headerH) / equipmentListState.pageSize);
   rowH = Math.max(26, Math.min(rowH, 52));
   _tabulatorInstance.options.rowHeight = rowH;

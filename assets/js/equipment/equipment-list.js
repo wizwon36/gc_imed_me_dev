@@ -410,12 +410,11 @@ function renderEquipmentList(items) {
     return;
   }
 
-  // Tabulator 생성 전에 rowHeight 계산
+  // eq-content 실측값 715px 기준 (1920x1080)
+  // (715 - 32) / 20 = 34px
+  // 동적으로도 계산하되 실측 기반으로 fallback
   var eqContent = document.querySelector('.eq-content');
-  var eqH = eqContent ? eqContent.clientHeight : 0;
-  // 측정값 표시 (디버깅용)
-  var dbg = document.getElementById('listSummary');
-  if (dbg) { dbg.style.display=''; dbg.textContent = 'eq-content:' + eqH; }
+  var eqH = (eqContent && eqContent.clientHeight > 100) ? eqContent.clientHeight : 715;
   var availH = eqH - 32;
   var initRowH = Math.floor(availH / equipmentListState.pageSize);
   initRowH = Math.max(26, Math.min(initRowH, 52));

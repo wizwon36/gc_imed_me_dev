@@ -109,6 +109,35 @@ function getCurrentFilters() {
   };
 }
 
+var EQUIPMENT_LIST_CACHE_KEY = 'gc_imed_equipment_list_state';
+
+function saveListState() {
+  try {
+    sessionStorage.setItem(EQUIPMENT_LIST_CACHE_KEY, JSON.stringify({
+      filters: getCurrentFilters(),
+      page:    equipmentListState.page,
+      ts:      Date.now()
+    }));
+  } catch(e) {}
+}
+
+function loadListState() {
+  try {
+    var raw = sessionStorage.getItem(EQUIPMENT_LIST_CACHE_KEY);
+    if (!raw) return null;
+    var state = JSON.parse(raw);
+    if (Date.now() - state.ts > 30 * 60 * 1000) {
+      sessionStorage.removeItem(EQUIPMENT_LIST_CACHE_KEY);
+      return null;
+    }
+    return state;
+  } catch(e) { return null; }
+}
+
+function clearListState() {
+  try { sessionStorage.removeItem(EQUIPMENT_LIST_CACHE_KEY); } catch(e) {}
+}
+
 function hasMeaningfulFilter(filters) {
   return Boolean(
     filters.keyword ||

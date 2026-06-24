@@ -9,7 +9,7 @@
 .eq-page {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 48px); /* shell topbar */
+  height: 100%; /* iframe 전체 높이 */
   overflow: hidden;
   padding: 4px 12px 0;
   gap: 4px;

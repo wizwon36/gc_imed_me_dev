@@ -271,12 +271,12 @@ function adjustRowHeight() {
   var pagin    = document.querySelector('.pagination-area');
   if (!el || !content) return;
 
-  var paginH  = pagin ? pagin.offsetHeight : 34;
-  var totalH  = content.clientHeight - paginH;
-
+  // #equipmentGrid는 CSS calc(100% - 34px)로 이미 pagination 제외됨
+  // el.clientHeight = 실제 그리드 영역 높이
   var headerEl = el.querySelector('.tabulator-header');
   var headerH  = headerEl ? headerEl.offsetHeight : 32;
-  var rowH = Math.floor((totalH - headerH) / equipmentListState.pageSize);
+  var availH   = el.clientHeight - headerH; // 데이터 행들이 채울 공간
+  var rowH     = Math.floor(availH / equipmentListState.pageSize);
   rowH = Math.max(26, Math.min(rowH, 52));
   _tabulatorInstance.options.rowHeight = rowH;
   _tabulatorInstance.redraw(true);

@@ -417,6 +417,10 @@ function renderEquipmentList(items) {
     overlayNoRowsTemplate: '<span style="color:#9ca3af;font-size:12px;">조회된 장비가 없습니다.</span>',
     onGridReady: function(params) {
       params.api.sizeColumnsToFit();
+      // 창 크기 변경 시 컬럼 너비 재조정
+      window.addEventListener('resize', function() {
+        if (_gridInstance) _gridInstance.sizeColumnsToFit();
+      });
     }
   };
 

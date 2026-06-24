@@ -396,18 +396,21 @@ function renderEquipmentList(items) {
     cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'center' },
   };
 
-  if (_gridInstance) {
-    _gridInstance.setGridOption('rowData', items);
-    return;
-  }
-
-  // 그리드 높이 기반 rowHeight 계산
-  var gridH   = el.clientHeight || 771;
-  var headerH = 33;
-  // 데이터 영역(헤더 제외)을 pageSize(20줄)로 나눔
+  // rowHeight 계산 — 먼저 계산 후 기존 인스턴스와 비교
+  var gridH   = el.clientHeight || 761;
+  var headerH = 34;
   var dataH   = gridH - headerH;
   var rowH    = Math.floor(dataH / equipmentListState.pageSize);
   rowH = Math.max(26, Math.min(rowH, 38));
+
+  if (_gridInstance) {
+    if (_gridInstance._rowH === rowH) {
+      _gridInstance.setGridOption('rowData', items);
+      return;
+    }
+    _gridInstance.destroy();
+    _gridInstance = null;
+  }
 
   var gridOptions = {
     columnDefs: columnDefs,
@@ -417,6 +420,7 @@ function renderEquipmentList(items) {
     headerHeight: 33,
     suppressPaginationPanel: true,
     suppressScrollOnNewData: true,
+    suppressHorizontalScroll: true,
     overlayNoRowsTemplate: '<span style="color:#9ca3af;font-size:12px;">조회된 장비가 없습니다.</span>',
     onGridReady: function(params) {
       params.api.sizeColumnsToFit();

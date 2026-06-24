@@ -328,6 +328,7 @@ function renderEquipmentList(items) {
   var columnDefs = [
     { headerName: '장비명', field: 'equipment_name', flex: 1, minWidth: 120,
       headerClass: 'ag-left-header',
+      cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'flex-start' },
       cellRenderer: function(p) {
         return '<span class="tab-name">' + escapeHtml(p.value || '—') + '</span>';
       }

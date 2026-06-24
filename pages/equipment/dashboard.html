@@ -404,12 +404,12 @@ var _dashData = null;
   var user = window.auth && window.auth.getSession && window.auth.getSession();
   if (!user) { location.replace(CONFIG.SITE_BASE_URL + '/index.html'); return; }
 
+  if (typeof showGlobalLoading === 'function') showGlobalLoading('대시보드를 불러오는 중...');
+
   if (window.appPermission) {
     var ok = await window.appPermission.requirePermission('equipment', ['view', 'edit', 'admin']);
-    if (!ok) return;
+    if (!ok) { if (typeof hideGlobalLoading === 'function') hideGlobalLoading(true); return; }
   }
-
-  if (typeof showGlobalLoading === 'function') showGlobalLoading('대시보드를 불러오는 중...');
 
   try {
     var email = user.email || user.user_email || '';

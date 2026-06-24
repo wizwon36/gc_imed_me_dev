@@ -422,13 +422,6 @@ function renderEquipmentList(items) {
   _gridInstance = agGrid.createGrid(el, gridOptions);
 }
 
-var _origRenderEquipmentList = renderEquipmentList;
-renderEquipmentList = function(items) {
-  equipmentListState.currentItems = Array.isArray(items) ? items : [];
-  _origRenderEquipmentList(items);
-  if (typeof bulkSelectedIds !== 'undefined') bulkSelectedIds.clear();
-  if (typeof updateBulkUI === 'function') updateBulkUI();
-};
 
 function renderRecentPagination() {
   var container = document.getElementById('paginationArea');

@@ -1,3 +1,5 @@
+html, body { height: 100%; margin: 0; }
+
 /* ============================================================
  * equipment-dashboard.css — 의료장비 대시보드
  * Shell SPA 기준 재작성
@@ -8,7 +10,7 @@
 .db-page {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 48px);
+  height: 100%;
   overflow: hidden;
   padding: 10px 16px 0;
   gap: 8px;

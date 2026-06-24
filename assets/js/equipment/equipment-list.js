@@ -929,9 +929,36 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
 
     applyListPermissionUi();
-    await initListFilters();
+    initListFiltersSync();
     bindListEvents();
-    await loadEquipmentList(equipmentListState.page);
+
+    var isReload = window.performance &&
+      window.performance.getEntriesByType &&
+      window.performance.getEntriesByType('navigation')[0] &&
+      window.performance.getEntriesByType('navigation')[0].type === 'reload';
+    if (isReload) clearListState();
+
+    var cached = loadListState();
+    if (cached && cached.filters) {
+      var f = cached.filters;
+      if (f.keyword)     setValue('keyword',    f.keyword);
+      if (f.status)      setValue('status',     f.status);
+      if (f.clinic_code) {
+        var clinicEl2 = document.getElementById('clinic_code');
+        if (clinicEl2 && !clinicEl2.disabled) setValue('clinic_code', f.clinic_code);
+      }
+      if (f.team_code) {
+        var teamEl2 = document.getElementById('team_code');
+        if (teamEl2 && !teamEl2.disabled) setValue('team_code', f.team_code);
+      }
+      equipmentListState.page = cached.page || 1;
+      equipmentListState._initialLoad = false;
+    }
+
+    await Promise.all([
+      initListFiltersAsync(),
+      loadEquipmentList(equipmentListState.page)
+    ]);
 
     var exportBtn = document.getElementById('exportExcelBtn');
     if (exportBtn) {

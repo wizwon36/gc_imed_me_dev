@@ -424,10 +424,22 @@ function renderEquipmentList(items) {
     overlayNoRowsTemplate: '<span style="color:#9ca3af;font-size:12px;">조회된 장비가 없습니다.</span>',
     onGridReady: function(params) {
       params.api.sizeColumnsToFit();
-      // 창 크기 변경 시 컬럼 너비 재조정
       window.addEventListener('resize', function() {
         if (_gridInstance) _gridInstance.sizeColumnsToFit();
       });
+    },
+    onFirstDataRendered: function(params) {
+      // 렌더링 완료 후 body viewport 실측값으로 rowHeight 교정
+      var viewport = el.querySelector('.ag-body-viewport');
+      if (!viewport) return;
+      var viewH = viewport.clientHeight;
+      var correctRowH = Math.floor(viewH / equipmentListState.pageSize);
+      correctRowH = Math.max(26, Math.min(correctRowH, 38));
+      if (correctRowH !== params.api.getGridOption('rowHeight')) {
+        params.api.setGridOption('rowHeight', correctRowH);
+        params.api.resetRowHeights();
+        _gridInstance._rowH = correctRowH;
+      }
     }
   };
 

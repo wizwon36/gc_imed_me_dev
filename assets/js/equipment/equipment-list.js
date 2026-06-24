@@ -419,11 +419,15 @@ function renderEquipmentList(items) {
   var initRowH = Math.floor(availH / equipmentListState.pageSize);
   initRowH = Math.max(26, Math.min(initRowH, 52));
 
+  // Tabulator에 명시적 높이 전달 (flex:1이 height:100%보다 안정적)
+  var gridEl = document.getElementById('equipmentGrid');
+  var gridH = gridEl ? gridEl.clientHeight : eqH;
+
   _tabulatorInstance = new Tabulator('#equipmentGrid', {
     data: items,
     columns: columns,
     layout: 'fitColumns',
-    height: '100%',
+    height: gridH + 'px',
     rowHeight: initRowH,
     placeholder: '조회된 장비가 없습니다.',
     columnHeaderSortMulti: false,

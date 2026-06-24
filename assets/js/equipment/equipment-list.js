@@ -297,11 +297,10 @@ function renderEquipmentList(items) {
   // 컬럼 정의
   var columns = [
     {
-      title: '장비명', field: 'equipment_name', minWidth: 140, frozen: false,
+      title: '장비명', field: 'equipment_name', minWidth: 140,
       hozAlign: 'left', headerHozAlign: 'left',
       formatter: function(cell) {
-        var v = cell.getValue() || '—';
-        return '<span class="tab-name">' + escapeHtml(v) + '</span>';
+        return '<span class="tab-name">' + escapeHtml(cell.getValue() || '—') + '</span>';
       }
     },
     {
@@ -317,9 +316,9 @@ function renderEquipmentList(items) {
       formatter: function(cell) { return escapeHtml(cell.getValue() || '—'); }
     },
     {
-      title: '부서', field: '_dept', width: 160,
+      title: '부서', field: 'clinic_name', width: 160,
       hozAlign: 'center', headerHozAlign: 'center',
-      formatter: function(cell, formatterParams, onRendered) {
+      formatter: function(cell) {
         var row = cell.getRow().getData();
         var clinic = row.clinic_name || '';
         var team   = row.team_name   || '';
@@ -327,15 +326,15 @@ function renderEquipmentList(items) {
       }
     },
     {
-      title: '제조사', field: 'manufacturer_name', width: 120,
+      title: '제조사', field: 'manufacturer', width: 120,
       hozAlign: 'center', headerHozAlign: 'center',
       formatter: function(cell) {
         var v = cell.getValue() || '';
-        return v ? '<span class="tab-mfr">' + escapeHtml(v) + '</span>' : '<span style="color:#9ca3af">-</span>';
+        return v ? '<span class="tab-mfr">' + escapeHtml(v) + '</span>' : '<span style="color:#9ca3af">—</span>';
       }
     },
     {
-      title: '시리얼', field: 'serial_number', width: 130,
+      title: '시리얼', field: 'serial_no', width: 130,
       hozAlign: 'center', headerHozAlign: 'center',
       formatter: function(cell) {
         return '<span class="tab-id">' + escapeHtml(cell.getValue() || '—') + '</span>';
@@ -352,7 +351,7 @@ function renderEquipmentList(items) {
       formatter: function(cell) { return getStatusBadge(cell.getValue()); }
     },
     {
-      title: '액션', field: '_actions', width: 130,
+      title: '액션', field: '_actions', width: 140,
       hozAlign: 'center', headerHozAlign: 'center',
       headerSort: false,
       formatter: function(cell) {
@@ -363,7 +362,6 @@ function renderEquipmentList(items) {
   ];
 
   if (_tabulatorInstance) {
-    // 이미 생성된 경우 데이터만 교체
     _tabulatorInstance.replaceData(items);
     return;
   }
@@ -373,18 +371,13 @@ function renderEquipmentList(items) {
     columns: columns,
     layout: 'fitColumns',
     height: '100%',
-    rowHeight: 30,
+    rowHeight: 28,
     placeholder: '조회된 장비가 없습니다.',
     columnHeaderSortMulti: false,
-    pagination: false,   // 페이지네이션은 직접 처리
+    pagination: false,
     movableColumns: false,
     resizableRows: false,
-    columnDefaults: {
-      resizable: true,
-    },
-    rowFormatter: function(row) {
-      row.getElement().style.lineHeight = '30px';
-    },
+    columnDefaults: { resizable: true },
   });
 }
 
@@ -556,6 +549,7 @@ async function loadEquipmentList(nextPage) {
 
   try {
     if (typeof clearMessage === 'function') clearMessage();
+    if (typeof showGlobalLoading === 'function') showGlobalLoading('불러오는 중...');
 
     if (equipmentListState._initialLoad) {
       var urlParams = getListQueryParams();
@@ -609,6 +603,7 @@ async function loadEquipmentList(nextPage) {
     }
   } finally {
     equipmentListState.loading = false;
+    if (typeof hideGlobalLoading === 'function') hideGlobalLoading();
   }
 }
 

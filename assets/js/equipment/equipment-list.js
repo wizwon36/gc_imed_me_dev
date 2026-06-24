@@ -402,8 +402,9 @@ function renderEquipmentList(items) {
 
   // 그리드 높이 기반 rowHeight 계산
   var gridH  = el.clientHeight || 713;
-  var rowH   = Math.floor((gridH - 32) / equipmentListState.pageSize);
-  rowH = Math.max(28, Math.min(rowH, 40));
+  // AG Grid 헤더 32px + 각 행 상하 border 1px*2 고려
+  var rowH   = Math.floor((gridH - 33) / equipmentListState.pageSize) - 1;
+  rowH = Math.max(26, Math.min(rowH, 40));
 
   var gridOptions = {
     columnDefs: columnDefs,
@@ -568,10 +569,17 @@ async function loadEquipmentList(nextPage) {
       showGlobalLoading('장비 목록을 불러오는 중...');
     }
 
-    filters = equipmentListState._initialLoad
-      ? getListQueryParams()   // 최초 로딩: URL params 직접 사용
-      : getCurrentFilters();   // 이후 검색: form 값 사용
-
+    if (equipmentListState._initialLoad) {
+      var urlParams = getListQueryParams();
+      // URL에 필터 없으면 소속 의원/팀으로 기본 세팅
+      if (!urlParams.clinic_code && !urlParams.keyword && !urlParams.status) {
+        urlParams.clinic_code = equipmentListState.userClinicCode || '';
+        urlParams.team_code   = equipmentListState.userTeamCode   || '';
+      }
+      filters = urlParams;
+    } else {
+      filters = getCurrentFilters();
+    }
     equipmentListState._initialLoad = false;
     requestParams = buildListRequestParams(filters, nextPage || equipmentListState.page);
 
@@ -579,7 +587,7 @@ async function loadEquipmentList(nextPage) {
 
     result = await apiGet('listEquipments', requestParams);
 
-    equipmentListState.page = Number(result.page || 1);
+    // GAS result.page는 항상 1 반환 — 덮어쓰지 않음
     equipmentListState.hasNext = Boolean(result.has_next);
     equipmentListState.hasPrev = Boolean(result.has_prev);
 

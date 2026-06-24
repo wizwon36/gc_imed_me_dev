@@ -194,7 +194,9 @@
 .eq-content {
   flex: 1;
   min-height: 0;
-  overflow: hidden; /* 그리드만 담음, pagination은 eq-page 직접 자식 */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .equipment-list-grid {

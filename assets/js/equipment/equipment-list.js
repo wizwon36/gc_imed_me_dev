@@ -411,9 +411,12 @@ function renderEquipmentList(items) {
   }
 
   // Tabulator 생성 전에 rowHeight 계산
-  // eq-content 높이에서 헤더(32px) 빼고 pageSize로 나눔
   var eqContent = document.querySelector('.eq-content');
-  var availH = (eqContent ? eqContent.clientHeight : 948) - 32;
+  var eqH = eqContent ? eqContent.clientHeight : 0;
+  // 측정값 표시 (디버깅용)
+  var dbg = document.getElementById('listSummary');
+  if (dbg) { dbg.style.display=''; dbg.textContent = 'eq-content:' + eqH; }
+  var availH = eqH - 32;
   var initRowH = Math.floor(availH / equipmentListState.pageSize);
   initRowH = Math.max(26, Math.min(initRowH, 52));
 

@@ -403,7 +403,7 @@ function renderEquipmentList(items) {
   // 그리드 높이 기반 rowHeight 계산
   var gridH  = el.clientHeight || 713;
   var rowH   = Math.floor((gridH - 32) / equipmentListState.pageSize);
-  rowH = Math.max(26, Math.min(rowH, 52));
+  rowH = Math.max(28, Math.min(rowH, 40));
 
   var gridOptions = {
     columnDefs: columnDefs,

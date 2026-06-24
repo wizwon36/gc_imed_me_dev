@@ -406,18 +406,23 @@ function renderEquipmentList(items) {
   ];
 
   if (_tabulatorInstance) {
-    _tabulatorInstance.replaceData(items).then(function() {
-      adjustRowHeight();
-    });
+    _tabulatorInstance.replaceData(items);
     return;
   }
+
+  // Tabulator 생성 전에 rowHeight 계산
+  // eq-content 높이에서 헤더(32px) 빼고 pageSize로 나눔
+  var eqContent = document.querySelector('.eq-content');
+  var availH = (eqContent ? eqContent.clientHeight : 948) - 32;
+  var initRowH = Math.floor(availH / equipmentListState.pageSize);
+  initRowH = Math.max(26, Math.min(initRowH, 52));
 
   _tabulatorInstance = new Tabulator('#equipmentGrid', {
     data: items,
     columns: columns,
     layout: 'fitColumns',
     height: '100%',
-    rowHeight: 32,          // 기본값, tableBuilt 후 동적 조정
+    rowHeight: initRowH,
     placeholder: '조회된 장비가 없습니다.',
     columnHeaderSortMulti: false,
     pagination: false,
@@ -425,7 +430,6 @@ function renderEquipmentList(items) {
     resizableRows: false,
     columnDefaults: { resizable: true, vertAlign: 'middle' },
     tableBuilt: function() {
-      setTimeout(adjustRowHeight, 50);
       // 헤더 가운데 정렬 강제 적용 (Tabulator가 인라인 스타일로 덮어쓰므로 JS로 처리)
       var cols = document.querySelectorAll('.tabulator-col');
       cols.forEach(function(col) {

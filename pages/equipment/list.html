@@ -13,12 +13,11 @@
       document.documentElement.classList.add('in-shell');
   </script>
   <style>
-    /* 로딩 중 숨김 */
-    .eq-filter-bar, .eq-toolbar, .eq-content { display: none; }
+    /* 로딩 중 숨김 — JS 실행 전 콘텐츠 숨김 */
+    .eq-filter-bar, .eq-toolbar, .eq-content { visibility: hidden; }
     body.page-ready .eq-filter-bar,
     body.page-ready .eq-toolbar,
-    body.page-ready .eq-content { display: flex; }
-    body.page-ready .eq-content { display: flex; flex-direction: column; }
+    body.page-ready .eq-content { visibility: visible; }
     /* Tabulator 커스텀 */
     #equipmentGrid { height: 100%; }
     .tabulator { border: 1px solid #e5e7eb; border-radius: 8px; font-size: 12px; font-family: inherit; background: #fff; }

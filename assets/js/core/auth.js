@@ -19,7 +19,11 @@
   }
 
   function getPortalUrl() {
-    return `${CONFIG.SITE_BASE_URL}/portal.html`;
+    // 개발 서버(gc_imed_me_dev)는 포털 없이 바로 app.html로 진입
+    const isDev = CONFIG.SITE_BASE_URL.includes('_dev') || location.hostname === 'localhost';
+    return isDev
+      ? `${CONFIG.SITE_BASE_URL}/app.html`
+      : `${CONFIG.SITE_BASE_URL}/portal.html`;
   }
 
   function getChangePasswordUrl() {

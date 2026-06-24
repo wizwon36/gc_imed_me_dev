@@ -6,6 +6,20 @@
 
 const APP_ID = 'lj_chart';
 
+// 로컬 날짜 헬퍼 — toISOString()은 UTC 기준이라 UTC+9(KST) 환경에서
+// 오전 9시 이전에 하루 전 날짜가 반환되는 버그가 있음. 이 함수로 대체.
+function todayYmd() {
+  const d = new Date();
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0');
+}
+function dateToYmd(d) {
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0');
+}
+
 // 소수점 자리수 헬퍼
 function getDecimals(item) {
   const d = parseInt(item?.decimal_places ?? 3);
@@ -246,7 +260,7 @@ function bindEvents() {
     if (e.target === $('itemModal')) closeItemModal();
   });
 
-  $('entryDate').value = new Date().toISOString().slice(0, 10);
+  $('entryDate').value = todayYmd();
 
   // 날짜 필터 기본값: 최근 30일
   applyDatePreset(30, false);
@@ -1113,7 +1127,7 @@ async function addEntry() {
 
     if (!isQual) $('entryValue').value = '';
     $('entryMemo').value = '';
-    $('entryDate').value = new Date().toISOString().slice(0, 10);
+    $('entryDate').value = todayYmd();
 
     renderDataTable();
     renderStats();
@@ -1289,11 +1303,11 @@ async function deleteEntry(entryId) {
 function dateOffsetYmd(days) {
   const d = new Date();
   d.setDate(d.getDate() - days);
-  return d.toISOString().slice(0, 10);
+  return dateToYmd(d);
 }
 
 function applyDatePreset(days, rerender = true) {
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayYmd();
   if (days === 0) {
     state.dateFrom = '';
     state.dateTo   = '';
@@ -1688,7 +1702,7 @@ async function loadSampleData() {
     for (let i = 19; i >= 0; i--) {
       const d = new Date(today);
       d.setDate(d.getDate() - i);
-      const dateStr = d.toISOString().slice(0, 10);
+      const dateStr = dateToYmd(d);
       const value = parseFloat((mean + randomNormal() * sd).toFixed(getDecimals(item)));
       const result = await apiPost('ljCreateEntry', {
         item_id: state.activeItemId, date: dateStr, value, memo: '샘플',
@@ -1734,7 +1748,7 @@ function exportCsv() {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = `LJ_${item.item_name}_${new Date().toISOString().slice(0, 10)}.csv`;
+  a.download = `LJ_${item.item_name}_${todayYmd()}.csv`;
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -1751,7 +1765,7 @@ function exportExcel() {
   const mean = Number(item.mean);
   const sd   = Number(item.sd);
   const analyzed = analyzeEntries(entries, mean, sd);
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayYmd();
 
   // ── 시트1: 통계 요약 ──
   const values = entries.map(e => Number(e.value));
@@ -1825,7 +1839,7 @@ async function exportPdf() {
   const mean = Number(item.mean);
   const sd   = Number(item.sd);
   const analyzed = analyzeEntries(entries, mean, sd);
-  const today = new Date().toISOString().slice(0, 10);
+  const today = todayYmd();
   const values = entries.map(e => Number(e.value));
   const n = values.length;
   const actualMean = values.reduce((s, v) => s + v, 0) / n;

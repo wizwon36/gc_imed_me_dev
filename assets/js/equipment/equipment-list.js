@@ -425,7 +425,15 @@ function renderEquipmentList(items) {
     resizableRows: false,
     columnDefaults: { resizable: true, vertAlign: 'middle' },
     tableBuilt: function() {
-      setTimeout(adjustRowHeight, 0);
+      setTimeout(function() {
+        var el = document.getElementById('equipmentGrid');
+        var cont = document.querySelector('.eq-content');
+        var hdr = el ? el.querySelector('.tabulator-header') : null;
+        alert('eq-content:' + (cont ? cont.clientHeight : '?') + 
+              ' header:' + (hdr ? hdr.offsetHeight : '?') + 
+              ' grid:' + (el ? el.clientHeight : '?'));
+        adjustRowHeight();
+      }, 0);
       // 헤더 가운데 정렬 강제 적용 (Tabulator가 인라인 스타일로 덮어쓰므로 JS로 처리)
       var cols = document.querySelectorAll('.tabulator-col');
       cols.forEach(function(col) {

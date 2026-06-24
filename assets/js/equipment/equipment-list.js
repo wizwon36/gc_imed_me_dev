@@ -401,9 +401,9 @@ function renderEquipmentList(items) {
   }
 
   // 그리드 높이 기반 rowHeight 계산
-  var gridH  = el.clientHeight || 713;
-  // AG Grid 헤더 32px + 각 행 상하 border 1px*2 고려
-  var rowH   = Math.floor((gridH - 33) / equipmentListState.pageSize) - 1;
+  var gridH    = el.clientHeight || 767;
+  var headerH  = 33; // 실측값
+  var rowH     = Math.floor((gridH - headerH) / equipmentListState.pageSize);
   rowH = Math.max(26, Math.min(rowH, 40));
 
   var gridOptions = {

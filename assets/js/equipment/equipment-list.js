@@ -431,15 +431,18 @@ function renderEquipmentList(items) {
     onFirstDataRendered: function(params) {
       // 렌더링 완료 후 body viewport 실측값으로 rowHeight 교정
       var viewport = el.querySelector('.ag-body-viewport');
-      if (!viewport) return;
-      var viewH = viewport.clientHeight;
-      var correctRowH = Math.floor(viewH / equipmentListState.pageSize);
-      correctRowH = Math.max(26, Math.min(correctRowH, 38));
-      if (correctRowH !== params.api.getGridOption('rowHeight')) {
-        params.api.setGridOption('rowHeight', correctRowH);
-        params.api.resetRowHeights();
-        _gridInstance._rowH = correctRowH;
+      if (viewport) {
+        var viewH = viewport.clientHeight;
+        var correctRowH = Math.floor(viewH / equipmentListState.pageSize);
+        correctRowH = Math.max(26, Math.min(correctRowH, 38));
+        if (correctRowH !== params.api.getGridOption('rowHeight')) {
+          params.api.setGridOption('rowHeight', correctRowH);
+          params.api.resetRowHeights();
+          _gridInstance._rowH = correctRowH;
+        }
       }
+      // rowHeight 교정 완료 후 콘텐츠 표시 — 줄어드는 애니메이션 방지
+      document.body.classList.add('page-ready');
     }
   };
 
@@ -1029,7 +1032,6 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
   } finally {
     if (typeof hideGlobalLoading === 'function') hideGlobalLoading(true);
-    document.body.classList.add('page-ready');
   }
 });
 

@@ -192,11 +192,9 @@
    100vh - 48(shell topbar) - 10(pt) - 10(pb) - 8(gap1) - 46(filterbar) - 8(gap2) - 22(toolbar) - 8(gap3) - 30(pagination) = 100vh - 190px
 */
 .eq-content {
-  display: flex;
-  flex-direction: column;
   flex: 1;
   min-height: 0;
-  gap: 0;
+  overflow: hidden; /* 그리드만 담음, pagination은 eq-page 직접 자식 */
 }
 
 .equipment-list-grid {

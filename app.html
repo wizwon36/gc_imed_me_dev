@@ -204,10 +204,6 @@
 
     <!-- iframe 콘텐츠 영역 -->
     <div class="shell-content">
-      <div class="shell-loading" id="shellLoading">
-        <div class="shell-loading-spinner"></div>
-        <div class="shell-loading-text">페이지 로딩 중...</div>
-      </div>
       <iframe
         class="shell-iframe"
         id="shellFrame"
@@ -306,7 +302,6 @@ function renderUserInfo(user) {
 // ── 페이지 이동 ───────────────────────────────────────────────
 function navigate(page, tab, skipHistory) {
   const frame   = document.getElementById('shellFrame');
-  const loading = document.getElementById('shellLoading');
 
   currentPage = page;
   currentTab  = tab || '';
@@ -327,11 +322,11 @@ function navigate(page, tab, skipHistory) {
   let url = `${CONFIG.SITE_BASE_URL}/pages/${page}.html?shell=1`;
   if (tab) url += `&tab=${tab}`;
 
-  // 로딩 표시
-  loading.classList.remove('hidden');
+  // iframe 로드 전 숨김 → onload 후 표시 (자체 스피너 없이)
+  frame.style.visibility = 'hidden';
 
   frame.onload = () => {
-    loading.classList.add('hidden');
+    frame.style.visibility = 'visible';
 
     // iframe 내부에 탭 전환 신호 전달
     if (tab) {

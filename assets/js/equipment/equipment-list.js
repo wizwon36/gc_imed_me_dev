@@ -466,8 +466,11 @@ function renderFullPagination() {
     return;
   }
 
-  start = Math.max(1, page - 2);
-  end = Math.min(totalPages, page + 2);
+  // 10개 블록 방식
+  var blockSize = 10;
+  var blockStart = Math.floor((page - 1) / blockSize) * blockSize + 1;
+  start = blockStart;
+  end = Math.min(totalPages, blockStart + blockSize - 1);
 
   for (i = start; i <= end; i += 1) {
     pages.push(
@@ -478,9 +481,9 @@ function renderFullPagination() {
   }
 
   container.innerHTML =
-    '<button type="button" class="pagination-btn" data-page="' + Math.max(1, page - 1) + '" ' + (page <= 1 ? 'disabled' : '') + '>이전</button>' +
+    '<button type="button" class="pagination-btn" data-page="' + Math.max(1, blockStart - 1) + '" ' + (blockStart <= 1 ? 'disabled' : '') + '>이전</button>' +
     pages.join('') +
-    '<button type="button" class="pagination-btn" data-page="' + Math.min(totalPages, page + 1) + '" ' + (page >= totalPages ? 'disabled' : '') + '>다음</button>';
+    '<button type="button" class="pagination-btn" data-page="' + Math.min(totalPages, end + 1) + '" ' + (end >= totalPages ? 'disabled' : '') + '>다음</button>';
 
   Array.prototype.forEach.call(container.querySelectorAll('.pagination-btn'), function(btn) {
     btn.addEventListener('click', async function() {

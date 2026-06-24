@@ -384,6 +384,8 @@ html, body { height: 100%; overflow: hidden; }
   height: 100%;
   border: none;
   display: block;
+  background: #f0f2f5; /* shell-content와 동일한 배경 — 로드 중 깜빡임 방지 */
+  transition: opacity 0.15s ease;
 }
 
 /* iframe 로딩 오버레이 */

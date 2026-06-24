@@ -14,10 +14,11 @@
   </script>
   <style>
     /* 로딩 중 숨김 */
-    .eq-filter-bar, .eq-toolbar, .eq-content { opacity: 0; }
+    .eq-filter-bar, .eq-toolbar, .eq-content { display: none; }
     body.page-ready .eq-filter-bar,
     body.page-ready .eq-toolbar,
-    body.page-ready .eq-content { opacity: 1; transition: opacity 0.15s; }
+    body.page-ready .eq-content { display: flex; }
+    body.page-ready .eq-content { display: flex; flex-direction: column; }
     /* Tabulator 커스텀 */
     #equipmentGrid { height: 100%; }
     .tabulator { border: 1px solid #e5e7eb; border-radius: 8px; font-size: 12px; font-family: inherit; background: #fff; }
@@ -32,9 +33,6 @@
       padding: 0 10px;
       font-size: 12px;
       color: #374151;
-      /* 세로 가운데: Tabulator 셀은 display:flex로 처리 */
-      display: flex !important;
-      align-items: center !important;
       overflow: hidden;
     }
     .tabulator .tabulator-row .tabulator-cell:last-child { border-right: none; }

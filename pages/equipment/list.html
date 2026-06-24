@@ -38,8 +38,10 @@
     /* AG Grid 커스텀 */
     #equipmentGrid { flex: 1; min-height: 0; height: 100%; }
     .ag-theme-alpine {
-      --ag-font-size: 11px;
-      --ag-font-family: "Pretendard", "Noto Sans KR", sans-serif;
+      --ag-font-size: 11px !important;
+      --ag-font-family: "Pretendard", "Noto Sans KR", sans-serif !important;
+      --ag-row-height: 36px;
+      --ag-header-height: 33px;
       --ag-header-background-color: #f8fafc;
       --ag-header-foreground-color: #4b5563;
       --ag-border-color: #e5e7eb;
@@ -52,7 +54,9 @@
     .ag-theme-alpine .ag-root-wrapper { border-radius: 8px; overflow: hidden; }
     .ag-theme-alpine .ag-body-viewport { overflow-x: hidden !important; }
     .ag-theme-alpine .ag-header { font-size: 11px; }
-    .ag-theme-alpine .ag-cell { font-size: 11px !important; font-family: "Pretendard", "Noto Sans KR", sans-serif !important; }
+    .ag-theme-alpine .ag-cell { font-size: 11px !important; font-family: "Pretendard", "Noto Sans KR", sans-serif !important; line-height: 36px !important; }
+    .ag-theme-alpine .ag-cell * { font-size: 11px !important; }
+    .ag-theme-alpine .ag-row { height: 36px !important; max-height: 36px !important; }
     .ag-theme-alpine .ag-header-cell-text { font-size: 11px !important; }
     .ag-theme-alpine .ag-header-cell-label { justify-content: center; font-weight: 700; }
     .ag-left-header .ag-header-cell-label { justify-content: flex-start !important; }

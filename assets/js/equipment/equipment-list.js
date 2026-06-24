@@ -276,7 +276,7 @@ function adjustRowHeight() {
   // eq-content 높이 기준 (paginationArea는 eq-content 밖으로 분리됨)
   // border 2px + 여유 2px = 4px 추가로 빼서 마지막 줄 잘림 방지
   var eqContentH = content ? content.clientHeight : el.clientHeight;
-  var availH   = eqContentH - headerH - 4;
+  var availH   = eqContentH - headerH - 2; // border 1px*2
   var rowH     = Math.floor(availH / equipmentListState.pageSize);
   rowH = Math.max(26, Math.min(rowH, 52));
   _tabulatorInstance.options.rowHeight = rowH;
@@ -316,26 +316,26 @@ function renderEquipmentList(items) {
   // 컬럼 정의
   var columns = [
     {
-      title: '장비명', field: 'equipment_name', minWidth: 120,
+      title: '장비명', field: 'equipment_name', width: 160, minWidth: 100,
       hozAlign: 'left', headerHozAlign: 'left',
       formatter: function(cell) {
         return '<span class="tab-name">' + escapeHtml(cell.getValue() || '—') + '</span>';
       }
     },
     {
-      title: '장비번호', field: 'equipment_id', width: 130,
+      title: '장비번호', field: 'equipment_id', width: 120,
       hozAlign: 'center', headerHozAlign: 'center',
       formatter: function(cell) {
         return '<span class="tab-id">' + escapeHtml(cell.getValue() || '—') + '</span>';
       }
     },
     {
-      title: '모델명', field: 'model_name', width: 120,
+      title: '모델명', field: 'model_name', width: 110,
       hozAlign: 'center', headerHozAlign: 'center',
       formatter: function(cell) { return escapeHtml(cell.getValue() || '—'); }
     },
     {
-      title: '부서', field: 'clinic_name', width: 160,
+      title: '부서', field: 'clinic_name', width: 150,
       hozAlign: 'center', headerHozAlign: 'center',
       formatter: function(cell) {
         var row = cell.getRow().getData();
@@ -345,7 +345,7 @@ function renderEquipmentList(items) {
       }
     },
     {
-      title: '제조사', field: 'manufacturer', width: 120,
+      title: '제조사', field: 'manufacturer', width: 100,
       hozAlign: 'center', headerHozAlign: 'center',
       formatter: function(cell) {
         var v = cell.getValue() || '';
@@ -353,24 +353,40 @@ function renderEquipmentList(items) {
       }
     },
     {
-      title: '시리얼', field: 'serial_no', width: 130,
+      title: '시리얼', field: 'serial_no', width: 120,
       hozAlign: 'center', headerHozAlign: 'center',
       formatter: function(cell) {
         return '<span class="tab-id">' + escapeHtml(cell.getValue() || '—') + '</span>';
       }
     },
     {
-      title: '위치', field: 'location', width: 90,
+      title: '위치', field: 'location', width: 80,
       hozAlign: 'center', headerHozAlign: 'center',
       formatter: function(cell) { return escapeHtml(cell.getValue() || '—'); }
     },
     {
-      title: '상태', field: 'status', width: 80,
+      title: '납품처', field: 'vendor', width: 100,
+      hozAlign: 'center', headerHozAlign: 'center',
+      formatter: function(cell) {
+        var v = cell.getValue() || '';
+        return v ? escapeHtml(v) : '<span style="color:#9ca3af">—</span>';
+      }
+    },
+    {
+      title: '구매일', field: 'purchase_date', width: 90,
+      hozAlign: 'center', headerHozAlign: 'center',
+      formatter: function(cell) {
+        var v = cell.getValue() || '';
+        return v ? '<span class="tab-id">' + escapeHtml(v) + '</span>' : '<span style="color:#9ca3af">—</span>';
+      }
+    },
+    {
+      title: '상태', field: 'status', width: 70,
       hozAlign: 'center', headerHozAlign: 'center',
       formatter: function(cell) { return getStatusBadge(cell.getValue()); }
     },
     {
-      title: '액션', field: '_actions', width: 140,
+      title: '액션', field: '_actions', width: 120,
       hozAlign: 'center', headerHozAlign: 'center',
       headerSort: false,
       formatter: function(cell) {

@@ -38,13 +38,16 @@
       font-size: 12px;
       color: #374151;
       overflow: hidden;
+      display: table-cell;
+      vertical-align: middle;
     }
     .tabulator .tabulator-row .tabulator-cell:last-child { border-right: none; }
     .tabulator-col:last-child { border-right: none !important; }
     .tabulator-footer { display: none; }
     /* 빈 화면 흰색 */
     .tabulator .tabulator-placeholder { background: #fff; }
-    .tabulator .tabulator-placeholder .tabulator-placeholder-contents { color: #9ca3af; font-size: 12px; }
+    .tabulator .tabulator-placeholder .tabulator-placeholder-contents { color: #9ca3af; font-size: 12px; font-weight: normal; }
+    .tabulator .tabulator-placeholder-contents { font-size: 12px !important; font-weight: normal !important; }
 
     .tab-name { font-weight: 600; color: #111827; }
     .tab-id   { font-size: 11px; color: #6b7280; font-family: Consolas, monospace; }

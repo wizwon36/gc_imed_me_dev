@@ -993,9 +993,8 @@ document.addEventListener('DOMContentLoaded', async function() {
       console.error(error);
     }
   } finally {
-    if (typeof hideGlobalLoading === 'function') {
-      hideGlobalLoading();
-    }
+    if (typeof hideGlobalLoading === 'function') hideGlobalLoading(true);
+    document.body.classList.add('page-ready');
   }
 });
 

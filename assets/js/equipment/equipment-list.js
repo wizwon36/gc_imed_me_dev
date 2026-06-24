@@ -1,4 +1,4 @@
-var _tabulatorInstance = null; // Tabulator 그리드 인스턴스
+var _gridInstance = null; // AG Grid 인스턴스
 
 var equipmentListState = {
   user: null,
@@ -264,22 +264,7 @@ function buildEquipmentRow(item) {
   );
 }
 
-function adjustRowHeight() {
-  if (!_tabulatorInstance) return;
-  var el       = document.getElementById('equipmentGrid');
-  var content  = document.querySelector('.eq-content');
-  var pagin    = document.querySelector('.pagination-area');
-  if (!el || !content) return;
 
-  var headerEl = el.querySelector('.tabulator-header');
-  var headerH  = headerEl ? headerEl.offsetHeight : 32;
-  var eqContentH = content ? content.clientHeight : el.clientHeight;
-  // pageSize + 1로 나눠서 행 높이를 조금 작게 → 마지막 줄 절대 잘리지 않음
-  var rowH = Math.floor((eqContentH - headerH) / equipmentListState.pageSize);
-  rowH = Math.max(26, Math.min(rowH, 52));
-  _tabulatorInstance.options.rowHeight = rowH;
-  _tabulatorInstance.redraw(true);
-}
 
 function getStatusBadge(status) {
   var map = {
@@ -295,7 +280,6 @@ function getStatusBadge(status) {
 
 function getActionButtons(item) {
   var id = escapeHtml(item.equipment_id || '');
-  // 상세/수정 이동 전 필터 상태 저장
   var btns = '<a class="tbl-btn" href="detail.html?id=' + id + '&shell=1" onclick="saveListState()">상세</a>';
   if (equipmentListState.canEdit && canEditItem(item)) {
     btns += '<a class="tbl-btn tbl-btn--primary" href="form.html?id=' + id + '&shell=1" onclick="saveListState()">수정</a>';
@@ -309,947 +293,112 @@ function getActionButtons(item) {
 function renderEquipmentList(items) {
   var el = document.getElementById('equipmentGrid');
   if (!el) return;
-
   items = Array.isArray(items) ? items : [];
 
   // 컬럼 정의
-  var columns = [
-    {
-      title: '장비명', field: 'equipment_name', minWidth: 120,
-      hozAlign: 'left', headerHozAlign: 'left',
-      formatter: function(cell) {
-        return '<span class="tab-name">' + escapeHtml(cell.getValue() || '—') + '</span>';
+  var columnDefs = [
+    { headerName: '장비명', field: 'equipment_name', flex: 1, minWidth: 120,
+      headerClass: 'ag-left-header',
+      cellRenderer: function(p) {
+        return '<span class="tab-name">' + escapeHtml(p.value || '—') + '</span>';
       }
     },
-    {
-      title: '장비번호', field: 'equipment_id', width: 140,
-      hozAlign: 'center', headerHozAlign: 'center',
-      formatter: function(cell) {
-        return '<span class="tab-id">' + escapeHtml(cell.getValue() || '—') + '</span>';
+    { headerName: '장비번호', field: 'equipment_id', width: 140,
+      cellRenderer: function(p) {
+        return '<span class="tab-id">' + escapeHtml(p.value || '—') + '</span>';
       }
     },
-    {
-      title: '모델명', field: 'model_name', width: 130,
-      hozAlign: 'center', headerHozAlign: 'center',
-      formatter: function(cell) { return escapeHtml(cell.getValue() || '—'); }
-    },
-    {
-      title: '부서', field: 'clinic_name', width: 170,
-      hozAlign: 'center', headerHozAlign: 'center',
-      formatter: function(cell) {
-        var row = cell.getRow().getData();
-        var clinic = row.clinic_name || '';
-        var team   = row.team_name   || '';
-        return escapeHtml(clinic && team ? clinic + ' / ' + team : clinic || team || '—');
+    { headerName: '모델명', field: 'model_name', width: 130 },
+    { headerName: '부서', field: 'clinic_name', width: 160,
+      cellRenderer: function(p) {
+        var d = p.data;
+        var c = d.clinic_name || '', t = d.team_name || '';
+        return escapeHtml(c && t ? c + ' / ' + t : c || t || '—');
       }
     },
-    {
-      title: '제조사', field: 'manufacturer', width: 120,
-      hozAlign: 'center', headerHozAlign: 'center',
-      formatter: function(cell) {
-        var v = cell.getValue() || '';
+    { headerName: '제조사', field: 'manufacturer', width: 120,
+      cellRenderer: function(p) {
+        var v = p.value || '';
         return v ? '<span class="tab-mfr">' + escapeHtml(v) + '</span>' : '<span style="color:#9ca3af">—</span>';
       }
     },
-    {
-      title: '시리얼', field: 'serial_no', width: 140,
-      hozAlign: 'center', headerHozAlign: 'center',
-      formatter: function(cell) {
-        return '<span class="tab-id">' + escapeHtml(cell.getValue() || '—') + '</span>';
+    { headerName: '시리얼', field: 'serial_no', width: 140,
+      cellRenderer: function(p) {
+        return '<span class="tab-id">' + escapeHtml(p.value || '—') + '</span>';
       }
     },
-    {
-      title: '납품처', field: 'vendor', width: 110,
-      hozAlign: 'center', headerHozAlign: 'center',
-      formatter: function(cell) {
-        var v = cell.getValue() || '';
-        return v ? escapeHtml(v) : '<span style="color:#9ca3af">—</span>';
+    { headerName: '납품처', field: 'vendor', width: 110,
+      cellRenderer: function(p) {
+        return p.value ? escapeHtml(p.value) : '<span style="color:#9ca3af">—</span>';
       }
     },
-    {
-      title: '구매일', field: 'purchase_date', width: 100,
-      hozAlign: 'center', headerHozAlign: 'center',
-      formatter: function(cell) {
-        var v = cell.getValue() || '';
-        return v ? escapeHtml(v) : '<span style="color:#9ca3af">—</span>';
+    { headerName: '구매일', field: 'purchase_date', width: 100,
+      cellRenderer: function(p) {
+        return p.value ? escapeHtml(p.value) : '<span style="color:#9ca3af">—</span>';
       }
     },
-    {
-      title: '유지보수만료', field: 'maintenance_end_date', width: 110,
-      hozAlign: 'center', headerHozAlign: 'center',
-      formatter: function(cell) {
-        var v = cell.getValue() || '';
+    { headerName: '유지보수만료', field: 'maintenance_end_date', width: 110,
+      cellRenderer: function(p) {
+        var v = p.value || '';
         if (!v) return '<span style="color:#9ca3af">—</span>';
         var days = Math.ceil((new Date(v) - new Date()) / 86400000);
         var color = days <= 30 ? '#b91c1c' : days <= 60 ? '#c2410c' : '#374151';
-        return '<span style="color:' + color + ';font-size:11px;">' + escapeHtml(v) + '</span>';
+        return '<span style="color:' + color + '">' + escapeHtml(v) + '</span>';
       }
     },
-    {
-      title: '위치', field: 'location', width: 90,
-      hozAlign: 'center', headerHozAlign: 'center',
-      formatter: function(cell) { return escapeHtml(cell.getValue() || '—'); }
+    { headerName: '위치', field: 'location', width: 90 },
+    { headerName: '상태', field: 'status', width: 80,
+      cellRenderer: function(p) { return getStatusBadge(p.value); }
     },
-    {
-      title: '상태', field: 'status', width: 90,
-      hozAlign: 'center', headerHozAlign: 'center',
-      formatter: function(cell) { return getStatusBadge(cell.getValue()); }
-    },
-    {
-      title: '액션', field: '_actions', width: 150,
-      hozAlign: 'center', headerHozAlign: 'center',
-      headerSort: false,
-      formatter: function(cell) {
-        var row = cell.getRow().getData();
-        return '<div style="display:flex;gap:4px;justify-content:center;align-items:center;">' + getActionButtons(row) + '</div>';
+    { headerName: '액션', field: 'equipment_id', width: 140, sortable: false,
+      cellRenderer: function(p) {
+        return '<div style="display:flex;gap:4px;align-items:center;">' + getActionButtons(p.data) + '</div>';
       }
     }
   ];
 
-  if (_tabulatorInstance) {
-    _tabulatorInstance.replaceData(items);
-    return;
-  }
-
-  // eq-content 실측값 715px 기준 (1920x1080)
-  // (715 - 32) / 20 = 34px
-  // 동적으로도 계산하되 실측 기반으로 fallback
-  var eqContent = document.querySelector('.eq-content');
-  var eqH = (eqContent && eqContent.clientHeight > 100) ? eqContent.clientHeight : 715;
-  var availH = eqH - 32;
-  var initRowH = Math.floor(availH / equipmentListState.pageSize);
-  initRowH = Math.max(26, Math.min(initRowH, 52));
-
-  // Tabulator에 명시적 높이 전달 (flex:1이 height:100%보다 안정적)
-  var gridEl = document.getElementById('equipmentGrid');
-  var gridH = gridEl ? gridEl.clientHeight : eqH;
-
-  _tabulatorInstance = new Tabulator('#equipmentGrid', {
-    data: items,
-    columns: columns,
-    layout: 'fitColumns',
-    height: gridH + 'px',
-    rowHeight: initRowH,
-    placeholder: '조회된 장비가 없습니다.',
-    columnHeaderSortMulti: false,
-    pagination: false,
-    movableColumns: false,
-    resizableRows: false,
-    columnDefaults: { resizable: true },
-    rowFormatter: function(row) {
-      var cells = row.getElement().querySelectorAll('.tabulator-cell');
-      var rowH = row.getElement().offsetHeight || 34;
-      cells.forEach(function(cell) {
-        cell.style.lineHeight = rowH + 'px';
-      });
-    },
-    tableBuilt: function() {
-      // 헤더 가운데 정렬 강제 적용 (Tabulator가 인라인 스타일로 덮어쓰므로 JS로 처리)
-      var cols = document.querySelectorAll('.tabulator-col');
-      cols.forEach(function(col) {
-        var field = col.getAttribute('tabulator-field');
-        var content = col.querySelector('.tabulator-col-content');
-        if (!content) return;
-        if (field === 'equipment_name') {
-          content.style.justifyContent = 'flex-start';
-        } else {
-          content.style.justifyContent = 'center';
-        }
-      });
-    },
-  });
-}
-
-function renderRecentPagination() {
-  var container = document.getElementById('paginationArea');
-  var page = equipmentListState.page;
-  if (!container) return;
-
-  container.innerHTML =
-    '<button type="button" class="pagination-btn" data-page="' + Math.max(1, page - 1) + '" ' + (page <= 1 ? 'disabled' : '') + '>이전</button>' +
-    '<button type="button" class="pagination-btn is-active" disabled>' + page + '</button>' +
-    '<button type="button" class="pagination-btn" data-page="' + (page + 1) + '" ' + (equipmentListState.hasNext ? '' : 'disabled') + '>다음</button>';
-
-  Array.prototype.forEach.call(container.querySelectorAll('.pagination-btn[data-page]'), function(btn) {
-    btn.addEventListener('click', async function() {
-      var nextPage = Number(btn.dataset.page || page);
-      if (!nextPage || nextPage === equipmentListState.page) return;
-      await loadEquipmentList(nextPage);
-    });
-  });
-}
-
-function renderFullPagination() {
-  var container = document.getElementById('paginationArea');
-  var page = equipmentListState.page;
-  var totalPages = equipmentListState.totalPages;
-  var i, html = '';
-
-  if (!container) return;
-  if (totalPages <= 1) { container.innerHTML = ''; return; }
-
-  // 10개씩 묶어서 현재 페이지가 속한 블록 표시
-  var BLOCK = 10;
-  var blockStart = Math.floor((page - 1) / BLOCK) * BLOCK + 1;
-  var blockEnd   = Math.min(blockStart + BLOCK - 1, totalPages);
-
-  html += '<button type="button" class="pagination-btn" data-page="' + Math.max(1, blockStart - 1) + '" ' + (blockStart <= 1 ? 'disabled' : '') + '>이전</button>';
-
-  for (i = blockStart; i <= blockEnd; i++) {
-    html += '<button type="button" class="pagination-btn ' + (i === page ? 'is-active' : '') + '" data-page="' + i + '">' + i + '</button>';
-  }
-
-  html += '<button type="button" class="pagination-btn" data-page="' + Math.min(totalPages, blockEnd + 1) + '" ' + (blockEnd >= totalPages ? 'disabled' : '') + '>다음</button>';
-
-  container.innerHTML = html;
-
-  Array.prototype.forEach.call(container.querySelectorAll('.pagination-btn'), function(btn) {
-    btn.addEventListener('click', async function() {
-      var nextPage = Number(btn.dataset.page || page);
-      if (!nextPage || nextPage === equipmentListState.page) return;
-      await loadEquipmentList(nextPage);
-    });
-  });
-}
-
-function renderPagination() {
-  if (equipmentListState.isRecentMode) {
-    renderRecentPagination();
-    return;
-  }
-  renderFullPagination();
-}
-
-// ★ 개별 장비에 대해 수정 가능 여부 판단
-// admin이면 모든 장비 수정 가능, user이면 본인 소속 팀 장비만 수정 가능
-function canEditItem(item) {
-  if (equipmentListState.isAdmin) return true;
-  var itemTeamCode = String(item.team_code || '').trim();
-  var userTeamCode = equipmentListState.userTeamCode;
-  return !!userTeamCode && itemTeamCode === userTeamCode;
-}
-
-function applyListPermissionUi() {
-  var createBtn = document.getElementById('createEquipmentBtn');
-  if (createBtn) {
-    createBtn.style.display = equipmentListState.canEdit ? '' : 'none';
-  }
-
-  // ★ user 권한이면 엑셀 다운로드 버튼 숨김
-  var exportBtn = document.getElementById('exportExcelBtn');
-  if (exportBtn) {
-    if (equipmentListState.canEdit || equipmentListState.isAdmin) {
-      exportBtn.style.display = 'inline-flex';
-    } else {
-      exportBtn.style.display = 'none';
-    }
-  }
-
-  if (typeof applyTopActionsColClass === 'function') applyTopActionsColClass();
-}
-
-function buildListRequestParams(filters, nextPage) {
-  var hasFilter = hasMeaningfulFilter(filters);
-
-  equipmentListState.isRecentMode = !hasFilter;
-
-  var base = {
-    request_user_email: equipmentListState.user && equipmentListState.user.email ? equipmentListState.user.email : '',
-    keyword:      filters.keyword,
-    clinic_code:  filters.clinic_code,
-    team_code:    filters.team_code,
-    status:       filters.status,
-    manufacturer: filters.manufacturer,
-    page:         nextPage,
-    page_size:    equipmentListState.pageSize
+  // 기본 컬럼 설정
+  var defaultColDef = {
+    sortable: true,
+    resizable: true,
+    suppressMovable: true,
+    headerClass: 'ag-center-header',
+    cellStyle: { display: 'flex', alignItems: 'center', justifyContent: 'center' },
   };
 
-  if (!hasFilter) {
-    base.recent_only = 'Y';
-    base.include_total = 'N';
-    return base;
-  }
-
-  base.include_total = 'Y';
-  return base;
-}
-
-function syncListQueryParams(filters) {
-  setListQueryParams({
-    keyword: filters.keyword,
-    clinic_code: filters.clinic_code,
-    team_code: filters.team_code,
-    status: filters.status,
-    manufacturer: filters.manufacturer,
-    page: equipmentListState.page,
-    page_size: equipmentListState.pageSize
-  });
-}
-
-var EQUIPMENT_LIST_CACHE_KEY = 'gc_imed_equipment_list_state';
-
-function saveListState() {
-  try {
-    var state = {
-      filters: getCurrentFilters(),
-      page:    equipmentListState.page,
-      ts:      Date.now()
-    };
-    sessionStorage.setItem(EQUIPMENT_LIST_CACHE_KEY, JSON.stringify(state));
-  } catch(e) {}
-}
-
-function loadListState() {
-  try {
-    var raw = sessionStorage.getItem(EQUIPMENT_LIST_CACHE_KEY);
-    if (!raw) return null;
-    var state = JSON.parse(raw);
-    // 30분 이상 지난 캐시는 무시
-    if (Date.now() - state.ts > 30 * 60 * 1000) {
-      sessionStorage.removeItem(EQUIPMENT_LIST_CACHE_KEY);
-      return null;
-    }
-    return state;
-  } catch(e) { return null; }
-}
-
-function clearListState() {
-  try { sessionStorage.removeItem(EQUIPMENT_LIST_CACHE_KEY); } catch(e) {}
-}
-
-async function loadEquipmentList(nextPage) {
-  var filters;
-  var requestParams;
-  var result;
-
-  if (equipmentListState.loading) return;
-
-  equipmentListState.loading = true;
-
-  try {
-    if (typeof clearMessage === 'function') clearMessage();
-    if (typeof showGlobalLoading === 'function') showGlobalLoading('불러오는 중...');
-
-    if (equipmentListState._initialLoad) {
-      var urlParams = getListQueryParams();
-      // URL에 필터가 없으면 소속 의원/팀으로 기본 필터 적용
-      if (!urlParams.keyword && !urlParams.clinic_code && !urlParams.team_code && !urlParams.status && !urlParams.manufacturer) {
-        urlParams.clinic_code = equipmentListState.userClinicCode || '';
-        urlParams.team_code   = equipmentListState.userTeamCode   || '';
-      }
-      filters = urlParams;
-    } else {
-      filters = getCurrentFilters();
-    }
-
-    equipmentListState._initialLoad = false;
-    requestParams = buildListRequestParams(filters, nextPage || equipmentListState.page);
-
-    equipmentListState.page = nextPage || equipmentListState.page;
-
-    result = await apiGet('listEquipments', requestParams);
-
-    // GAS result.page는 항상 1을 반환할 수 있으므로 신뢰하지 않고
-    // 요청한 nextPage 값을 그대로 유지
-    // equipmentListState.page = Number(result.page || 1);
-    equipmentListState.hasNext = Boolean(result.has_next);
-    equipmentListState.hasPrev = Boolean(result.has_prev);
-
-    if (equipmentListState.isRecentMode) {
-      equipmentListState.totalCount = 0;
-      equipmentListState.totalPages = equipmentListState.hasNext
-        ? equipmentListState.page + 1
-        : equipmentListState.page;
-    } else {
-      equipmentListState.totalCount = Number(result.total_count || result.count || result.totalCount || 0);
-      // GAS API가 total_pages / totalPages / pageCount 등 다양한 키로 내려올 수 있음
-      var rawTotal = result.total_pages || result.totalPages || result.page_count || result.pageCount || 0;
-      if (!rawTotal && equipmentListState.totalCount > 0) {
-        rawTotal = Math.ceil(equipmentListState.totalCount / equipmentListState.pageSize);
-      }
-      equipmentListState.totalPages = Math.max(1, Number(rawTotal));
-    }
-
-    renderEquipmentList(Array.isArray(result.data) ? result.data : []);
-    renderListSummary();
-    renderPagination();
-    syncListQueryParams(filters);
-  } catch (error) {
-    if (typeof showMessage === 'function') {
-      showMessage(error.message || '장비 목록을 불러오는 중 오류가 발생했습니다.', 'error');
-    } else {
-      console.error(error);
-    }
-  } finally {
-    equipmentListState.loading = false;
-    if (typeof hideGlobalLoading === 'function') hideGlobalLoading();
-  }
-}
-
-// 동기 초기화 — 상태/UI 기본 세팅 (API 호출 없음)
-function initListFiltersSync() {
-  var query = getListQueryParams();
-  equipmentListState.page = query.page > 0 ? query.page : 1;
-  equipmentListState.pageSize = 20;
-  fillStatusFilterOptions();
-  setValue('keyword', query.keyword || '');
-  setValue('status', query.status || '');
-  setValue('manufacturer', query.manufacturer || '');
-  setValue('page_size', String(equipmentListState.pageSize));
-}
-
-// 비동기 초기화 — org API 호출 후 필터 UI 세팅
-async function initListFiltersAsync() {
-  var query = getListQueryParams();
-  var clinicEl = document.getElementById('clinic_code');
-  var teamEl = document.getElementById('team_code');
-
-  if (!window.orgSelect || !clinicEl || !teamEl) return;
-
-  var orgInitResults = await Promise.all([
-    window.orgSelect.loadOrgData(),
-    apiGet('getScopedOrgOptions', {
-      request_user_email: equipmentListState.user?.email || equipmentListState.user?.user_email,
-      app_id: 'equipment'
-    })
-  ]);
-  var scopedResult = orgInitResults[1];
-  var scopedData = scopedResult?.data || { clinics: [], teams: [], scope: null };
-  var scope = scopedData.scope;
-
-  if (scope === 'team') {
-    window.orgSelect.fillSelectOptions(clinicEl, scopedData.clinics, { emptyText: '' });
-    clinicEl.value = equipmentListState.userClinicCode;
-    clinicEl.disabled = true;
-    window.orgSelect.fillSelectOptions(teamEl, scopedData.teams, { emptyText: '' });
-    teamEl.value = query.team_code || equipmentListState.userTeamCode;
-    teamEl.disabled = true;
-
-  } else if (scope === 'clinic') {
-    window.orgSelect.fillSelectOptions(clinicEl, scopedData.clinics, { emptyText: '' });
-    clinicEl.value = equipmentListState.userClinicCode;
-    clinicEl.disabled = true;
-    window.orgSelect.fillSelectOptions(teamEl, scopedData.teams, { emptyText: '전체 팀' });
-    teamEl.value = query.team_code || equipmentListState.userTeamCode || '';
-    teamEl.disabled = false;
-
-  } else {
-    // scope === 'all' (admin 포함)
-    window.orgSelect.fillSelectOptions(clinicEl, scopedData.clinics, { emptyText: '전체 의원' });
-    window.orgSelect.bindClinicTeamSelects({
-      clinicSelect: clinicEl,
-      teamSelect: teamEl,
-      teamEmptyText: '전체 팀',
-      onTeamChanged: null
-    });
-    var initClinic = query.clinic_code || equipmentListState.userClinicCode || '';
-    if (initClinic) {
-      clinicEl.value = initClinic;
-      window.orgSelect.fillSelectOptions(
-        teamEl,
-        window.orgSelect.getFilteredTeams(initClinic),
-        { emptyText: '전체 팀' }
-      );
-      teamEl.disabled = false;
-      teamEl.value = query.team_code || equipmentListState.userTeamCode || '';
-    } else {
-      teamEl.innerHTML = '<option value="">의원을 먼저 선택하세요</option>';
-      teamEl.disabled = true;
-    }
-  }
-}
-
-function bindListEvents() {
-  var searchForm = document.getElementById('searchForm');
-  var resetBtn = document.getElementById('resetFilterBtn');
-  var pageSizeEl = document.getElementById('page_size');
-
-  if (searchForm) {
-    searchForm.addEventListener('submit', async function(event) {
-      event.preventDefault();
-      await loadEquipmentList(1);
-    });
-  }
-
-  if (resetBtn) {
-    resetBtn.addEventListener('click', async function() {
-      setValue('keyword', '');
-      // 초기화: admin도 소속 의원/팀으로 복원
-      if (equipmentListState.isAdmin) {
-        var clinicElReset2 = document.getElementById('clinic_code');
-        var teamElReset2   = document.getElementById('team_code');
-        setValue('clinic_code', equipmentListState.userClinicCode || '');
-        if (window.orgSelect && clinicElReset2 && teamElReset2) {
-          window.orgSelect.fillSelectOptions(
-            teamElReset2,
-            window.orgSelect.getFilteredTeams(equipmentListState.userClinicCode),
-            { emptyText: '전체 팀' }
-          );
-          teamElReset2.disabled = false;
-        }
-        setValue('team_code', equipmentListState.userTeamCode || '');
-      } else {
-        // ★ user: 초기화 시 팀을 본인 소속 팀으로 복원 (의원은 disabled 유지, 팀은 변경 가능)
-        setValue('team_code', equipmentListState.userTeamCode || '');
-        if (window.orgSelect) {
-          var teamElReset = document.getElementById('team_code');
-          window.orgSelect.fillSelectOptions(
-            teamElReset,
-            window.orgSelect.getFilteredTeams(equipmentListState.userClinicCode),
-            { emptyText: '전체 팀' }
-          );
-          teamElReset.value = equipmentListState.userTeamCode || '';
-          teamElReset.disabled = false;
-        }
-      }
-      setValue('status', '');
-      setValue('manufacturer', '');
-
-      // 초기화 시 sessionStorage 캐시도 삭제
-      clearListState();
-
-      await loadEquipmentList(1);
-    });
-  }
-
-  if (pageSizeEl) {
-    pageSizeEl.addEventListener('change', async function() {
-      equipmentListState.pageSize = Number(pageSizeEl.value || 20) || 20;
-      await loadEquipmentList(1);
-    });
-  }
-}
-
-function statusLabelForExport(value) {
-  var map = {
-    IN_USE: '사용중',
-    REPAIRING: '수리중',
-    INSPECTING: '점검중',
-    STORED: '보관',
-    DISPOSED: '폐기'
-  };
-  return map[String(value || '').trim()] || (value || '');
-}
-
-async function exportEquipmentExcel() {
-  var exportBtn = document.getElementById('exportExcelBtn');
-
-  if (!window.XLSX) {
-    showMessage('엑셀 라이브러리를 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.', 'error');
+  if (_gridInstance) {
+    _gridInstance.setGridOption('rowData', items);
     return;
   }
 
-  var filters = getCurrentFilters();
-  var userEmail = equipmentListState.user && equipmentListState.user.email
-    ? equipmentListState.user.email : '';
+  // 그리드 높이 기반 rowHeight 계산
+  var gridH  = el.clientHeight || 713;
+  var rowH   = Math.floor((gridH - 32) / equipmentListState.pageSize);
+  rowH = Math.max(26, Math.min(rowH, 52));
 
-  try {
-    if (exportBtn) {
-      exportBtn.disabled = true;
-      exportBtn.textContent = '다운로드 중...';
+  var gridOptions = {
+    columnDefs: columnDefs,
+    defaultColDef: defaultColDef,
+    rowData: items,
+    rowHeight: rowH,
+    headerHeight: 32,
+    suppressPaginationPanel: true,
+    suppressScrollOnNewData: true,
+    overlayNoRowsTemplate: '<span style="color:#9ca3af;font-size:12px;">조회된 장비가 없습니다.</span>',
+    onGridReady: function(params) {
+      params.api.sizeColumnsToFit();
     }
-    showGlobalLoading('장비 데이터를 불러오는 중...');
+  };
 
-    var result = await apiGet('exportEquipments', {
-      request_user_email: userEmail,
-      keyword: filters.keyword,
-      clinic_code: filters.clinic_code,
-      team_code: filters.team_code,
-      status: filters.status,
-      manufacturer: filters.manufacturer
-    });
-
-    var data = Array.isArray(result.data) ? result.data : [];
-
-    if (!data.length) {
-      showMessage('다운로드할 데이터가 없습니다.', 'error');
-      return;
-    }
-
-    var headers = [
-      '장비번호', '장비명', '모델명', '제조사', '시리얼번호',
-      '사용부서', '의원', '팀', '현재위치', '현재상태',
-      '담당자', '연락처', '구매처', '취득가액',
-      '취득일자', '제조일자', '유지보수종료일', '현재사용자', '비고', '등록일시'
-    ];
-
-    // 컬럼 유형 (0-based index)
-    var COL_NUM  = new Set([13]);         // 취득가액
-    var COL_DATE = new Set([14, 15, 16]); // 취득일자, 제조일자, 유지보수종료일
-
-    var toDateOnly = function(v) { return v ? String(v).substring(0, 10) : ''; };
-
-    var rows = data.map(function(item) {
-      return [
-        item.equipment_id || '',
-        item.equipment_name || '',
-        item.model_name || '',
-        item.manufacturer || '',
-        item.serial_no || '',
-        item.department || '',
-        item.clinic_name || '',
-        item.team_name || '',
-        item.location || '',
-        statusLabelForExport(item.status),
-        item.manager_name || '',
-        item.manager_phone || '',
-        item.vendor || '',
-        item.acquisition_cost !== '' && item.acquisition_cost !== null && item.acquisition_cost !== undefined
-          ? Number(item.acquisition_cost) : '',
-        toDateOnly(item.purchase_date),
-        toDateOnly(item.manufacture_date),
-        toDateOnly(item.maintenance_end_date),
-        item.current_user || '',
-        item.memo || '',
-        item.created_at || ''
-      ];
-    });
-
-    // ── 스타일 정의 ──────────────────────────────────────────────
-    var FONT_BASE   = { name: '맑은 고딕', sz: 10 };
-    var FONT_HEADER = { name: '맑은 고딕', sz: 10, bold: true, color: { rgb: '1F3864' } };
-    var FILL_HEADER = { patternType: 'solid', fgColor: { rgb: 'B8CCE4' } };
-    var BORDER = {
-      top:    { style: 'thin', color: { rgb: 'BFBFBF' } },
-      bottom: { style: 'thin', color: { rgb: 'BFBFBF' } },
-      left:   { style: 'thin', color: { rgb: 'BFBFBF' } },
-      right:  { style: 'thin', color: { rgb: 'BFBFBF' } }
-    };
-    var ALIGN_LEFT   = { horizontal: 'left',   vertical: 'center' };
-    var ALIGN_CENTER = { horizontal: 'center', vertical: 'center' };
-    var ALIGN_RIGHT  = { horizontal: 'right',  vertical: 'center' };
-    var FMT_NUM  = '#,##0';
-    var FMT_DATE = 'yyyy-mm-dd';
-
-    // ── 워크시트 수동 생성 ───────────────────────────────────────
-    var ws = {};
-    var totalCols = headers.length;
-    var totalRows = rows.length + 1;
-
-    // 헤더 행
-    headers.forEach(function(h, c) {
-      var addr = window.XLSX.utils.encode_cell({ r: 0, c: c });
-      ws[addr] = {
-        v: h, t: 's',
-        s: { font: FONT_HEADER, fill: FILL_HEADER, border: BORDER, alignment: ALIGN_CENTER }
-      };
-    });
-
-    // 데이터 행
-    rows.forEach(function(row, r) {
-      row.forEach(function(val, c) {
-        var addr   = window.XLSX.utils.encode_cell({ r: r + 1, c: c });
-        var isNum  = COL_NUM.has(c);
-        var isDate = COL_DATE.has(c);
-
-        var cell = {
-          v: val,
-          t: isNum && val !== '' ? 'n' : 's',
-          s: {
-            font:      FONT_BASE,
-            border:    BORDER,
-            alignment: isNum ? ALIGN_RIGHT : isDate ? ALIGN_CENTER : ALIGN_LEFT
-          }
-        };
-
-        if (isNum && val !== '') { cell.z = FMT_NUM;  cell.s.numFmt = FMT_NUM;  }
-        if (isDate && val)       { cell.z = FMT_DATE; cell.s.numFmt = FMT_DATE; }
-
-        ws[addr] = cell;
-      });
-    });
-
-    ws['!ref']  = window.XLSX.utils.encode_range({ r: 0, c: 0 }, { r: totalRows - 1, c: totalCols - 1 });
-    ws['!cols'] = [
-      { wch: 14 }, { wch: 20 }, { wch: 16 }, { wch: 14 }, { wch: 16 },
-      { wch: 20 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 8 },
-      { wch: 10 }, { wch: 14 }, { wch: 14 }, { wch: 12 },
-      { wch: 12 }, { wch: 12 }, { wch: 14 }, { wch: 10 }, { wch: 20 }, { wch: 18 }
-    ];
-    ws['!rows'] = Array(totalRows).fill({ hpt: 18 });
-
-    var wb = window.XLSX.utils.book_new();
-    window.XLSX.utils.book_append_sheet(wb, ws, '장비대장');
-
-    var now = new Date();
-    var dateStr = now.getFullYear() +
-      String(now.getMonth() + 1).padStart(2, '0') +
-      String(now.getDate()).padStart(2, '0');
-    var fileName = '장비대장_' + dateStr + '.xlsx';
-
-    window.XLSX.writeFile(wb, fileName);
-
-  } catch (error) {
-    showMessage(error.message || '엑셀 다운로드 중 오류가 발생했습니다.', 'error');
-  } finally {
-    if (exportBtn) {
-      exportBtn.disabled = false;
-      exportBtn.textContent = '엑셀 다운로드';
-    }
-    hideGlobalLoading(true);
-  }
+  _gridInstance = agGrid.createGrid(el, gridOptions);
 }
 
-document.addEventListener('DOMContentLoaded', async function() {
-  try {
-    if (typeof showGlobalLoading === 'function') {
-      showGlobalLoading('장비 목록 화면을 준비하는 중...');
-    }
-
-    if (window.auth && typeof window.auth.requireAuth === 'function') {
-      equipmentListState.user = window.auth.requireAuth();
-    }
-
-    if (!equipmentListState.user) {
-      if (typeof hideGlobalLoading === 'function') hideGlobalLoading();
-      return;
-    }
-
-    // ★ admin 여부 및 소속 의원/팀 코드 세팅
-    var userRole = String(equipmentListState.user.role || '').trim().toLowerCase();
-    equipmentListState.isAdmin = (userRole === 'admin');
-    equipmentListState.userClinicCode = String(equipmentListState.user.clinic_code || '').trim();
-    equipmentListState.userTeamCode   = String(equipmentListState.user.team_code   || '').trim();
-
-    // 뒤로가기 복귀 감지 — performance.navigation 또는 sessionStorage
-    var isBackNav = (
-      (window.performance && window.performance.navigation &&
-       window.performance.navigation.type === 2) ||
-      (window.performance && window.performance.getEntriesByType &&
-       window.performance.getEntriesByType('navigation')[0] &&
-       window.performance.getEntriesByType('navigation')[0].type === 'back_forward')
-    );
-    equipmentListState._isBackNav = isBackNav;
-
-    // 권한 3개 + org 데이터 병렬 호출 (기존 순차 → Promise.all)
-    var permResults = await Promise.all([
-      window.appPermission && typeof window.appPermission.requirePermission === 'function'
-        ? window.appPermission.requirePermission('equipment', ['view', 'edit', 'admin'])
-        : Promise.resolve(true),
-      window.appPermission && typeof window.appPermission.hasPermission === 'function'
-        ? window.appPermission.hasPermission('equipment', ['edit', 'admin'])
-        : Promise.resolve(false),
-      window.appPermission && typeof window.appPermission.getPermission === 'function'
-        ? window.appPermission.getPermission('equipment')
-        : Promise.resolve(null)
-    ]);
-
-    var canView  = permResults[0];
-    var canEdit  = permResults[1];
-    var appPerm  = permResults[2];
-
-    if (!canView) {
-      if (typeof hideGlobalLoading === 'function') hideGlobalLoading();
-      return;
-    }
-
-    equipmentListState.canEdit     = canEdit;
-    equipmentListState.isAppAdmin  = (String(appPerm || '').trim().toLowerCase() === 'admin');
-
-    applyListPermissionUi();
-
-    // 동기 초기화 (상태/UI 기본 세팅)
-    initListFiltersSync();
-    bindListEvents();
-
-    // 뒤로가기 복귀 시 캐시 필터 복원 (동기)
-    // 뒤로가기로 돌아온 경우에만 캐시 복원, 강제 새로고침(reload)은 무시
-    var isReload = window.performance &&
-      window.performance.getEntriesByType &&
-      window.performance.getEntriesByType('navigation')[0] &&
-      window.performance.getEntriesByType('navigation')[0].type === 'reload';
-    if (isReload) clearListState();
-
-    var cached = loadListState();
-    if (cached && cached.filters) {
-      var f = cached.filters;
-      if (f.keyword)     setValue('keyword',    f.keyword);
-      if (f.status)      setValue('status',     f.status);
-      if (f.clinic_code) {
-        var clinicEl2 = document.getElementById('clinic_code');
-        if (clinicEl2 && !clinicEl2.disabled) setValue('clinic_code', f.clinic_code);
-      }
-      if (f.team_code) {
-        var teamEl2 = document.getElementById('team_code');
-        if (teamEl2 && !teamEl2.disabled) setValue('team_code', f.team_code);
-      }
-      equipmentListState.page = cached.page || 1;
-      equipmentListState._initialLoad = false; // 캐시된 필터로 바로 조회
-    }
-
-    // org 필터 UI + 장비 목록 데이터를 병렬로 호출
-    await Promise.all([
-      initListFiltersAsync(),
-      loadEquipmentList(equipmentListState.page)
-    ]);
-
-    var exportBtn = document.getElementById('exportExcelBtn');
-    if (exportBtn) {
-      exportBtn.addEventListener('click', exportEquipmentExcel);
-    }
-  } catch (error) {
-    if (typeof showMessage === 'function') {
-      showMessage(error.message || '화면 초기화 중 오류가 발생했습니다.', 'error');
-    } else {
-      console.error(error);
-    }
-  } finally {
-    if (typeof hideGlobalLoading === 'function') hideGlobalLoading(true);
-    document.body.classList.add('page-ready');
-  }
-});
-
-// ================================================================
-// 라벨 일괄 출력
-// ================================================================
-
-var bulkSelectedIds = new Set();
-
-function initBulkLabelFeature() {
-  var bulkBtn    = document.getElementById('bulkLabelBtn');
-  var checkAllEl = document.getElementById('bulkCheckAll');
-
-  if (!bulkBtn) return;
-
-  // 라벨 일괄 출력 버튼 클릭 → 오버레이 인쇄
-  bulkBtn.addEventListener('click', function() {
-    if (!bulkSelectedIds.size) return;
-    var ids        = Array.from(bulkSelectedIds);
-    var sizeClass  = getSelectedLabelSizeForBulk();
-    var layoutSelect = document.getElementById('bulkLayoutSelect');
-    var layout     = layoutSelect ? layoutSelect.value : '';
-    printLabelsOverlay(ids, sizeClass, layout);
-  });
-
-  // 검수확인서 일괄 출력 버튼
-  var certBtn = document.getElementById('bulkInspectionCertBtn');
-  if (certBtn) {
-    certBtn.addEventListener('click', async function() {
-      if (!bulkSelectedIds.size) return;
-      var ids = Array.from(bulkSelectedIds);
-
-      try {
-        showGlobalLoading('장비 정보를 불러오는 중...');
-
-        var user = equipmentListState.user;
-        var userEmail = (user && user.email) ? user.email : '';
-
-        var items = await Promise.all(
-          ids.map(function(id) {
-            return apiGet('getEquipment', {
-              id: id,
-              request_user_email: userEmail
-            }).then(function(result) {
-              return result.data || {};
-            });
-          })
-        );
-
-        if (typeof generateInspectionCertPDF === 'function') {
-          // 구매처 동일 여부 체크
-          var vendors = [...new Set(items.map(function(e) { return String(e.vendor || '').trim(); }).filter(Boolean))];
-
-          if (vendors.length > 1) {
-            alert('⚠️ 선택한 장비의 구매처가 다릅니다.\n\n' +
-              vendors.join(', ') +
-              '\n\n검수확인서는 구매처가 동일한 장비만 함께 출력할 수 있습니다.');
-            return;
-          }
-
-          generateInspectionCertPDF(items);
-        }
-      } catch (error) {
-        showMessage(error.message || '장비 정보를 불러오는 중 오류가 발생했습니다.', 'error');
-      } finally {
-        hideGlobalLoading();
-      }
-    });
-  }
-
-  // 사이즈 변경 시 격자 옵션 갱신
-  var sizeSelectEl = document.getElementById('bulkLabelSizeSelect');
-  if (sizeSelectEl) sizeSelectEl.addEventListener('change', updateLayoutOptions);
-
-  // 전체 선택 체크박스 (헤더)
-  document.addEventListener('change', function(e) {
-    if (e.target.id !== 'bulkCheckAll') return;
-    var checks = document.querySelectorAll('.bulk-item-check');
-    checks.forEach(function(cb) {
-      cb.checked = e.target.checked;
-      var id = cb.dataset.id;
-      if (e.target.checked) bulkSelectedIds.add(id);
-      else bulkSelectedIds.delete(id);
-    });
-    updateBulkUI();
-  });
-
-  // 개별 체크박스 이벤트 위임
-  var listEl = document.getElementById('equipmentList');
-  if (listEl) {
-    listEl.addEventListener('change', function(e) {
-      if (!e.target.classList.contains('bulk-item-check')) return;
-      var id = e.target.dataset.id;
-      if (e.target.checked) bulkSelectedIds.add(id);
-      else bulkSelectedIds.delete(id);
-
-      // 헤더 전체선택 체크박스 상태 동기화
-      var checkAll = document.getElementById('bulkCheckAll');
-      if (checkAll) {
-        var allChecks = document.querySelectorAll('.bulk-item-check');
-        var checkedCount = document.querySelectorAll('.bulk-item-check:checked').length;
-        checkAll.checked = allChecks.length > 0 && checkedCount === allChecks.length;
-        checkAll.indeterminate = checkedCount > 0 && checkedCount < allChecks.length;
-      }
-
-      updateBulkUI();
-    });
-  }
-}
-
-function updateBulkUI() {
-  var btn                 = document.getElementById('bulkLabelBtn');
-  var countEl             = document.getElementById('bulkLabelCount');
-  var sizeSelect          = document.getElementById('bulkLabelSizeSelect');
-  var layoutSelect        = document.getElementById('bulkLayoutSelect');
-  var certBtn             = document.getElementById('bulkInspectionCertBtn');
-  var certCountEl         = document.getElementById('bulkInspectionCertCount');
-  var count               = bulkSelectedIds.size;
-
-  if (btn)          btn.style.display          = count > 0 ? '' : 'none';
-  if (sizeSelect)   sizeSelect.style.display   = count > 0 ? '' : 'none';
-  if (layoutSelect) layoutSelect.style.display = count > 0 ? '' : 'none';
-  if (countEl)      countEl.textContent        = count;
-  if (certBtn)      certBtn.style.display      = (count > 0 && (equipmentListState.isAdmin || equipmentListState.isAppAdmin)) ? '' : 'none';
-  if (certCountEl)  certCountEl.textContent    = count;
-}
-
-function updateLayoutOptions() {
-  var sizeSelect   = document.getElementById('bulkLabelSizeSelect');
-  var layoutSelect = document.getElementById('bulkLayoutSelect');
-  if (!layoutSelect || !sizeSelect) return;
-
-  var size = sizeSelect.value;
-  if (size === 'size-70x40') {
-    layoutSelect.innerHTML =
-      '<option value="2x6">격자 — 2×6 (12칸)</option>';
-  } else {
-    layoutSelect.innerHTML =
-      '<option value="2x5">격자 — 2×5 (10칸)</option>';
-  }
-}
-
-function getSelectedLabelSizeForBulk() {
-  var sizeSelect = document.getElementById('bulkLabelSizeSelect');
-  return sizeSelect ? sizeSelect.value : 'size-90x48';
-}
-
-// 목록 렌더링 후 체크 상태 초기화
 var _origRenderEquipmentList = renderEquipmentList;
 renderEquipmentList = function(items) {
   equipmentListState.currentItems = Array.isArray(items) ? items : [];
   _origRenderEquipmentList(items);
-  bulkSelectedIds.clear();
-  updateBulkUI();
+  if (typeof bulkSelectedIds !== 'undefined') bulkSelectedIds.clear();
+  if (typeof updateBulkUI === 'function') updateBulkUI();
 };
 
 document.addEventListener('DOMContentLoaded', function() {

@@ -295,9 +295,10 @@ function getStatusBadge(status) {
 
 function getActionButtons(item) {
   var id = escapeHtml(item.equipment_id || '');
-  var btns = '<a class="tbl-btn" href="detail.html?id=' + id + '&shell=1">상세</a>';
+  // 상세/수정 이동 전 필터 상태 저장
+  var btns = '<a class="tbl-btn" href="detail.html?id=' + id + '&shell=1" onclick="saveListState()">상세</a>';
   if (equipmentListState.canEdit && canEditItem(item)) {
-    btns += '<a class="tbl-btn tbl-btn--primary" href="form.html?id=' + id + '&shell=1">수정</a>';
+    btns += '<a class="tbl-btn tbl-btn--primary" href="form.html?id=' + id + '&shell=1" onclick="saveListState()">수정</a>';
   }
   if (equipmentListState.canEdit) {
     btns += '<button class="tbl-btn" onclick="printSingleLabel(\'' + id + '\')">라벨</button>';
@@ -1042,22 +1043,22 @@ document.addEventListener('DOMContentLoaded', async function() {
     bindListEvents();
 
     // 뒤로가기 복귀 시 캐시 필터 복원 (동기)
-    if (equipmentListState._isBackNav) {
-      var cached = loadListState();
-      if (cached && cached.filters) {
-        var f = cached.filters;
-        if (f.keyword)    setValue('keyword',    f.keyword);
-        if (f.status)     setValue('status',     f.status);
-        if (f.clinic_code) {
-          var clinicEl2 = document.getElementById('clinic_code');
-          if (clinicEl2 && !clinicEl2.disabled) setValue('clinic_code', f.clinic_code);
-        }
-        if (f.team_code) {
-          var teamEl2 = document.getElementById('team_code');
-          if (teamEl2 && !teamEl2.disabled) setValue('team_code', f.team_code);
-        }
-        equipmentListState.page = cached.page || 1;
+    // 뒤로가기 여부와 무관하게 sessionStorage 캐시가 있으면 필터 복원
+    var cached = loadListState();
+    if (cached && cached.filters) {
+      var f = cached.filters;
+      if (f.keyword)     setValue('keyword',    f.keyword);
+      if (f.status)      setValue('status',     f.status);
+      if (f.clinic_code) {
+        var clinicEl2 = document.getElementById('clinic_code');
+        if (clinicEl2 && !clinicEl2.disabled) setValue('clinic_code', f.clinic_code);
       }
+      if (f.team_code) {
+        var teamEl2 = document.getElementById('team_code');
+        if (teamEl2 && !teamEl2.disabled) setValue('team_code', f.team_code);
+      }
+      equipmentListState.page = cached.page || 1;
+      equipmentListState._initialLoad = false; // 캐시된 필터로 바로 조회
     }
 
     // org 필터 UI + 장비 목록 데이터를 병렬로 호출

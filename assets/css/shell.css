@@ -387,37 +387,7 @@ html, body { height: 100%; overflow: hidden; }
 }
 
 /* iframe 로딩 오버레이 */
-.shell-loading {
-  position: absolute;
-  inset: 0;
-  background: #f0f2f5;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-direction: column;
-  gap: 12px;
-  z-index: 10;
-  transition: opacity 0.2s ease;
-}
-
-.shell-loading.hidden {
-  opacity: 0;
-  pointer-events: none;
-}
-
-.shell-loading-spinner {
-  width: 28px;
-  height: 28px;
-  border: 2.5px solid #e5e7eb;
-  border-top-color: #2f6df6;
-  border-radius: 50%;
-  animation: spin 0.7s linear infinite;
-}
-
-.shell-loading-text {
-  font-size: 12px;
-  color: #9ca3af;
-}
+/* shell-loading 제거 — iframe visibility로 처리 */
 
 /* ─────────────────────────────────────────────────────────────
  * 모바일 오버레이

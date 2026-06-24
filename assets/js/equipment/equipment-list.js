@@ -412,6 +412,7 @@ function renderEquipmentList(items) {
     _gridInstance = null;
   }
 
+
   var gridOptions = {
     columnDefs: columnDefs,
     defaultColDef: defaultColDef,
@@ -435,8 +436,6 @@ function renderEquipmentList(items) {
         var correctRowH = Math.floor(viewH / equipmentListState.pageSize);
         correctRowH = Math.max(26, Math.min(correctRowH, 38));
         if (correctRowH !== params.api.getGridOption('rowHeight')) {
-          // 재생성 중 화면에 보이지 않게 그리드 숨김
-          el.style.visibility = 'hidden';
           var currentData = _gridInstance.getGridOption('rowData') || [];
           _gridInstance.destroy();
           _gridInstance = null;
@@ -450,6 +449,11 @@ function renderEquipmentList(items) {
 
   _gridInstance = agGrid.createGrid(el, gridOptions);
   _gridInstance._rowH = rowH;
+
+  // 빈 데이터면 onFirstDataRendered가 발생 안 하므로 즉시 page-ready
+  if (!items.length) {
+    document.body.classList.add('page-ready');
+  }
 }
 
 

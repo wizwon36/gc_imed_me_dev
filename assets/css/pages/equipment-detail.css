@@ -60,33 +60,32 @@
   flex-shrink: 0;
 }
 
-/* ── 메인 3열 레이아웃 ── */
+/* ── 메인 2열 레이아웃 ── */
 .det-body {
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: 1fr 1.1fr 1.1fr;
+  grid-template-columns: 1fr 1.4fr;
   gap: 8px;
   overflow: hidden;
 }
 
-/* ── 1열: 기본정보 + 사진/QR ── */
-.det-col-info {
+/* ── 좌측 컬럼 ── */
+.det-col-left {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+/* ── 우측 컬럼 ── */
+.det-col-right {
   display: flex;
   flex-direction: column;
   gap: 8px;
   min-height: 0;
   overflow: hidden;
 }
-
-.det-card--info {
-  flex: 1;
-  min-height: 0;
-  overflow-y: auto;
-}
-
-.det-card--info::-webkit-scrollbar { width: 3px; }
-.det-card--info::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
 
 .det-media-row {
   display: grid;
@@ -95,30 +94,13 @@
   flex-shrink: 0;
 }
 
-/* ── 2열: 수리이력 ── */
-.det-col-history {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-  overflow: hidden;
-}
-
-.det-col-history .det-card {
+.det-history-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
   flex: 1;
   min-height: 0;
-}
-
-/* ── 3열: 재고이력 ── */
-.det-col-inventory {
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
   overflow: hidden;
-}
-
-.det-col-inventory .det-card {
-  flex: 1;
-  min-height: 0;
 }
 
 /* ── 카드 공통 ── */
@@ -131,7 +113,19 @@
   flex-direction: column;
 }
 
+.det-col-left .det-card {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+}
 
+.det-col-left .det-card::-webkit-scrollbar { width: 3px; }
+.det-col-left .det-card::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
+
+.det-history-row .det-card {
+  min-height: 0;
+  overflow: hidden;
+}
 
 /* 카드 헤더 */
 .det-card-head {
@@ -209,16 +203,7 @@
   white-space: nowrap;
 }
 
-.info-row--wide .info-cell {
-  grid-template-columns: 76px 1fr;
-  padding: 5px 12px 8px;
-}
-
-.info-row--wide .info-cell-value {
-  font-size: 11px;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
+/* info-row--wide 기본 스타일은 det-card--info 전용 스타일로 대체 */
 
 /* ── 사진 ── */
 .det-card--photo { min-height: 140px; }
@@ -283,18 +268,15 @@
   line-height: 1.4;
 }
 
-/* ── 이력 카드 스크롤 ── */
-.det-col-history .det-card > div:last-child,
-.det-col-inventory .det-card > div:last-child {
+/* ── 이력 테이블 ── */
+.det-history-row .det-card > div:last-child {
   flex: 1;
   overflow-y: auto;
   min-height: 0;
 }
 
-.det-col-history .det-card > div:last-child::-webkit-scrollbar,
-.det-col-inventory .det-card > div:last-child::-webkit-scrollbar { width: 3px; }
-.det-col-history .det-card > div:last-child::-webkit-scrollbar-thumb,
-.det-col-inventory .det-card > div:last-child::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
+.det-history-row .det-card > div:last-child::-webkit-scrollbar { width: 3px; }
+.det-history-row .det-card > div:last-child::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
 
 /* 이력 테이블 — JS가 생성하는 .det-tbl-scroll 포함 */
 .det-tbl-scroll {
@@ -408,19 +390,17 @@
 .btn-card-action:hover { background: #f3f4f6; }
 
 /* ── 반응형 ── */
-@media (max-width: 1200px) {
+@media (max-width: 1100px) {
   .det-body { grid-template-columns: 1fr 1fr; }
-  .det-col-inventory { grid-column: 1 / -1; max-height: 240px; }
 }
 
 @media (max-width: 768px) {
   .det-page { height: auto; overflow: auto; padding: 8px 10px; }
   .det-body { grid-template-columns: 1fr; overflow: visible; }
-  .det-col-info { overflow: visible; }
-  .det-card--info { overflow: visible; }
+  .det-col-left { overflow: visible; }
+  .det-col-left .det-card { overflow: visible; }
   .det-media-row { grid-template-columns: 1fr 1fr; }
-  .det-col-history,
-  .det-col-inventory { overflow: visible; min-height: auto; max-height: none; }
-  .det-col-history .det-card > div:last-child,
-  .det-col-inventory .det-card > div:last-child { overflow: visible; }
+  .det-history-row { grid-template-columns: 1fr; overflow: visible; }
+  .det-history-row .det-card { overflow: visible; min-height: auto; }
+  .det-history-row .det-card > div:last-child { overflow: visible; }
 }

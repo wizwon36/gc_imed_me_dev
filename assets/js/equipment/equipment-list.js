@@ -398,11 +398,13 @@ function renderEquipmentList(items) {
   };
 
   // rowHeight 계산 — 먼저 계산 후 기존 인스턴스와 비교
+  // Math.round: 소수점 버림 누적으로 생기는 하단 여백 최소화
+  // 상한 제거: 배율·OS 차이로 rowH가 38px 초과할 수 있음
   var gridH   = el.clientHeight || 761;
   var headerH = 34;
   var dataH   = gridH - headerH;
-  var rowH    = Math.floor(dataH / equipmentListState.pageSize);
-  rowH = Math.max(26, Math.min(rowH, 38));
+  var rowH    = Math.round(dataH / equipmentListState.pageSize);
+  rowH = Math.max(26, rowH);
 
   if (_gridInstance) {
     if (_gridInstance._rowH === rowH) {
@@ -434,13 +436,13 @@ function renderEquipmentList(items) {
       var viewport = el.querySelector('.ag-body-viewport');
       if (!viewport) return;
       var viewH = viewport.clientHeight;
-      var correctRowH = Math.floor(viewH / equipmentListState.pageSize);
-      correctRowH = Math.max(26, Math.min(correctRowH, 38));
+      // Math.round + 상한 제거 — 초기 계산과 동일한 기준 적용
+      var correctRowH = Math.round(viewH / equipmentListState.pageSize);
+      correctRowH = Math.max(26, correctRowH);
       if (correctRowH !== params.api.getGridOption('rowHeight')) {
-        var currentData = _gridInstance.getGridOption('rowData') || [];
-        _gridInstance.destroy();
-        _gridInstance = null;
-        renderEquipmentList(currentData);
+        params.api.setGridOption('rowHeight', correctRowH);
+        params.api.resetRowHeights();
+        _gridInstance._rowH = correctRowH;
       }
     }
   };

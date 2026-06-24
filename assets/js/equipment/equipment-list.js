@@ -406,7 +406,7 @@ function renderEquipmentList(items) {
   var headerH = 33;
   // 데이터 영역(헤더 제외)을 pageSize(20줄)로 나눔
   var dataH   = gridH - headerH;
-  var rowH    = Math.ceil(dataH / equipmentListState.pageSize);
+  var rowH    = Math.floor(dataH / equipmentListState.pageSize);
   rowH = Math.max(26, Math.min(rowH, 38));
 
   var gridOptions = {

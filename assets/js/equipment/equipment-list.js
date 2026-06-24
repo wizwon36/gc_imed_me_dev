@@ -767,18 +767,20 @@ function bindListEvents() {
   if (resetBtn) {
     resetBtn.addEventListener('click', async function() {
       setValue('keyword', '');
-      // ★ admin이 아니면 의원 선택 초기화 안 함 (고정)
+      // 초기화: admin도 소속 의원/팀으로 복원
       if (equipmentListState.isAdmin) {
-        setValue('clinic_code', '');
-        setValue('team_code', '');
-        if (window.orgSelect) {
+        var clinicElReset2 = document.getElementById('clinic_code');
+        var teamElReset2   = document.getElementById('team_code');
+        setValue('clinic_code', equipmentListState.userClinicCode || '');
+        if (window.orgSelect && clinicElReset2 && teamElReset2) {
           window.orgSelect.fillSelectOptions(
-            document.getElementById('team_code'),
-            [],
-            { emptyText: '의원을 먼저 선택하세요' }
+            teamElReset2,
+            window.orgSelect.getFilteredTeams(equipmentListState.userClinicCode),
+            { emptyText: '전체 팀' }
           );
-          document.getElementById('team_code').disabled = true;
+          teamElReset2.disabled = false;
         }
+        setValue('team_code', equipmentListState.userTeamCode || '');
       } else {
         // ★ user: 초기화 시 팀을 본인 소속 팀으로 복원 (의원은 disabled 유지, 팀은 변경 가능)
         setValue('team_code', equipmentListState.userTeamCode || '');
@@ -796,7 +798,8 @@ function bindListEvents() {
       setValue('status', '');
       setValue('manufacturer', '');
 
-      // pageSize 고정 — UI 없음
+      // 초기화 시 sessionStorage 캐시도 삭제
+      clearListState();
 
       await loadEquipmentList(1);
     });
@@ -1043,7 +1046,13 @@ document.addEventListener('DOMContentLoaded', async function() {
     bindListEvents();
 
     // 뒤로가기 복귀 시 캐시 필터 복원 (동기)
-    // 뒤로가기 여부와 무관하게 sessionStorage 캐시가 있으면 필터 복원
+    // 뒤로가기로 돌아온 경우에만 캐시 복원, 강제 새로고침(reload)은 무시
+    var isReload = window.performance &&
+      window.performance.getEntriesByType &&
+      window.performance.getEntriesByType('navigation')[0] &&
+      window.performance.getEntriesByType('navigation')[0].type === 'reload';
+    if (isReload) clearListState();
+
     var cached = loadListState();
     if (cached && cached.filters) {
       var f = cached.filters;

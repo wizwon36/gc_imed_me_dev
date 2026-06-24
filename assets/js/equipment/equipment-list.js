@@ -431,31 +431,23 @@ function renderEquipmentList(items) {
     },
     onFirstDataRendered: function(params) {
       var viewport = el.querySelector('.ag-body-viewport');
-      if (viewport) {
-        var viewH = viewport.clientHeight;
-        var correctRowH = Math.floor(viewH / equipmentListState.pageSize);
-        correctRowH = Math.max(26, Math.min(correctRowH, 38));
-        if (correctRowH !== params.api.getGridOption('rowHeight')) {
-          // 재생성 전 page-ready 제거 → 화면 숨김
-          document.body.classList.remove('page-ready');
-          var currentData = _gridInstance.getGridOption('rowData') || [];
-          _gridInstance.destroy();
-          _gridInstance = null;
-          renderEquipmentList(currentData);
-          return;
-        }
+      if (!viewport) return;
+      var viewH = viewport.clientHeight;
+      var correctRowH = Math.floor(viewH / equipmentListState.pageSize);
+      correctRowH = Math.max(26, Math.min(correctRowH, 38));
+      if (correctRowH !== params.api.getGridOption('rowHeight')) {
+        var currentData = _gridInstance.getGridOption('rowData') || [];
+        _gridInstance.destroy();
+        _gridInstance = null;
+        renderEquipmentList(currentData);
       }
-      document.body.classList.add('page-ready');
     }
   };
 
   _gridInstance = agGrid.createGrid(el, gridOptions);
   _gridInstance._rowH = rowH;
 
-  // 빈 데이터면 onFirstDataRendered가 발생 안 하므로 즉시 page-ready
-  if (!items.length) {
-    document.body.classList.add('page-ready');
-  }
+
 }
 
 
@@ -1040,6 +1032,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     }
   } finally {
     if (typeof hideGlobalLoading === 'function') hideGlobalLoading(true);
+    document.body.classList.add('page-ready');
   }
 });
 

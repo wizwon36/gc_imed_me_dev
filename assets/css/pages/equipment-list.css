@@ -351,13 +351,13 @@
 /* ── 페이지네이션 ── */
 .pagination-area {
   flex-shrink: 0;
-  height: 28px;
+  height: 32px;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 3px;
   box-sizing: border-box;
-  padding: 2px 0 0;
+  padding: 4px 0 6px;
 }
 
 .pagination-btn {

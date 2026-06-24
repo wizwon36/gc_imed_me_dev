@@ -272,10 +272,7 @@ function adjustRowHeight() {
   if (!el || !content) return;
 
   var paginH  = pagin ? pagin.offsetHeight : 34;
-  var totalH  = content.clientHeight - paginH;  // pagination 제외한 실제 그리드 높이
-
-  // Tabulator 높이도 맞춰서 설정
-  _tabulatorInstance.setHeight(totalH);
+  var totalH  = content.clientHeight - paginH;
 
   var headerEl = el.querySelector('.tabulator-header');
   var headerH  = headerEl ? headerEl.offsetHeight : 32;

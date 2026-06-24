@@ -555,7 +555,9 @@ function applyListPermissionUi() {
 function buildListRequestParams(filters, nextPage) {
   var hasFilter = hasMeaningfulFilter(filters);
 
-  equipmentListState.isRecentMode = !hasFilter;
+  // scope='all'이면 필터 없어도 전체 페이지네이션이 필요하므로 isRecentMode 강제 false
+  var isAllScope = equipmentListState.userScope === 'all';
+  equipmentListState.isRecentMode = !hasFilter && !isAllScope;
 
   var base = {
     request_user_email: equipmentListState.user && equipmentListState.user.email ? equipmentListState.user.email : '',
@@ -568,7 +570,7 @@ function buildListRequestParams(filters, nextPage) {
     page_size:    equipmentListState.pageSize
   };
 
-  if (!hasFilter) {
+  if (!hasFilter && !isAllScope) {
     base.recent_only = 'Y';
     base.include_total = 'N';
     return base;

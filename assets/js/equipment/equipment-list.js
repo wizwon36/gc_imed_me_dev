@@ -318,7 +318,7 @@ function renderEquipmentList(items) {
   // 컬럼 정의
   var columns = [
     {
-      title: '장비명', field: 'equipment_name', minWidth: 140,
+      title: '장비명', field: 'equipment_name', width: 200, minWidth: 120,
       hozAlign: 'left', headerHozAlign: 'left',
       formatter: function(cell) {
         return '<span class="tab-name">' + escapeHtml(cell.getValue() || '—') + '</span>';
@@ -403,6 +403,18 @@ function renderEquipmentList(items) {
     columnDefaults: { resizable: true, vertAlign: 'middle' },
     tableBuilt: function() {
       adjustRowHeight();
+      // 헤더 가운데 정렬 강제 적용 (Tabulator가 인라인 스타일로 덮어쓰므로 JS로 처리)
+      var cols = document.querySelectorAll('.tabulator-col');
+      cols.forEach(function(col) {
+        var field = col.getAttribute('tabulator-field');
+        var content = col.querySelector('.tabulator-col-content');
+        if (!content) return;
+        if (field === 'equipment_name') {
+          content.style.justifyContent = 'flex-start';
+        } else {
+          content.style.justifyContent = 'center';
+        }
+      });
     },
   });
 }

@@ -32,12 +32,14 @@
 
   <div id="messageBox" class="message-box"></div>
 
-  <!-- ── 메인 레이아웃 (2열) ── -->
+  <!-- ── 메인 레이아웃 (3열) ── -->
   <div class="det-body">
 
-    <!-- 좌: 기본 정보 -->
-    <div class="det-col-left">
-      <div class="det-card">
+    <!-- 1열: 기본정보 + 사진 + QR -->
+    <div class="det-col-info">
+
+      <!-- 기본 정보 -->
+      <div class="det-card det-card--info">
         <div class="det-card-head">
           <span class="det-card-title">기본 정보</span>
         </div>
@@ -45,10 +47,6 @@
           <div class="empty-box">불러오는 중...</div>
         </div>
       </div>
-    </div>
-
-    <!-- 우: 사진 + QR + 이력 -->
-    <div class="det-col-right">
 
       <!-- 사진 + QR 나란히 -->
       <div class="det-media-row">
@@ -79,36 +77,40 @@
         </div>
       </div>
 
-      <!-- 이력 2열 -->
-      <div class="det-history-row">
-        <div class="det-card">
-          <div class="det-card-head">
-            <span class="det-card-title">수리 / 점검 이력</span>
-            <div class="det-card-actions">
-              <span class="det-card-count" id="historyCountText"></span>
-              <button type="button" id="addHistoryBtn" class="btn btn-sm" style="display:none;">+ 등록</button>
-            </div>
-          </div>
-          <div id="historyArea">
-            <div class="empty-box">불러오는 중...</div>
+    </div><!-- /det-col-info -->
+
+    <!-- 2열: 수리 / 점검 이력 -->
+    <div class="det-col-history">
+      <div class="det-card">
+        <div class="det-card-head">
+          <span class="det-card-title">수리 / 점검 이력</span>
+          <div class="det-card-actions">
+            <span class="det-card-count" id="historyCountText"></span>
+            <button type="button" id="addHistoryBtn" class="btn btn-sm" style="display:none;">+ 등록</button>
           </div>
         </div>
-
-        <div class="det-card">
-          <div class="det-card-head">
-            <span class="det-card-title">재고조사 이력</span>
-            <div class="det-card-actions">
-              <span class="det-card-count" id="inventoryCountText"></span>
-              <button type="button" id="addInventoryBtn" class="btn btn-sm" style="display:none;">+ 등록</button>
-            </div>
-          </div>
-          <div id="inventoryArea">
-            <div class="empty-box">불러오는 중...</div>
-          </div>
+        <div id="historyArea">
+          <div class="empty-box">불러오는 중...</div>
         </div>
       </div>
+    </div><!-- /det-col-history -->
 
-    </div><!-- /det-col-right -->
+    <!-- 3열: 재고조사 이력 -->
+    <div class="det-col-inventory">
+      <div class="det-card">
+        <div class="det-card-head">
+          <span class="det-card-title">재고조사 이력</span>
+          <div class="det-card-actions">
+            <span class="det-card-count" id="inventoryCountText"></span>
+            <button type="button" id="addInventoryBtn" class="btn btn-sm" style="display:none;">+ 등록</button>
+          </div>
+        </div>
+        <div id="inventoryArea">
+          <div class="empty-box">불러오는 중...</div>
+        </div>
+      </div>
+    </div><!-- /det-col-inventory -->
+
   </div><!-- /det-body -->
 
 </div><!-- /det-page -->

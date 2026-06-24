@@ -14,25 +14,23 @@
     html, body { height: 100%; margin: 0; }
     body { background: #f0f2f5; }
 
-    /* ── 전체 페이지 ── */
     .db-page {
       display: flex;
       flex-direction: column;
       height: 100vh;
       overflow: hidden;
-      padding: 10px 14px 10px;
+      padding: 10px 14px;
       gap: 8px;
       box-sizing: border-box;
     }
 
-    /* ── KPI 행 ── */
+    /* ── KPI ── */
     .db-kpi-row {
       display: grid;
       grid-template-columns: repeat(4, 1fr);
       gap: 8px;
       flex-shrink: 0;
     }
-
     .db-kpi-card {
       background: #fff;
       border: 1px solid #e5e7eb;
@@ -44,59 +42,38 @@
       border-left: 4px solid transparent;
       box-sizing: border-box;
     }
-
     .db-kpi-card--blue   { border-left-color: #3b82f6; }
     .db-kpi-card--green  { border-left-color: #22c55e; }
     .db-kpi-card--orange { border-left-color: #f59e0b; }
     .db-kpi-card--red    { border-left-color: #ef4444; }
-    .db-kpi-card--purple { border-left-color: #a78bfa; }
-
     .db-kpi-left { display: flex; flex-direction: column; gap: 3px; }
-
     .db-kpi-label {
-      font-size: 11px;
-      font-weight: 600;
-      color: #6b7280;
-      display: flex;
-      align-items: center;
-      gap: 4px;
-      white-space: nowrap;
+      font-size: 11px; font-weight: 600; color: #6b7280;
+      display: flex; align-items: center; gap: 4px; white-space: nowrap;
     }
-
     .db-kpi-label i { font-size: 13px; }
-
     .db-kpi-value {
-      font-size: 26px;
-      font-weight: 800;
-      color: #111827;
-      letter-spacing: -0.03em;
-      line-height: 1;
+      font-size: 26px; font-weight: 800; color: #111827;
+      letter-spacing: -0.03em; line-height: 1;
     }
+    .db-kpi-icon { font-size: 28px; opacity: 0.12; }
 
-    .db-kpi-icon {
-      font-size: 28px;
-      opacity: 0.12;
-    }
-
-    /* ── 메인 패널 (상단: 차트 2개) ── */
+    /* ── 차트 행 ── */
     .db-charts {
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 8px;
       flex-shrink: 0;
-      height: 200px;
+      height: 196px;
     }
 
-    /* ── 하단 그리드 패널 ── */
-    .db-grid-panel {
+    /* ── 하단 2패널 ── */
+    .db-bottom {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
       flex: 1;
       min-height: 0;
-      background: #fff;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
     }
 
     /* ── 카드 공통 ── */
@@ -108,7 +85,6 @@
       flex-direction: column;
       overflow: hidden;
     }
-
     .db-card-head {
       display: flex;
       align-items: center;
@@ -118,222 +94,107 @@
       background: #f8fafc;
       flex-shrink: 0;
     }
-
     .db-card-title {
-      font-size: 12px;
-      font-weight: 700;
-      color: #374151;
-      display: flex;
-      align-items: center;
-      gap: 5px;
+      font-size: 12px; font-weight: 700; color: #374151;
+      display: flex; align-items: center; gap: 5px;
     }
-
-    .db-card-sub {
-      font-size: 10px;
-      font-weight: 500;
-      color: #9ca3af;
-      margin-left: 4px;
+    .db-card-sub { font-size: 10px; font-weight: 500; color: #9ca3af; margin-left: 4px; }
+    .db-card-badge {
+      font-size: 11px; color: #6b7280; font-weight: 600;
     }
-
     .db-card-link {
-      font-size: 11px;
-      color: #2563eb;
-      text-decoration: none;
-      font-weight: 600;
+      font-size: 11px; color: #2563eb; text-decoration: none; font-weight: 600;
+      cursor: pointer; background: none; border: none; padding: 0;
     }
     .db-card-link:hover { text-decoration: underline; }
 
     /* ── 부서별 바 차트 ── */
     .db-dept-body {
-      flex: 1;
-      min-height: 0;
-      overflow: hidden;
+      flex: 1; min-height: 0; overflow: hidden;
       padding: 10px 14px;
-      display: flex;
-      flex-direction: column;
-      gap: 7px;
+      display: flex; flex-direction: column; gap: 7px;
     }
-
     .db-dept-row {
       display: grid;
-      grid-template-columns: 72px 1fr 32px;
+      grid-template-columns: 68px 1fr 32px;
       align-items: center;
       gap: 8px;
       flex-shrink: 0;
-    }
-
-    .db-dept-label {
-      font-size: 11px;
-      font-weight: 500;
-      color: #374151;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .db-dept-bar-wrap {
-      height: 18px;
-      background: #f3f4f6;
+      cursor: pointer;
       border-radius: 4px;
-      overflow: hidden;
+      padding: 2px 4px;
+      transition: background 0.1s;
     }
-
+    .db-dept-row:hover { background: #f0f7ff; }
+    .db-dept-row.is-active { background: #eff6ff; }
+    .db-dept-label {
+      font-size: 11px; font-weight: 500; color: #374151;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .db-dept-bar-wrap {
+      height: 18px; background: #f3f4f6; border-radius: 4px; overflow: hidden;
+    }
     .db-dept-bar {
       height: 100%;
       background: linear-gradient(90deg, #2563eb, #60a5fa);
-      border-radius: 4px;
-      min-width: 4px;
+      border-radius: 4px; min-width: 4px;
+      transition: opacity 0.15s;
     }
+    .db-dept-row.is-active .db-dept-bar { background: linear-gradient(90deg, #1d4ed8, #3b82f6); }
+    .db-dept-count { font-size: 12px; font-weight: 700; color: #111827; text-align: right; }
 
-    .db-dept-count {
-      font-size: 12px;
-      font-weight: 700;
-      color: #111827;
-      text-align: right;
-    }
-
-    /* ── 상태 도넛 차트 ── */
+    /* ── 도넛 ── */
     .db-status-body {
-      flex: 1;
-      min-height: 0;
-      padding: 10px 14px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      overflow: hidden;
+      flex: 1; min-height: 0; padding: 10px 14px;
+      display: flex; align-items: center; gap: 16px; overflow: hidden;
     }
-
     .db-donut-wrap {
-      flex-shrink: 0;
-      position: relative;
-      width: 110px;
-      height: 110px;
+      flex-shrink: 0; position: relative; width: 110px; height: 110px;
     }
-
     .db-donut-svg { width: 110px; height: 110px; }
-
     .db-donut-center {
-      position: absolute;
-      inset: 0;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
       pointer-events: none;
     }
+    .db-donut-total { font-size: 22px; font-weight: 800; color: #111827; line-height: 1; }
+    .db-donut-label { font-size: 10px; color: #9ca3af; margin-top: 2px; }
+    .db-status-legend { flex: 1; display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+    .db-legend-row { display: flex; align-items: center; gap: 7px; }
+    .db-legend-dot { width: 9px; height: 9px; border-radius: 50%; flex-shrink: 0; }
+    .db-legend-name { font-size: 11px; color: #6b7280; flex: 1; }
+    .db-legend-val { font-size: 12px; font-weight: 700; color: #111827; }
+    .db-legend-pct { font-size: 10px; color: #9ca3af; width: 32px; text-align: right; }
 
-    .db-donut-total {
-      font-size: 22px;
-      font-weight: 800;
-      color: #111827;
-      line-height: 1;
+    /* ── 하단 그리드 공통 ── */
+    .db-grid-wrap {
+      flex: 1; min-height: 0;
+      overflow-y: auto; overflow-x: hidden;
     }
-
-    .db-donut-label {
-      font-size: 10px;
-      color: #9ca3af;
-      margin-top: 2px;
-    }
-
-    .db-status-legend {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      min-width: 0;
-    }
-
-    .db-legend-row {
-      display: flex;
-      align-items: center;
-      gap: 7px;
-    }
-
-    .db-legend-dot {
-      width: 9px;
-      height: 9px;
-      border-radius: 50%;
-      flex-shrink: 0;
-    }
-
-    .db-legend-name {
-      font-size: 11px;
-      color: #6b7280;
-      flex: 1;
-    }
-
-    .db-legend-val {
-      font-size: 12px;
-      font-weight: 700;
-      color: #111827;
-    }
-
-    .db-legend-pct {
-      font-size: 10px;
-      color: #9ca3af;
-      width: 32px;
-      text-align: right;
-    }
-
-    /* ── 하단 그리드 테이블 ── */
-    .db-grid-table-wrap {
-      flex: 1;
-      min-height: 0;
-      overflow-y: auto;
-      overflow-x: hidden;
-    }
-
-    .db-grid-table-wrap::-webkit-scrollbar { width: 4px; }
-    .db-grid-table-wrap::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
+    .db-grid-wrap::-webkit-scrollbar { width: 4px; }
+    .db-grid-wrap::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
 
     .db-grid-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 12px;
-      table-layout: fixed;
+      width: 100%; border-collapse: collapse;
+      font-size: 12px; table-layout: fixed;
     }
-
-    .db-grid-thead {
-      position: sticky;
-      top: 0;
-      z-index: 2;
-      background: #f8fafc;
-    }
-
+    .db-grid-thead { position: sticky; top: 0; z-index: 2; background: #f8fafc; }
     .db-grid-th {
-      padding: 7px 10px;
-      font-size: 11px;
-      font-weight: 700;
-      color: #4b5563;
-      text-align: center;
-      border-bottom: 1px solid #e5e7eb;
-      border-right: 1px solid #e5e7eb;
-      white-space: nowrap;
+      padding: 7px 10px; font-size: 11px; font-weight: 700; color: #4b5563;
+      text-align: center; border-bottom: 1px solid #e5e7eb;
+      border-right: 1px solid #e5e7eb; white-space: nowrap;
     }
-
     .db-grid-th:first-child { text-align: left; }
     .db-grid-th:last-child  { border-right: none; }
-
-    .db-grid-tr {
-      border-bottom: 1px solid #f0f0f0;
-      transition: background 0.1s;
-    }
-
+    .db-grid-tr { border-bottom: 1px solid #f0f0f0; transition: background 0.1s; }
     .db-grid-tr:last-child { border-bottom: none; }
     .db-grid-tr:hover { background: #f8faff; }
-
     .db-grid-td {
-      padding: 7px 10px;
-      color: #374151;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      text-align: center;
-      border-right: 1px solid #f0f0f0;
-      box-sizing: border-box;
-      vertical-align: middle;
+      padding: 7px 10px; color: #374151;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      text-align: center; border-right: 1px solid #f0f0f0;
+      box-sizing: border-box; vertical-align: middle;
     }
-
     .db-grid-td:first-child { text-align: left; }
     .db-grid-td:last-child  { border-right: none; }
     .db-grid-td--name { font-weight: 600; color: #111827; }
@@ -341,23 +202,14 @@
 
     /* D-DAY 뱃지 */
     .db-dday {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-width: 48px;
-      height: 20px;
-      padding: 0 7px;
-      border-radius: 4px;
-      font-size: 11px;
-      font-weight: 700;
-      white-space: nowrap;
-      background: #eff6ff;
-      color: #1d4ed8;
-      border: 1px solid #bfdbfe;
+      display: inline-flex; align-items: center; justify-content: center;
+      min-width: 44px; height: 20px; padding: 0 6px; border-radius: 4px;
+      font-size: 11px; font-weight: 700; white-space: nowrap;
+      background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe;
     }
-    .db-dday--warn    { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
-    .db-dday--urgent  { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
-    .db-dday--today   { background: #fef2f2; color: #b91c1c; border-color: #fecaca; font-size: 10px; }
+    .db-dday--warn   { background: #fff7ed; color: #c2410c; border-color: #fed7aa; }
+    .db-dday--urgent { background: #fef2f2; color: #b91c1c; border-color: #fecaca; }
+    .db-dday--today  { background: #fef2f2; color: #b91c1c; border-color: #fecaca; font-size: 10px; }
 
     /* 상태 뱃지 */
     .status-badge {
@@ -373,32 +225,39 @@
 
     /* 빈 상태 */
     .db-empty {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      height: 100%;
-      gap: 8px;
-      color: #9ca3af;
-      font-size: 12px;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      height: 100%; gap: 8px; color: #9ca3af; font-size: 12px;
     }
     .db-empty i { font-size: 28px; opacity: 0.4; }
 
-    /* 로딩 skeleton */
+    /* 부서 상세 패널 로딩 */
+    .db-dept-detail-loading {
+      display: flex; align-items: center; justify-content: center;
+      height: 100%; gap: 8px; color: #9ca3af; font-size: 12px;
+    }
+
+    /* skeleton */
     .db-skeleton {
       background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
       background-size: 200% 100%;
       animation: skeleton-shimmer 1.2s infinite;
-      border-radius: 4px;
-      height: 14px;
+      border-radius: 4px; height: 14px;
     }
     @keyframes skeleton-shimmer {
       0%   { background-position: 200% 0; }
       100% { background-position: -200% 0; }
     }
+
+    /* 링크 버튼 */
+    .db-link-btn {
+      font-size: 11px; color: #2563eb; text-decoration: none;
+      font-weight: 600; cursor: pointer; background: none; border: none; padding: 0;
+    }
+    .db-link-btn:hover { text-decoration: underline; }
   </style>
 </head>
-<body class="dashboard-page">
+<body>
 
 <div class="db-page">
 
@@ -436,12 +295,11 @@
 
   <!-- 차트 2개 -->
   <div class="db-charts">
-
     <!-- 좌: 부서별 바 차트 -->
     <div class="db-card">
       <div class="db-card-head">
         <span class="db-card-title"><i class="ti ti-chart-bar"></i> 부서별 장비 현황</span>
-        <a class="db-card-link" href="list.html?shell=1">목록 보기 →</a>
+        <button class="db-card-link" onclick="shellNav('equipment/list')">목록 보기 →</button>
       </div>
       <div class="db-dept-body" id="deptBody">
         <div class="db-skeleton" style="width:100%"></div>
@@ -449,7 +307,6 @@
         <div class="db-skeleton" style="width:65%"></div>
       </div>
     </div>
-
     <!-- 우: 상태 도넛 -->
     <div class="db-card">
       <div class="db-card-head">
@@ -464,28 +321,48 @@
         </div>
       </div>
     </div>
-
   </div>
 
-  <!-- 하단: 유지보수 만료 임박 그리드 -->
-  <div class="db-grid-panel">
-    <div class="db-card-head">
-      <span class="db-card-title">
-        <i class="ti ti-calendar-event"></i> 유지보수 만료 임박
-        <span class="db-card-sub">60일 이내</span>
-      </span>
-      <span id="maintCount" style="font-size:11px;color:#6b7280;font-weight:600;"></span>
-    </div>
-    <div class="db-grid-table-wrap" id="maintGrid">
-      <div style="padding:16px;">
-        <div class="db-skeleton" style="width:100%;margin-bottom:8px;"></div>
-        <div class="db-skeleton" style="width:100%;margin-bottom:8px;"></div>
-        <div class="db-skeleton" style="width:80%;"></div>
+  <!-- 하단 2패널 -->
+  <div class="db-bottom">
+
+    <!-- 좌: 유지보수 만료 임박 -->
+    <div class="db-card">
+      <div class="db-card-head">
+        <span class="db-card-title">
+          <i class="ti ti-calendar-event"></i> 유지보수 만료 임박
+          <span class="db-card-sub">60일 이내</span>
+        </span>
+        <span class="db-card-badge" id="maintCount"></span>
+      </div>
+      <div class="db-grid-wrap" id="maintGrid">
+        <div style="padding:16px;">
+          <div class="db-skeleton" style="width:100%;margin-bottom:8px;"></div>
+          <div class="db-skeleton" style="width:100%;margin-bottom:8px;"></div>
+          <div class="db-skeleton" style="width:80%;"></div>
+        </div>
       </div>
     </div>
+
+    <!-- 우: 부서별 장비 상세 -->
+    <div class="db-card">
+      <div class="db-card-head">
+        <span class="db-card-title" id="deptDetailTitle">
+          <i class="ti ti-list-details"></i> 부서별 장비 상세
+        </span>
+        <span class="db-card-badge" id="deptDetailCount"></span>
+      </div>
+      <div class="db-grid-wrap" id="deptDetailGrid">
+        <div class="db-empty">
+          <i class="ti ti-hand-click"></i>
+          위 차트에서 부서를 선택하세요
+        </div>
+      </div>
+    </div>
+
   </div>
 
-</div><!-- /db-page -->
+</div>
 
 <script src="../../assets/js/core/config.js"></script>
 <script src="../../assets/js/core/api.js"></script>
@@ -494,6 +371,34 @@
 <script src="../../assets/js/core/app-permission.js"></script>
 <script>
 'use strict';
+
+/* ── shell 네비게이션 헬퍼 ── */
+// extraQuery: { id: 'ME-001' } 형태로 추가 쿼리 파라미터 전달 가능
+function shellNav(page, tab, extraQuery) {
+  try {
+    if (window.parent && window.parent.shellNavigate) {
+      window.parent.shellNavigate(page, tab || '', false, extraQuery || null);
+    } else {
+      var url = CONFIG.SITE_BASE_URL + '/pages/' + page + '.html';
+      if (extraQuery) {
+        url += '?' + Object.keys(extraQuery).map(function(k) {
+          return encodeURIComponent(k) + '=' + encodeURIComponent(extraQuery[k]);
+        }).join('&');
+      }
+      location.href = url;
+    }
+  } catch(e) {
+    location.href = CONFIG.SITE_BASE_URL + '/pages/' + page + '.html';
+  }
+}
+
+/* ── 장비 상세 이동 헬퍼 ── */
+function goDetail(id) {
+  shellNav('equipment/detail', '', { id: id });
+}
+
+/* ── 초기화 ── */
+var _dashData = null;
 
 (async function () {
   var user = window.auth && window.auth.getSession && window.auth.getSession();
@@ -504,17 +409,19 @@
     if (!ok) return;
   }
 
+  if (typeof showGlobalLoading === 'function') showGlobalLoading('대시보드를 불러오는 중...');
+
   try {
     var email = user.email || user.user_email || '';
     var res = await apiGet('getEquipmentDashboardSummary', { request_user_email: email });
     if (!res || res.error) throw new Error(res && res.error || '조회 실패');
 
     var d = res.data || res;
-    var kpis   = d.kpis              || {};
+    _dashData = d;
+
+    var kpis      = d.kpis              || {};
     var deptList  = d.department_summary || [];
     var maintAll  = d.maintenance_alerts || [];
-
-    // 만료 임박: 0 ≤ dday ≤ 60 만 표시 (이미 만료된 건 제외)
     var maintList = maintAll.filter(function(item) {
       return item.dday >= 0 && item.dday <= 60;
     });
@@ -523,42 +430,46 @@
     renderDept(deptList);
     renderDonut(kpis);
     renderMaintGrid(maintList);
+
   } catch (e) {
-    ['deptBody', 'statusBody', 'maintGrid'].forEach(function(id) {
+    ['deptBody','statusBody','maintGrid','deptDetailGrid'].forEach(function(id) {
       var el = document.getElementById(id);
       if (el) el.innerHTML = '<div class="db-empty"><i class="ti ti-alert-circle"></i>데이터를 불러오지 못했습니다.</div>';
     });
     ['kpiTotal','kpiInUse','kpiRepair','kpiExpiring'].forEach(function(id) {
-      var el = document.getElementById(id);
-      if (el) el.textContent = '—';
+      var el = document.getElementById(id); if (el) el.textContent = '—';
     });
+  } finally {
+    if (typeof hideGlobalLoading === 'function') hideGlobalLoading(true);
   }
 })();
 
 /* ── KPI ── */
 function renderKpi(kpis, expiringCount) {
-  setText('kpiTotal',    kpis.total     || 0);
-  setText('kpiInUse',    kpis.in_use    || 0);
+  setText('kpiTotal',    kpis.total    || 0);
+  setText('kpiInUse',    kpis.in_use   || 0);
   setText('kpiRepair',   (kpis.repairing || 0) + (kpis.inspecting || 0));
-  setText('kpiExpiring', expiringCount  || 0);
+  setText('kpiExpiring', expiringCount || 0);
 }
 
 /* ── 부서별 바 차트 ── */
+var _activeDept = null;
+
 function renderDept(list) {
   var el = document.getElementById('deptBody');
   if (!list || !list.length) {
     el.innerHTML = '<div class="db-empty"><i class="ti ti-inbox"></i>데이터 없음</div>';
     return;
   }
-
   var max = Math.max.apply(null, list.map(function(d) { return d.count || 0; }));
-  el.innerHTML = list.map(function(d) {
+  el.innerHTML = list.map(function(d, i) {
     var pct = max > 0 ? Math.round((d.count / max) * 100) : 0;
     var label = d.department
-      ? d.department.replace(/^.*\/\s*/, '') // "서울숲의원 / 내시경팀" → "내시경팀"
+      ? d.department.replace(/^.*\/\s*/, '')
       : (d.team_name || '미지정');
+    var teamCode = d.team_code || '';
     return (
-      '<div class="db-dept-row">' +
+      '<div class="db-dept-row" data-idx="' + i + '" data-team="' + esc(teamCode) + '" onclick="onDeptClick(this,' + i + ')">' +
         '<div class="db-dept-label" title="' + esc(label) + '">' + esc(label) + '</div>' +
         '<div class="db-dept-bar-wrap">' +
           '<div class="db-dept-bar" style="width:' + pct + '%"></div>' +
@@ -569,99 +480,156 @@ function renderDept(list) {
   }).join('');
 }
 
-/* ── 상태 도넛 ── */
+function onDeptClick(rowEl, idx) {
+  // active 토글
+  document.querySelectorAll('.db-dept-row').forEach(function(r) { r.classList.remove('is-active'); });
+  rowEl.classList.add('is-active');
+
+  var deptList = (_dashData && _dashData.department_summary) || [];
+  var dept = deptList[idx];
+  if (!dept) return;
+
+  var label = dept.department
+    ? dept.department.replace(/^.*\/\s*/, '')
+    : (dept.team_name || '미지정');
+
+  renderDeptDetail(label, dept.team_code || '', dept.count || 0);
+}
+
+/* ── 부서별 장비 상세 패널 ── */
+var _deptDetailLoading = false;
+
+async function renderDeptDetail(label, teamCode, count) {
+  if (_deptDetailLoading) return;
+  _deptDetailLoading = true;
+
+  var titleEl = document.getElementById('deptDetailTitle');
+  var countEl = document.getElementById('deptDetailCount');
+  var gridEl  = document.getElementById('deptDetailGrid');
+
+  titleEl.innerHTML = '<i class="ti ti-list-details"></i> ' + esc(label) + ' 장비 목록';
+  countEl.textContent = count + '건';
+  gridEl.innerHTML = '<div class="db-dept-detail-loading"><i class="ti ti-loader" style="animation:spin 1s linear infinite"></i> 불러오는 중...</div>';
+
+  try {
+    var user = window.auth && window.auth.getSession && window.auth.getSession();
+    var email = user && (user.email || user.user_email) || '';
+    var res = await apiGet('listEquipments', {
+      request_user_email: email,
+      team_code: teamCode,
+      page: 1,
+      page_size: 50
+    });
+
+    var items = (res && res.data) || [];
+    if (!items.length) {
+      gridEl.innerHTML = '<div class="db-empty"><i class="ti ti-inbox"></i>장비가 없습니다.</div>';
+      return;
+    }
+
+    var rows = items.map(function(item) {
+      var scls = 'status-badge ' + (typeof statusClass === 'function' ? statusClass(item.status) : '');
+      var slbl = typeof statusLabel === 'function' ? statusLabel(item.status) : (item.status || '');
+      return (
+        '<tr class="db-grid-tr">' +
+          '<td class="db-grid-td db-grid-td--name" style="width:38%">' + esc(item.equipment_name || '—') + '</td>' +
+          '<td class="db-grid-td db-grid-td--id"   style="width:26%">' + esc(item.equipment_id   || '—') + '</td>' +
+          '<td class="db-grid-td"                  style="width:18%">' +
+            '<span class="' + scls + '">' + esc(slbl) + '</span>' +
+          '</td>' +
+          '<td class="db-grid-td"                  style="width:18%">' +
+            '<button class="db-link-btn" onclick="goDetail(\'' + esc(item.equipment_id) + '\')">상세 보기</button>' +
+          '</td>' +
+        '</tr>'
+      );
+    }).join('');
+
+    gridEl.innerHTML =
+      '<table class="db-grid-table">' +
+        '<thead class="db-grid-thead"><tr>' +
+          '<th class="db-grid-th" style="width:38%;text-align:left;">장비명</th>' +
+          '<th class="db-grid-th" style="width:26%">장비번호</th>' +
+          '<th class="db-grid-th" style="width:18%">상태</th>' +
+          '<th class="db-grid-th" style="width:18%">바로가기</th>' +
+        '</tr></thead>' +
+        '<tbody>' + rows + '</tbody>' +
+      '</table>';
+
+  } catch(e) {
+    gridEl.innerHTML = '<div class="db-empty"><i class="ti ti-alert-circle"></i>불러오지 못했습니다.</div>';
+  } finally {
+    _deptDetailLoading = false;
+  }
+}
+
+/* ── 도넛 ── */
 function renderDonut(kpis) {
   var el = document.getElementById('statusBody');
-
   var STATUS_COLORS = {
-    in_use:     '#22c55e',
-    repairing:  '#f59e0b',
-    inspecting: '#3b82f6',
-    stored:     '#9ca3af',
-    disposed:   '#ef4444'
+    in_use:'#22c55e', repairing:'#f59e0b', inspecting:'#3b82f6', stored:'#9ca3af', disposed:'#ef4444'
   };
   var STATUS_LABELS = {
-    in_use:     '사용중',
-    repairing:  '수리중',
-    inspecting: '점검중',
-    stored:     '보관',
-    disposed:   '폐기'
+    in_use:'사용중', repairing:'수리중', inspecting:'점검중', stored:'보관', disposed:'폐기'
   };
-
   var segments = [
-    { key: 'in_use',     val: kpis.in_use     || 0 },
-    { key: 'repairing',  val: kpis.repairing  || 0 },
-    { key: 'inspecting', val: kpis.inspecting || 0 },
-    { key: 'stored',     val: kpis.stored      || 0 },
-    { key: 'disposed',   val: kpis.disposed   || 0 }
-  ].filter(function(s) { return s.val > 0; });
+    { key:'in_use',     val: kpis.in_use     || 0 },
+    { key:'repairing',  val: kpis.repairing  || 0 },
+    { key:'inspecting', val: kpis.inspecting || 0 },
+    { key:'stored',     val: kpis.stored     || 0 },
+    { key:'disposed',   val: kpis.disposed   || 0 }
+  ].filter(function(s){ return s.val > 0; });
 
-  var total = segments.reduce(function(s, d) { return s + d.val; }, 0);
-
-  /* SVG 도넛 */
+  var total = segments.reduce(function(s,d){ return s+d.val; }, 0);
   var R = 44, cx = 55, cy = 55, strokeW = 14;
   var circumference = 2 * Math.PI * R;
-  var offset = 0;
-  var svgPaths = '';
+  var offset = 0, svgPaths = '';
 
   if (total === 0) {
-    svgPaths = '<circle cx="' + cx + '" cy="' + cy + '" r="' + R + '" fill="none" stroke="#e5e7eb" stroke-width="' + strokeW + '"/>';
+    svgPaths = '<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none" stroke="#e5e7eb" stroke-width="'+strokeW+'"/>';
   } else {
     segments.forEach(function(seg) {
-      var frac = seg.val / total;
-      var dashLen = frac * circumference;
+      var dashLen = (seg.val/total)*circumference;
       var dashGap = circumference - dashLen;
-      svgPaths += (
-        '<circle cx="' + cx + '" cy="' + cy + '" r="' + R + '" fill="none"' +
-        ' stroke="' + STATUS_COLORS[seg.key] + '"' +
-        ' stroke-width="' + strokeW + '"' +
-        ' stroke-dasharray="' + dashLen.toFixed(2) + ' ' + dashGap.toFixed(2) + '"' +
-        ' stroke-dashoffset="' + (-offset * circumference).toFixed(2) + '"' +
-        ' transform="rotate(-90 ' + cx + ' ' + cy + ')"/>'
-      );
-      offset += frac;
+      svgPaths += '<circle cx="'+cx+'" cy="'+cy+'" r="'+R+'" fill="none"'+
+        ' stroke="'+STATUS_COLORS[seg.key]+'" stroke-width="'+strokeW+'"'+
+        ' stroke-dasharray="'+dashLen.toFixed(2)+' '+dashGap.toFixed(2)+'"'+
+        ' stroke-dashoffset="'+(-offset*circumference).toFixed(2)+'"'+
+        ' transform="rotate(-90 '+cx+' '+cy+')"/>';
+      offset += seg.val/total;
     });
   }
 
-  /* 범례 */
   var legendHtml = segments.map(function(seg) {
-    var pct = total > 0 ? Math.round((seg.val / total) * 100) : 0;
-    return (
-      '<div class="db-legend-row">' +
-        '<div class="db-legend-dot" style="background:' + STATUS_COLORS[seg.key] + '"></div>' +
-        '<span class="db-legend-name">' + STATUS_LABELS[seg.key] + '</span>' +
-        '<span class="db-legend-val">' + seg.val + '</span>' +
-        '<span class="db-legend-pct">' + pct + '%</span>' +
-      '</div>'
-    );
+    var pct = total > 0 ? Math.round((seg.val/total)*100) : 0;
+    return '<div class="db-legend-row">'+
+      '<div class="db-legend-dot" style="background:'+STATUS_COLORS[seg.key]+'"></div>'+
+      '<span class="db-legend-name">'+STATUS_LABELS[seg.key]+'</span>'+
+      '<span class="db-legend-val">'+seg.val+'</span>'+
+      '<span class="db-legend-pct">'+pct+'%</span>'+
+    '</div>';
   }).join('');
 
   el.innerHTML =
-    '<div class="db-donut-wrap">' +
-      '<svg class="db-donut-svg" viewBox="0 0 110 110">' + svgPaths + '</svg>' +
-      '<div class="db-donut-center">' +
-        '<div class="db-donut-total">' + total + '</div>' +
-        '<div class="db-donut-label">전체</div>' +
-      '</div>' +
-    '</div>' +
-    '<div class="db-status-legend">' + legendHtml + '</div>';
+    '<div class="db-donut-wrap">'+
+      '<svg class="db-donut-svg" viewBox="0 0 110 110">'+svgPaths+'</svg>'+
+      '<div class="db-donut-center">'+
+        '<div class="db-donut-total">'+total+'</div>'+
+        '<div class="db-donut-label">전체</div>'+
+      '</div>'+
+    '</div>'+
+    '<div class="db-status-legend">'+legendHtml+'</div>';
 }
 
 /* ── 유지보수 만료 임박 그리드 ── */
 function renderMaintGrid(list) {
-  var wrap = document.getElementById('maintGrid');
+  var wrap    = document.getElementById('maintGrid');
   var countEl = document.getElementById('maintCount');
 
   if (!list || !list.length) {
     if (countEl) countEl.textContent = '';
-    wrap.innerHTML =
-      '<div class="db-empty">' +
-        '<i class="ti ti-circle-check"></i>' +
-        '60일 이내 만료 예정 장비가 없습니다.' +
-      '</div>';
+    wrap.innerHTML = '<div class="db-empty"><i class="ti ti-circle-check"></i>60일 이내 만료 예정 장비가 없습니다.</div>';
     return;
   }
-
   if (countEl) countEl.textContent = list.length + '건';
 
   var rows = list.map(function(d) {
@@ -669,26 +637,21 @@ function renderMaintGrid(list) {
     var ddayCls = days === 0  ? 'db-dday db-dday--today'
                 : days <= 7  ? 'db-dday db-dday--urgent'
                 : days <= 30 ? 'db-dday db-dday--warn'
-                :              'db-dday';
+                :               'db-dday';
     var ddayLabel = days === 0 ? 'D-DAY' : 'D-' + days;
-
-    // department에서 팀명만 추출
-    var dept = d.department || '';
-    var teamLabel = dept ? dept.replace(/^.*\/\s*/, '') : (d.team_name || '—');
-
+    var teamLabel = d.department ? d.department.replace(/^.*\/\s*/, '') : (d.team_name || '—');
     return (
       '<tr class="db-grid-tr">' +
-        '<td class="db-grid-td db-grid-td--name" style="width:22%">' + esc(d.equipment_name || '—') + '</td>' +
-        '<td class="db-grid-td db-grid-td--id"   style="width:14%">' + esc(d.equipment_id  || '—') + '</td>' +
-        '<td class="db-grid-td"                  style="width:13%">' + esc(d.model_name    || '—') + '</td>' +
-        '<td class="db-grid-td"                  style="width:14%">' + esc(teamLabel)              + '</td>' +
+        '<td class="db-grid-td db-grid-td--name" style="width:24%">' + esc(d.equipment_name || '—') + '</td>' +
+        '<td class="db-grid-td db-grid-td--id"   style="width:15%">' + esc(d.equipment_id   || '—') + '</td>' +
+        '<td class="db-grid-td"                  style="width:13%">' + esc(d.model_name     || '—') + '</td>' +
+        '<td class="db-grid-td"                  style="width:13%">' + esc(teamLabel)               + '</td>' +
         '<td class="db-grid-td"                  style="width:13%">' + esc(d.maintenance_end_date || '—') + '</td>' +
         '<td class="db-grid-td"                  style="width:10%">' +
           '<span class="' + ddayCls + '">' + ddayLabel + '</span>' +
         '</td>' +
-        '<td class="db-grid-td"                  style="width:14%">' +
-          '<a href="detail.html?id=' + encodeURIComponent(d.equipment_id || '') + '&shell=1" ' +
-            'style="font-size:11px;color:#2563eb;text-decoration:none;font-weight:600;">상세 보기</a>' +
+        '<td class="db-grid-td"                  style="width:12%">' +
+          '<button class="db-link-btn" onclick="goDetail(\'' + esc(d.equipment_id || '') + '\')">상세 보기</button>' +
         '</td>' +
       '</tr>'
     );
@@ -696,36 +659,31 @@ function renderMaintGrid(list) {
 
   wrap.innerHTML =
     '<table class="db-grid-table">' +
-      '<thead class="db-grid-thead">' +
-        '<tr>' +
-          '<th class="db-grid-th" style="width:22%;text-align:left;">장비명</th>' +
-          '<th class="db-grid-th" style="width:14%">장비번호</th>' +
-          '<th class="db-grid-th" style="width:13%">모델명</th>' +
-          '<th class="db-grid-th" style="width:14%">부서</th>' +
-          '<th class="db-grid-th" style="width:13%">만료일</th>' +
-          '<th class="db-grid-th" style="width:10%">D-DAY</th>' +
-          '<th class="db-grid-th" style="width:14%">바로가기</th>' +
-        '</tr>' +
-      '</thead>' +
+      '<thead class="db-grid-thead"><tr>' +
+        '<th class="db-grid-th" style="width:24%;text-align:left;">장비명</th>' +
+        '<th class="db-grid-th" style="width:15%">장비번호</th>' +
+        '<th class="db-grid-th" style="width:13%">모델명</th>' +
+        '<th class="db-grid-th" style="width:13%">부서</th>' +
+        '<th class="db-grid-th" style="width:13%">만료일</th>' +
+        '<th class="db-grid-th" style="width:10%">D-DAY</th>' +
+        '<th class="db-grid-th" style="width:12%">바로가기</th>' +
+      '</tr></thead>' +
       '<tbody>' + rows + '</tbody>' +
     '</table>';
 }
 
+/* ── 유틸 ── */
 function setText(id, val) {
-  var el = document.getElementById(id);
-  if (el) el.textContent = val;
+  var el = document.getElementById(id); if (el) el.textContent = val;
 }
-
 function esc(str) {
-  return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+  return String(str || '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 </script>
 
-<div id="globalLoading" aria-hidden="true">
-  <div class="global-loading__dialog">
-    <div class="global-loading__spinner"></div>
-    <div class="global-loading__text" id="globalLoadingText">불러오는 중...</div>
-  </div>
-</div>
+<style>
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+
 </body>
 </html>

@@ -428,6 +428,7 @@ function renderEquipmentList(items) {
   };
 
   _gridInstance = agGrid.createGrid(el, gridOptions);
+  _gridInstance._rowH = rowH;
 }
 
 

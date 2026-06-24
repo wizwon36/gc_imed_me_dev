@@ -12,6 +12,18 @@
   <script>
     if (new URLSearchParams(location.search).get('shell') === '1')
       document.documentElement.classList.add('in-shell');
+    window.addEventListener('error', function(e) {
+      var d = document.createElement('div');
+      d.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#fee2e2;color:#991b1b;padding:8px 12px;font-size:12px;z-index:99999;';
+      d.textContent = 'ERROR: ' + e.message + ' (' + e.filename.split('/').pop() + ':' + e.lineno + ')';
+      document.body.appendChild(d);
+    });
+    window.addEventListener('unhandledrejection', function(e) {
+      var d = document.createElement('div');
+      d.style.cssText = 'position:fixed;top:40px;left:0;right:0;background:#fef3c7;color:#92400e;padding:8px 12px;font-size:12px;z-index:99999;';
+      d.textContent = 'PROMISE ERROR: ' + (e.reason && e.reason.message ? e.reason.message : String(e.reason));
+      document.body.appendChild(d);
+    });
   </script>
   <style>
     /* 로딩 중 흰 화면 방지 — shell-content 배경과 동일 */

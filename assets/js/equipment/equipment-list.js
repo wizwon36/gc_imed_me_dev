@@ -407,14 +407,14 @@ function renderEquipmentList(items) {
   // 데이터 영역(헤더 제외)을 pageSize(20줄)로 나눔
   var dataH   = gridH - headerH;
   var rowH    = Math.ceil(dataH / equipmentListState.pageSize);
-  rowH = Math.max(26, Math.min(rowH, 40));
+  rowH = Math.max(26, Math.min(rowH, 38));
 
   var gridOptions = {
     columnDefs: columnDefs,
     defaultColDef: defaultColDef,
     rowData: items,
     rowHeight: rowH,
-    headerHeight: 32,
+    headerHeight: 33,
     suppressPaginationPanel: true,
     suppressScrollOnNewData: true,
     overlayNoRowsTemplate: '<span style="color:#9ca3af;font-size:12px;">조회된 장비가 없습니다.</span>',

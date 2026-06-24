@@ -275,7 +275,7 @@ function adjustRowHeight() {
   var headerH  = headerEl ? headerEl.offsetHeight : 32;
   var eqContentH = content ? content.clientHeight : el.clientHeight;
   // pageSize + 1로 나눠서 행 높이를 조금 작게 → 마지막 줄 절대 잘리지 않음
-  var rowH = Math.floor((eqContentH - headerH) / (equipmentListState.pageSize + 1));
+  var rowH = Math.floor((eqContentH - headerH) / equipmentListState.pageSize);
   rowH = Math.max(26, Math.min(rowH, 52));
   _tabulatorInstance.options.rowHeight = rowH;
   _tabulatorInstance.redraw(true);
@@ -425,7 +425,7 @@ function renderEquipmentList(items) {
     resizableRows: false,
     columnDefaults: { resizable: true, vertAlign: 'middle' },
     tableBuilt: function() {
-      adjustRowHeight();
+      setTimeout(adjustRowHeight, 0);
       // 헤더 가운데 정렬 강제 적용 (Tabulator가 인라인 스타일로 덮어쓰므로 JS로 처리)
       var cols = document.querySelectorAll('.tabulator-col');
       cols.forEach(function(col) {

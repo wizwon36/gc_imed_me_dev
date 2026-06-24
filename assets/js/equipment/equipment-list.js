@@ -1020,6 +1020,11 @@ document.addEventListener('DOMContentLoaded', async function() {
     if (isReload) clearListState();
 
     var cached = loadListState();
+    // cached 복원은 initListFiltersAsync(scope 확정) 이후에 적용
+    // scope 확정이 _initialLoad 필터링보다 먼저 일어나야 하므로
+    // initListFiltersAsync 완료 후 loadEquipmentList 실행
+    await initListFiltersAsync();
+
     if (cached && cached.filters) {
       var f = cached.filters;
       if (f.keyword)     setValue('keyword',    f.keyword);
@@ -1036,9 +1041,6 @@ document.addEventListener('DOMContentLoaded', async function() {
       equipmentListState._initialLoad = false;
     }
 
-    // scope 확정이 _initialLoad 필터링보다 먼저 일어나야 하므로
-    // initListFiltersAsync 완료 후 loadEquipmentList 실행
-    await initListFiltersAsync();
     await loadEquipmentList(equipmentListState.page);
 
     var exportBtn = document.getElementById('exportExcelBtn');

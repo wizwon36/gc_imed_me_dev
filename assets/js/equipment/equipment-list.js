@@ -315,7 +315,7 @@ function renderEquipmentList(items) {
   // 컬럼 정의
   var columns = [
     {
-      title: '장비명', field: 'equipment_name', width: 200, minWidth: 120,
+      title: '장비명', field: 'equipment_name', minWidth: 120,
       hozAlign: 'left', headerHozAlign: 'left',
       formatter: function(cell) {
         return '<span class="tab-name">' + escapeHtml(cell.getValue() || '—') + '</span>';

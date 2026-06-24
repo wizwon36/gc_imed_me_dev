@@ -13,6 +13,8 @@
       document.documentElement.classList.add('in-shell');
   </script>
   <style>
+    /* 로딩 중 흰 화면 방지 — shell-content 배경과 동일 */
+    body { background: #f0f2f5; }
     /* 로딩 중 숨김 — JS 실행 전 콘텐츠 숨김 */
     .eq-filter-bar, .eq-toolbar, .eq-content { visibility: hidden; }
     body.page-ready .eq-filter-bar,

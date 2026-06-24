@@ -435,15 +435,16 @@ function renderEquipmentList(items) {
         var correctRowH = Math.floor(viewH / equipmentListState.pageSize);
         correctRowH = Math.max(26, Math.min(correctRowH, 38));
         if (correctRowH !== params.api.getGridOption('rowHeight')) {
-          // resetRowHeights 애니메이션 없이 — 파괴 후 재생성
+          // 재생성 중 화면에 보이지 않게 그리드 숨김
+          el.style.visibility = 'hidden';
           var currentData = _gridInstance.getGridOption('rowData') || [];
           _gridInstance.destroy();
           _gridInstance = null;
           renderEquipmentList(currentData);
-          // renderEquipmentList 내에서 page-ready 추가됨
           return;
         }
       }
+      el.style.visibility = ''; // 숨김 해제
       document.body.classList.add('page-ready');
     }
   };

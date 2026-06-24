@@ -436,6 +436,8 @@ function renderEquipmentList(items) {
         var correctRowH = Math.floor(viewH / equipmentListState.pageSize);
         correctRowH = Math.max(26, Math.min(correctRowH, 38));
         if (correctRowH !== params.api.getGridOption('rowHeight')) {
+          // 재생성 전 page-ready 제거 → 화면 숨김
+          document.body.classList.remove('page-ready');
           var currentData = _gridInstance.getGridOption('rowData') || [];
           _gridInstance.destroy();
           _gridInstance = null;

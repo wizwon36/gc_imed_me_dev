@@ -436,6 +436,13 @@ function renderEquipmentList(items) {
     movableColumns: false,
     resizableRows: false,
     columnDefaults: { resizable: true },
+    rowFormatter: function(row) {
+      var cells = row.getElement().querySelectorAll('.tabulator-cell');
+      var rowH = row.getElement().offsetHeight || 34;
+      cells.forEach(function(cell) {
+        cell.style.lineHeight = rowH + 'px';
+      });
+    },
     tableBuilt: function() {
       // 헤더 가운데 정렬 강제 적용 (Tabulator가 인라인 스타일로 덮어쓰므로 JS로 처리)
       var cols = document.querySelectorAll('.tabulator-col');

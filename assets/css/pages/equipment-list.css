@@ -197,18 +197,6 @@
   flex: 1;
   min-height: 0;
   gap: 0;
-  padding-bottom: 34px; /* pagination-area 높이만큼 확보 */
-  position: relative;
-}
-
-/* pagination-area를 eq-content 하단에 absolute로 고정 */
-.eq-content > .pagination-area {
-  position: absolute;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 34px;
-  padding: 4px 0;
 }
 
 .equipment-list-grid {

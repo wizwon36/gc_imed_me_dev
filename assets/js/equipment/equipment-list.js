@@ -444,7 +444,6 @@ function renderEquipmentList(items) {
           return;
         }
       }
-      el.style.visibility = ''; // 숨김 해제
       document.body.classList.add('page-ready');
     }
   };

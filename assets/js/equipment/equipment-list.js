@@ -394,7 +394,7 @@ function renderEquipmentList(items) {
     pagination: false,
     movableColumns: false,
     resizableRows: false,
-    columnDefaults: { resizable: true },
+    columnDefaults: { resizable: true, vertAlign: 'middle' },
     tableBuilt: function() {
       adjustRowHeight();
     },

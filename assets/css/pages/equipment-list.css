@@ -11,7 +11,7 @@
   flex-direction: column;
   height: calc(100vh - 48px); /* shell topbar */
   overflow: hidden;
-  padding: 4px 12px 4px;
+  padding: 4px 12px 0;
   gap: 4px;
   box-sizing: border-box;
 }
@@ -351,13 +351,13 @@
 /* ── 페이지네이션 ── */
 .pagination-area {
   flex-shrink: 0;
-  height: 30px;
+  height: 34px;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 3px;
   box-sizing: border-box;
-  padding-top: 2px;
+  padding: 2px 0 6px;
 }
 
 .pagination-btn {

@@ -323,10 +323,10 @@ function navigate(page, tab, skipHistory) {
   if (tab) url += `&tab=${tab}`;
 
   // iframe 로드 전 숨김 → onload 후 표시 (자체 스피너 없이)
-  frame.style.visibility = 'hidden';
+  frame.style.opacity = '0';
 
   frame.onload = () => {
-    frame.style.visibility = 'visible';
+    frame.style.opacity = '1';
 
     // iframe 내부에 탭 전환 신호 전달
     if (tab) {

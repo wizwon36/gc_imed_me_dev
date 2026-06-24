@@ -15,6 +15,7 @@ var equipmentListState = {
   isAppAdmin: false,
   userClinicCode: '',
   userTeamCode: '',
+  userScope: null,     // ★ equipment 앱 scope: 'all' | 'clinic' | 'team' | null (로드 전)
   _initialLoad: true   // ★ 최초 로딩 여부 — URL params 직접 사용
 };
 
@@ -436,9 +437,10 @@ function renderEquipmentList(items) {
       var correctRowH = Math.floor(viewH / equipmentListState.pageSize);
       correctRowH = Math.max(26, Math.min(correctRowH, 38));
       if (correctRowH !== params.api.getGridOption('rowHeight')) {
-        params.api.setGridOption('rowHeight', correctRowH);
-        params.api.resetRowHeights();
-        _gridInstance._rowH = correctRowH;
+        var currentData = _gridInstance.getGridOption('rowData') || [];
+        _gridInstance.destroy();
+        _gridInstance = null;
+        renderEquipmentList(currentData);
       }
     }
   };
@@ -600,10 +602,21 @@ async function loadEquipmentList(nextPage) {
 
     if (equipmentListState._initialLoad) {
       var urlParams = getListQueryParams();
-      // URL에 필터 없으면 소속 의원/팀으로 기본 세팅
+      // URL에 필터 없으면 scope에 따라 기본 필터 세팅
+      // scope='all' → 필터 강제 없음 (전체 조회)
+      // scope='clinic' → 소속 의원만 고정
+      // scope='team' / null(로드 전) → 소속 의원+팀 고정 (보수적 처리)
       if (!urlParams.clinic_code && !urlParams.keyword && !urlParams.status) {
-        urlParams.clinic_code = equipmentListState.userClinicCode || '';
-        urlParams.team_code   = equipmentListState.userTeamCode   || '';
+        var scope = equipmentListState.userScope;
+        if (scope === 'all') {
+          // 필터 강제 없음 — 전체 조회
+        } else if (scope === 'clinic') {
+          urlParams.clinic_code = equipmentListState.userClinicCode || '';
+        } else {
+          // 'team' 또는 아직 scope 미확정(null) → 보수적으로 의원+팀 고정
+          urlParams.clinic_code = equipmentListState.userClinicCode || '';
+          urlParams.team_code   = equipmentListState.userTeamCode   || '';
+        }
       }
       filters = urlParams;
     } else {
@@ -908,6 +921,8 @@ async function initListFiltersAsync() {
   var scopedResult = orgInitResults[1];
   var scopedData = scopedResult?.data || { clinics: [], teams: [], scope: null };
   var scope = scopedData.scope;
+  // scope 확정 후 state에 저장 — _initialLoad 필터링 시 참조
+  equipmentListState.userScope = scope;
 
   if (scope === 'team') {
     window.orgSelect.fillSelectOptions(clinicEl, scopedData.clinics, { emptyText: '' });
@@ -1014,10 +1029,10 @@ document.addEventListener('DOMContentLoaded', async function() {
       equipmentListState._initialLoad = false;
     }
 
-    await Promise.all([
-      initListFiltersAsync(),
-      loadEquipmentList(equipmentListState.page)
-    ]);
+    // scope 확정이 _initialLoad 필터링보다 먼저 일어나야 하므로
+    // initListFiltersAsync 완료 후 loadEquipmentList 실행
+    await initListFiltersAsync();
+    await loadEquipmentList(equipmentListState.page);
 
     var exportBtn = document.getElementById('exportExcelBtn');
     if (exportBtn) {

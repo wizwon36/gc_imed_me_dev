@@ -11,8 +11,8 @@
   flex-direction: column;
   height: calc(100vh - 48px); /* shell topbar */
   overflow: hidden;
-  padding: 6px 16px 6px;
-  gap: 6px;
+  padding: 4px 12px 4px;
+  gap: 4px;
   box-sizing: border-box;
 }
 
@@ -29,7 +29,7 @@
   border-radius: 8px;
   padding: 7px 12px;
   flex-shrink: 0;
-  height: 42px;
+  height: 40px;
   box-sizing: border-box;
 }
 
@@ -262,7 +262,7 @@
 
 /* ── 행 — JS가 높이를 동적 계산해서 주입 ── */
 .equipment-tbl-row {
-  height: 36px;
+  height: 30px;
   border-bottom: 1px solid #f0f0f0;
   transition: background 0.1s;
 }
@@ -272,7 +272,7 @@
 
 /* ── 셀 ── */
 .equipment-tbl-cell {
-  height: 36px;
+  height: 30px;
   padding: 0 10px;
   vertical-align: middle;
   color: #374151;
@@ -351,13 +351,13 @@
 /* ── 페이지네이션 ── */
 .pagination-area {
   flex-shrink: 0;
-  height: 36px;
+  height: 30px;
   display: flex;
   justify-content: center;
   align-items: center;
   gap: 3px;
   box-sizing: border-box;
-  padding-top: 4px;
+  padding-top: 2px;
 }
 
 .pagination-btn {

@@ -403,9 +403,12 @@ function renderEquipmentList(items) {
 
   // 그리드 높이 기반 rowHeight 계산
   var gridH    = el.clientHeight || 767;
-  var headerH  = 33; // 실측값
+  var headerH  = el.querySelector ? (el.querySelector('.ag-header') || {offsetHeight: 33}).offsetHeight || 33 : 33;
   var rowH     = Math.floor((gridH - headerH) / equipmentListState.pageSize);
   rowH = Math.max(26, Math.min(rowH, 40));
+  // 그리드 높이를 rowH*pageSize+headerH로 정확히 맞춤 → 마지막 줄 잘림 방지
+  var exactH = rowH * equipmentListState.pageSize + headerH;
+  el.style.height = exactH + 'px';
 
   var gridOptions = {
     columnDefs: columnDefs,

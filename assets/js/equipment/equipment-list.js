@@ -678,89 +678,77 @@ async function loadEquipmentList(nextPage) {
   }
 }
 
-async function initListFilters() {
+// 동기 초기화 — 상태/UI 기본 세팅 (API 호출 없음)
+function initListFiltersSync() {
   var query = getListQueryParams();
-  var clinicEl;
-  var teamEl;
-
   equipmentListState.page = query.page > 0 ? query.page : 1;
-  equipmentListState.pageSize = 20; // 고정
-
+  equipmentListState.pageSize = 20;
   fillStatusFilterOptions();
-
-  clinicEl = document.getElementById('clinic_code');
-  teamEl = document.getElementById('team_code');
-
-  if (window.orgSelect && clinicEl && teamEl) {
-    // scope='all' 분기에서 getFilteredTeams/bindClinicTeamSelects가 내부
-    // orgDataCache(이 호출이 채움)에 의존하므로 그대로 유지한다.
-    // loadOrgData + getScopedOrgOptions 병렬 호출
-    var orgInitResults = await Promise.all([
-      window.orgSelect.loadOrgData(),
-      apiGet('getScopedOrgOptions', {
-        request_user_email: equipmentListState.user?.email || equipmentListState.user?.user_email,
-        app_id: 'equipment'
-      })
-    ]);
-    var scopedResult = orgInitResults[1];
-    var scopedData = scopedResult?.data || { clinics: [], teams: [], scope: null };
-    var scope = scopedData.scope; // 'all' | 'clinic' | 'team' | null(admin은 'all'로 내려옴)
-
-    if (scope === 'team') {
-      // 소속 의원 + 소속 부서만: 의원/팀 둘 다 고정(disabled), 선택지도 1개뿐
-      window.orgSelect.fillSelectOptions(clinicEl, scopedData.clinics, { emptyText: '' });
-      clinicEl.value = equipmentListState.userClinicCode;
-      clinicEl.disabled = true;
-
-      window.orgSelect.fillSelectOptions(teamEl, scopedData.teams, { emptyText: '' });
-      // 진입 시 소속 팀 자동 세팅 (URL params 없으면 소속 팀)
-      teamEl.value = query.team_code || equipmentListState.userTeamCode;
-      teamEl.disabled = true;
-
-    } else if (scope === 'clinic') {
-      // 소속 의원 + 전체 부서: 의원은 고정, 팀은 소속 의원 산하 전체 중 자유 선택
-      window.orgSelect.fillSelectOptions(clinicEl, scopedData.clinics, { emptyText: '' });
-      clinicEl.value = equipmentListState.userClinicCode;
-      clinicEl.disabled = true;
-
-      window.orgSelect.fillSelectOptions(teamEl, scopedData.teams, { emptyText: '전체 팀' });
-      // 진입 시 소속 팀 자동 세팅
-      teamEl.value = query.team_code || equipmentListState.userTeamCode || '';
-      teamEl.disabled = false;
-
-    } else {
-      // scope === 'all'(admin 포함): 전체 의원 자유 선택
-      window.orgSelect.fillSelectOptions(clinicEl, scopedData.clinics, {
-        emptyText: '전체 의원'
-      });
-      window.orgSelect.bindClinicTeamSelects({
-        clinicSelect: clinicEl,
-        teamSelect: teamEl,
-        teamEmptyText: '전체 팀',
-        onTeamChanged: null
-      });
-      var initClinic = query.clinic_code || equipmentListState.userClinicCode || '';
-      if (initClinic) {
-        clinicEl.value = initClinic;
-        window.orgSelect.fillSelectOptions(
-          teamEl,
-          window.orgSelect.getFilteredTeams(initClinic),
-          { emptyText: '전체 팀' }
-        );
-        teamEl.disabled = false;
-        // 진입 시 소속 팀 자동 세팅
-        teamEl.value = query.team_code || equipmentListState.userTeamCode || '';
-      } else {
-        teamEl.innerHTML = '<option value="">의원을 먼저 선택하세요</option>';
-        teamEl.disabled = true;
-      }
-    }
-  }
-
   setValue('keyword', query.keyword || '');
   setValue('status', query.status || '');
   setValue('manufacturer', query.manufacturer || '');
   setValue('page_size', String(equipmentListState.pageSize));
+}
+
+// 비동기 초기화 — org API 호출 후 필터 UI 세팅
+async function initListFiltersAsync() {
+  var query = getListQueryParams();
+  var clinicEl = document.getElementById('clinic_code');
+  var teamEl = document.getElementById('team_code');
+
+  if (!window.orgSelect || !clinicEl || !teamEl) return;
+
+  var orgInitResults = await Promise.all([
+    window.orgSelect.loadOrgData(),
+    apiGet('getScopedOrgOptions', {
+      request_user_email: equipmentListState.user?.email || equipmentListState.user?.user_email,
+      app_id: 'equipment'
+    })
+  ]);
+  var scopedResult = orgInitResults[1];
+  var scopedData = scopedResult?.data || { clinics: [], teams: [], scope: null };
+  var scope = scopedData.scope;
+
+  if (scope === 'team') {
+    window.orgSelect.fillSelectOptions(clinicEl, scopedData.clinics, { emptyText: '' });
+    clinicEl.value = equipmentListState.userClinicCode;
+    clinicEl.disabled = true;
+    window.orgSelect.fillSelectOptions(teamEl, scopedData.teams, { emptyText: '' });
+    teamEl.value = query.team_code || equipmentListState.userTeamCode;
+    teamEl.disabled = true;
+
+  } else if (scope === 'clinic') {
+    window.orgSelect.fillSelectOptions(clinicEl, scopedData.clinics, { emptyText: '' });
+    clinicEl.value = equipmentListState.userClinicCode;
+    clinicEl.disabled = true;
+    window.orgSelect.fillSelectOptions(teamEl, scopedData.teams, { emptyText: '전체 팀' });
+    teamEl.value = query.team_code || equipmentListState.userTeamCode || '';
+    teamEl.disabled = false;
+
+  } else {
+    // scope === 'all' (admin 포함)
+    window.orgSelect.fillSelectOptions(clinicEl, scopedData.clinics, { emptyText: '전체 의원' });
+    window.orgSelect.bindClinicTeamSelects({
+      clinicSelect: clinicEl,
+      teamSelect: teamEl,
+      teamEmptyText: '전체 팀',
+      onTeamChanged: null
+    });
+    var initClinic = query.clinic_code || equipmentListState.userClinicCode || '';
+    if (initClinic) {
+      clinicEl.value = initClinic;
+      window.orgSelect.fillSelectOptions(
+        teamEl,
+        window.orgSelect.getFilteredTeams(initClinic),
+        { emptyText: '전체 팀' }
+      );
+      teamEl.disabled = false;
+      teamEl.value = query.team_code || equipmentListState.userTeamCode || '';
+    } else {
+      teamEl.innerHTML = '<option value="">의원을 먼저 선택하세요</option>';
+      teamEl.disabled = true;
+    }
+  }
 }
 
 function bindListEvents() {
@@ -1048,30 +1036,35 @@ document.addEventListener('DOMContentLoaded', async function() {
     equipmentListState.isAppAdmin  = (String(appPerm || '').trim().toLowerCase() === 'admin');
 
     applyListPermissionUi();
-    await initListFilters();
+
+    // 동기 초기화 (상태/UI 기본 세팅)
+    initListFiltersSync();
     bindListEvents();
 
-    // 뒤로가기 복귀 시 캐시 필터 복원
+    // 뒤로가기 복귀 시 캐시 필터 복원 (동기)
     if (equipmentListState._isBackNav) {
       var cached = loadListState();
       if (cached && cached.filters) {
-        // 필터 폼에 캐시 값 세팅
         var f = cached.filters;
         if (f.keyword)    setValue('keyword',    f.keyword);
         if (f.status)     setValue('status',     f.status);
         if (f.clinic_code) {
-          var clinicEl = document.getElementById('clinic_code');
-          if (clinicEl && !clinicEl.disabled) setValue('clinic_code', f.clinic_code);
+          var clinicEl2 = document.getElementById('clinic_code');
+          if (clinicEl2 && !clinicEl2.disabled) setValue('clinic_code', f.clinic_code);
         }
         if (f.team_code) {
-          var teamEl = document.getElementById('team_code');
-          if (teamEl && !teamEl.disabled) setValue('team_code', f.team_code);
+          var teamEl2 = document.getElementById('team_code');
+          if (teamEl2 && !teamEl2.disabled) setValue('team_code', f.team_code);
         }
         equipmentListState.page = cached.page || 1;
       }
     }
 
-    await loadEquipmentList(equipmentListState.page);
+    // org 필터 UI + 장비 목록 데이터를 병렬로 호출
+    await Promise.all([
+      initListFiltersAsync(),
+      loadEquipmentList(equipmentListState.page)
+    ]);
 
     var exportBtn = document.getElementById('exportExcelBtn');
     if (exportBtn) {

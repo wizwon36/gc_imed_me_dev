@@ -264,6 +264,21 @@ function buildEquipmentRow(item) {
   );
 }
 
+function adjustRowHeight() {
+  if (!_tabulatorInstance) return;
+  var el = document.getElementById('equipmentGrid');
+  if (!el) return;
+  var totalH = el.clientHeight;
+  var headerEl = el.querySelector('.tabulator-header');
+  var headerH = headerEl ? headerEl.offsetHeight : 32;
+  var rowCount = _tabulatorInstance.getDataCount();
+  if (rowCount <= 0) return;
+  var rowH = Math.floor((totalH - headerH) / equipmentListState.pageSize);
+  rowH = Math.max(26, Math.min(rowH, 52));
+  _tabulatorInstance.options.rowHeight = rowH;
+  _tabulatorInstance.redraw(true);
+}
+
 function getStatusBadge(status) {
   var map = {
     'IN_USE':     { cls: 'is-in-use',     label: '사용중' },
@@ -362,7 +377,9 @@ function renderEquipmentList(items) {
   ];
 
   if (_tabulatorInstance) {
-    _tabulatorInstance.replaceData(items);
+    _tabulatorInstance.replaceData(items).then(function() {
+      adjustRowHeight();
+    });
     return;
   }
 
@@ -371,13 +388,16 @@ function renderEquipmentList(items) {
     columns: columns,
     layout: 'fitColumns',
     height: '100%',
-    rowHeight: 28,
+    rowHeight: 32,          // 기본값, tableBuilt 후 동적 조정
     placeholder: '조회된 장비가 없습니다.',
     columnHeaderSortMulti: false,
     pagination: false,
     movableColumns: false,
     resizableRows: false,
     columnDefaults: { resizable: true },
+    tableBuilt: function() {
+      adjustRowHeight();
+    },
   });
 }
 

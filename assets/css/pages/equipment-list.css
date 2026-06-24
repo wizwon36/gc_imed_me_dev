@@ -11,7 +11,7 @@
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
-  padding: 4px 12px 0;
+  padding: 4px 12px 10px;
   gap: 4px;
   box-sizing: border-box;
 }

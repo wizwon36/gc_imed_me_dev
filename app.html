@@ -45,6 +45,25 @@
 .sb-sub-sub-item:hover { background: rgba(255,255,255,0.07); color: #fff; }
 .sb-sub-sub-item.active { background: rgba(255,255,255,0.12); color: #fff; font-weight: 600; }
 .sb-sub-sub-item i { font-size: 12px; flex-shrink: 0; width: 14px; text-align: center; }
+
+/* flyout 내 parent 항목 (화살표 → 2차 flyout) */
+.sb-flyout-parent {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.75);
+  cursor: pointer;
+  border-radius: 5px;
+  transition: background 0.12s, color 0.12s;
+  margin: 0 4px;
+}
+.sb-flyout-parent:hover {
+  background: rgba(255,255,255,0.09);
+  color: #fff;
+}
 </style>
 </head>
 <body>
@@ -497,22 +516,57 @@ function showFlyout(menuId, triggerEl) {
   const directChildren = submenu.children;
   Array.from(directChildren).forEach(child => {
     if (child.classList.contains('sb-sub-parent')) {
-      // 장비 등록 같은 sub-parent: 라벨만 표시 (비활성 구분선 역할)
-      const label = document.createElement('div');
-      label.style.cssText = 'padding:4px 10px 2px;font-size:10px;font-weight:700;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.05em;';
-      label.textContent = child.querySelector('span') ? child.querySelector('span').textContent.trim() : '';
-      flyout.appendChild(label);
+      // sub-parent: 화살표 있는 버튼으로 표시 — hover 시 2차 flyout
+      const subMenuId = child.getAttribute('data-menu');
+      const subSubmenu = document.getElementById('menu-' + subMenuId);
+      const btn = document.createElement('div');
+      btn.className = 'sb-flyout-parent';
+      btn.innerHTML =
+        '<span style="display:flex;align-items:center;gap:7px;flex:1;">' +
+          (child.querySelector('i:first-child') ? '<i class="' + child.querySelector('i:first-child').className + '"></i>' : '') +
+          '<span>' + (child.querySelector('span') ? child.querySelector('span').textContent.trim() : '') + '</span>' +
+        '</span>' +
+        '<i class="ti ti-chevron-right" style="font-size:11px;color:rgba(255,255,255,0.4);"></i>';
+      // hover 시 2차 flyout
+      if (subSubmenu) {
+        btn.addEventListener('mouseenter', function() {
+          // 기존 2차 flyout 제거
+          var old2 = document.getElementById('sbFlyout2');
+          if (old2) old2.remove();
+          var flyout2 = document.createElement('div');
+          flyout2.className = 'sb-flyout';
+          flyout2.id = 'sbFlyout2';
+          Array.from(subSubmenu.querySelectorAll('.sb-sub-sub-item')).forEach(function(item) {
+            var btn2 = document.createElement('button');
+            btn2.className = 'sb-sub-item';
+            btn2.innerHTML = item.innerHTML;
+            var origOnclick = item.getAttribute('onclick');
+            if (origOnclick) btn2.setAttribute('onclick', origOnclick);
+            if (item.classList.contains('active')) btn2.classList.add('active');
+            flyout2.appendChild(btn2);
+          });
+          document.body.appendChild(flyout2);
+          var r = btn.getBoundingClientRect();
+          var f2H = flyout2.offsetHeight;
+          var top2 = r.top + (r.height / 2) - (f2H / 2);
+          top2 = Math.max(8, Math.min(top2, window.innerHeight - f2H - 8));
+          flyout2.style.left = (r.right + 4) + 'px';
+          flyout2.style.top  = top2 + 'px';
+          flyout2.addEventListener('mouseleave', function() {
+            flyout2.remove();
+          });
+        });
+        btn.addEventListener('mouseleave', function(e) {
+          // 2차 flyout으로 마우스 이동 시 유지
+          setTimeout(function() {
+            var f2 = document.getElementById('sbFlyout2');
+            if (f2 && !f2.matches(':hover')) f2.remove();
+          }, 80);
+        });
+      }
+      flyout.appendChild(btn);
     } else if (child.classList.contains('sb-sub-submenu')) {
-      // 하위 항목들 — indent 없이 바로 표시
-      Array.from(child.querySelectorAll('.sb-sub-sub-item')).forEach(item => {
-        const btn = item.cloneNode(true);
-        btn.className = 'sb-sub-item';
-        btn.style.paddingLeft = '20px';
-        const origOnclick = item.getAttribute('onclick');
-        if (origOnclick) btn.setAttribute('onclick', origOnclick);
-        if (item.classList.contains('active')) btn.classList.add('active');
-        flyout.appendChild(btn);
-      });
+      // sb-sub-submenu는 flyout에서 직접 표시 안 함 (sb-flyout-parent hover로 처리)
     } else if (child.classList.contains('sb-sub-item')) {
       const btn = child.cloneNode(true);
       const origOnclick = child.getAttribute('onclick');
@@ -547,6 +601,8 @@ function showFlyout(menuId, triggerEl) {
 }
 
 function hideFlyout() {
+  var f2 = document.getElementById('sbFlyout2');
+  if (f2) f2.remove();
   if (_flyout) {
     _flyout.remove();
     _flyout = null;

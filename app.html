@@ -53,6 +53,9 @@
         <button class="sb-sub-item" data-page="equipment/list" onclick="navigate('equipment/list')">
           <i class="ti ti-list" aria-hidden="true"></i> 장비 목록
         </button>
+        <button class="sb-sub-item" data-page="equipment/form" onclick="navigate('equipment/form')">
+          <i class="ti ti-plus" aria-hidden="true"></i> 장비 등록
+        </button>
       </div>
 
       <!-- 월마감(구매) (아코디언) -->
@@ -228,6 +231,7 @@ const MENU_META = {
   'equipment/dashboard':          { app: '의료장비 관리', page: '대시보드' },
   'equipment/list':               { app: '의료장비 관리', page: '장비 목록' },
   'equipment/form':               { app: '의료장비 관리', page: '장비 등록·수정' },
+  'equipment/form':               { app: '의료장비 관리', page: '장비 등록·수정' },
   'equipment/detail':             { app: '의료장비 관리', page: '장비 상세' },
   'equipment/history-form':       { app: '의료장비 관리', page: '이력 등록' },
   'equipment/inventory-form':     { app: '의료장비 관리', page: '재고조사 등록' },
@@ -300,7 +304,7 @@ function renderUserInfo(user) {
 }
 
 // ── 페이지 이동 ───────────────────────────────────────────────
-function navigate(page, tab, skipHistory, extraQuery) {
+function navigate(page, tab, skipHistory) {
   const frame   = document.getElementById('shellFrame');
 
   currentPage = page;
@@ -321,13 +325,6 @@ function navigate(page, tab, skipHistory, extraQuery) {
   // iframe URL 결정
   let url = `${CONFIG.SITE_BASE_URL}/pages/${page}.html?shell=1`;
   if (tab) url += `&tab=${tab}`;
-  // extraQuery: 추가 쿼리 파라미터 — detail 페이지 id 전달 등에 사용
-  // 예: parent.shellNavigate('equipment/detail', '', false, { id: 'ME-001' })
-  if (extraQuery && typeof extraQuery === 'object') {
-    Object.keys(extraQuery).forEach(function(k) {
-      url += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(extraQuery[k]);
-    });
-  }
 
   // iframe 로드 전 숨김 → onload 후 표시 (자체 스피너 없이)
   frame.style.opacity = '0';
@@ -529,7 +526,6 @@ window.addEventListener('popstate', e => {
 
 // ── iframe 내부에서 navigate 요청 수신 ──────────────────────
 // 각 페이지에서 parent.shellNavigate(page, tab) 로 호출 가능
-// extraQuery 파라미터 포함 버전으로 노출
 window.shellNavigate = navigate;
 </script>
 

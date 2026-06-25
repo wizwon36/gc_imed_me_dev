@@ -75,7 +75,7 @@ function bindItemsEvents() {
   });
 }
 
-// ── 이하: 기존 lj-chart.js 에서 groups/items 관련 함수 전체 ──
+// ── 이하: 기존 qc 소스 파일 에서 groups/items 관련 함수 전체 ──
 function renderGroupTabs() {
   // 하위 호환 — groupTabsWrap이 있으면 비움
   const wrap = $('groupTabsWrap');

@@ -6,7 +6,6 @@
   <title>검사항목 관리 · 정도관리</title>
   <link rel="stylesheet" href="../../assets/css/common.css" />
   <link rel="stylesheet" href="../../assets/css/pages/qc-common.css" />
-  <link rel="stylesheet" href="../../assets/css/pages/qc-common.css" />
   <link rel="stylesheet" href="../../assets/css/pages/qc-items.css" />
   <link rel="stylesheet" href="../../assets/font/tabler-icons/tabler-icons.min.css" />
   <script>
@@ -20,21 +19,21 @@
 
   <div id="messageBox" class="message-box" style="display:none;"></div>
 
-  <div id="permissionDenied" class="lj-card" style="display:none;">
-    <div class="lj-empty">
+  <div id="permissionDenied" class="qc-card" style="display:none;">
+    <div class="qc-empty">
       <i class="ti ti-lock" style="font-size:40px;color:#d1d5db;"></i>
-      <p class="lj-empty-title">접근 권한이 없습니다</p>
+      <p class="qc-empty-title">접근 권한이 없습니다</p>
     </div>
   </div>
 
   <div class="qc-manage-body">
 
     <!-- 좌: 그룹 관리 -->
-    <div class="lj-card qc-col-groups">
+    <div class="qc-card qc-col-groups">
 
-      <div class="lj-card-head">
-        <span class="lj-card-title"><i class="ti ti-folder"></i> 그룹</span>
-        <span class="lj-card-count" id="groupCountText"></span>
+      <div class="qc-card-head">
+        <span class="qc-card-title"><i class="ti ti-folder"></i> 그룹</span>
+        <span class="qc-card-count" id="groupCountText"></span>
       </div>
 
       <!-- 그룹 입력 폼 -->
@@ -55,18 +54,18 @@
 
       <!-- 그룹 목록 -->
       <div class="qc-list-area" id="groupManageList">
-        <div class="lj-empty"><p class="lj-empty-desc">그룹이 없습니다</p></div>
+        <div class="qc-empty"><p class="qc-empty-desc">그룹이 없습니다</p></div>
       </div>
 
     </div>
 
     <!-- 우: 검사항목 관리 -->
-    <div class="lj-card qc-col-items">
+    <div class="qc-card qc-col-items">
 
-      <div class="lj-card-head">
-        <span class="lj-card-title"><i class="ti ti-flask"></i> 검사항목</span>
+      <div class="qc-card-head">
+        <span class="qc-card-title"><i class="ti ti-flask"></i> 검사항목</span>
         <div style="display:flex;align-items:center;gap:8px;">
-          <span class="lj-card-count" id="itemCountText"></span>
+          <span class="qc-card-count" id="itemCountText"></span>
           <button class="btn btn-sm btn-primary" id="addItemTabBtn" style="display:none;">
             <i class="ti ti-plus"></i> 항목 추가
           </button>
@@ -75,10 +74,10 @@
 
       <!-- 항목 테이블 -->
       <div class="qc-item-table-wrap">
-        <div class="lj-empty" id="itemEmptyState">
+        <div class="qc-empty" id="itemEmptyState">
           <i class="ti ti-flask-off" style="font-size:36px;color:#d1d5db;"></i>
-          <p class="lj-empty-title" id="itemEmptyTitle">등록된 검사항목이 없습니다</p>
-          <p class="lj-empty-desc" id="itemEmptyDesc">+ 항목 추가 버튼을 눌러 항목을 등록하세요.</p>
+          <p class="qc-empty-title" id="itemEmptyTitle">등록된 검사항목이 없습니다</p>
+          <p class="qc-empty-desc" id="itemEmptyDesc">+ 항목 추가 버튼을 눌러 항목을 등록하세요.</p>
         </div>
         <table class="qc-item-table" id="itemTable" style="display:none;">
           <thead>
@@ -126,22 +125,22 @@
 </div>
 
 <!-- 검사 항목 추가/수정 모달 -->
-<div class="lj-modal-overlay" id="itemModal" style="display:none;">
-  <div class="lj-modal">
-    <div class="lj-modal-head">
-      <span class="lj-modal-title" id="itemModalTitle">
+<div class="qc-modal-overlay" id="itemModal" style="display:none;">
+  <div class="qc-modal">
+    <div class="qc-modal-head">
+      <span class="qc-modal-title" id="itemModalTitle">
         <i class="ti ti-flask"></i> 검사 항목 추가
       </span>
-      <button class="lj-modal-close" id="itemModalClose"><i class="ti ti-x"></i></button>
+      <button class="qc-modal-close" id="itemModalClose"><i class="ti ti-x"></i></button>
     </div>
-    <div class="lj-modal-body">
+    <div class="qc-modal-body">
       <input type="hidden" id="modalItemId" />
-      <div class="lj-modal-grid">
-        <div class="form-field lj-full">
+      <div class="qc-modal-grid">
+        <div class="form-field qc-full">
           <label class="form-label required">검사 항목명</label>
           <input type="text" id="modalItemName" class="input" placeholder="예: GLU, HbA1c, RPR" />
         </div>
-        <div class="form-field lj-full">
+        <div class="form-field qc-full">
           <label class="form-label">그룹</label>
           <select id="modalItemGroup" class="input"><option value="">미분류 (그룹 없음)</option></select>
         </div>
@@ -155,7 +154,7 @@
             <select id="modalItemTeam" class="input"><option value="">선택</option></select>
           </div>
         </div>
-        <div class="form-field lj-full">
+        <div class="form-field qc-full">
           <label class="form-label required">관리 유형</label>
           <select id="modalItemType" class="input">
             <option value="quantitative">정량적 (Quantitative)</option>
@@ -187,7 +186,7 @@
           </div>
         </div>
         <div id="qualitativeFields" style="display:none;contents:none;">
-          <div class="form-field lj-full">
+          <div class="form-field qc-full">
             <label class="form-label required">결과값 프리셋</label>
             <select id="modalItemPreset" class="input">
               <option value="pos_neg">Positive / Negative</option>
@@ -198,18 +197,18 @@
               <option value="weak_pos">Negative / Weak Positive / Positive / Strong Positive</option>
             </select>
           </div>
-          <div class="form-field lj-full">
+          <div class="form-field qc-full">
             <label class="form-label required">기대 결과값 (정상)</label>
             <select id="modalItemExpected" class="input"></select>
           </div>
         </div>
-        <div class="form-field lj-full">
+        <div class="form-field qc-full">
           <label class="form-label">메모 (선택)</label>
           <input type="text" id="modalItemMemo" class="input" placeholder="장비명, 시약 lot 등" />
         </div>
       </div>
     </div>
-    <div class="lj-modal-foot">
+    <div class="qc-modal-foot">
       <button type="button" class="btn btn-sm" id="itemModalCancel">취소</button>
       <button type="button" class="btn btn-sm btn-primary" id="itemModalSave">저장</button>
     </div>
@@ -258,7 +257,7 @@ function renderGroupTable() {
   if (countEl) countEl.textContent = list.length + '개';
 
   if (!list.length) {
-    wrap.innerHTML = '<div class="lj-empty"><p class="lj-empty-desc">그룹이 없습니다</p></div>';
+    wrap.innerHTML = '<div class="qc-empty"><p class="qc-empty-desc">그룹이 없습니다</p></div>';
     return;
   }
 

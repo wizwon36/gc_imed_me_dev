@@ -935,7 +935,7 @@ async function submitHistoryModal() {
   var user = getCurrentUser();
   var actor = user && (user.email || user.user_email) || '';
 
-  var equipment = currentEquipment || {};
+  var equipment = currentEquipmentData || {};
   var payload = {
     equipment_id:   currentEquipmentId,
     history_type:   historyType,
@@ -972,12 +972,11 @@ async function submitHistoryModal() {
     }
 
     closeHistoryModal();
-    // 이력 섹션만 재로드
     var user2 = getCurrentUser();
-    await loadHistorySection(currentEquipmentId, user2 && user2.email || '');
-    // 장비 상태 반영 시 기본정보도 갱신
+    var email2 = user2 && (user2.email || user2.user_email) || '';
+    await loadHistorySection(currentEquipmentId, email2);
     if (payload.update_equipment_status) {
-      await loadEquipmentCore(currentEquipmentId, user2 && user2.email || '', { resetSkeleton: false });
+      await loadEquipmentCore(currentEquipmentId, email2, { resetSkeleton: false });
     }
   } catch(e) {
     historyModalShowMsg(e.message || '저장 중 오류가 발생했습니다.', 'error');
@@ -1058,7 +1057,7 @@ async function submitInventoryModal() {
   if (!checkedBy)       { inventoryModalShowMsg('점검자를 입력하세요.', 'error'); return; }
 
   var user = getCurrentUser();
-  var equipment = currentEquipment || {};
+  var equipment = currentEquipmentData || {};
 
   var payload = {
     equipment_id:          currentEquipmentId,
@@ -1085,7 +1084,8 @@ async function submitInventoryModal() {
 
     closeInventoryModal();
     var user2 = getCurrentUser();
-    await loadInventorySection(currentEquipmentId, user2 && user2.email || '');
+    var email2 = user2 && (user2.email || user2.user_email) || '';
+    await loadInventorySection(currentEquipmentId, email2);
   } catch(e) {
     inventoryModalShowMsg(e.message || '저장 중 오류가 발생했습니다.', 'error');
   } finally {

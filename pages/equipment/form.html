@@ -3,250 +3,531 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>장비 등록/수정</title>
-  <link rel="stylesheet" href="../../assets/css/common.css" />
-  <link rel="stylesheet" href="../../assets/css/pages/equipment-form.css" />
+  <title>MSO관리팀 업무지원 시스템</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="assets/css/common.css" />
+  <link rel="stylesheet" href="assets/css/shell.css" />
+  <link rel="stylesheet" href="assets/font/tabler-icons/tabler-icons.min.css" />
 </head>
-<body class="portal-page equipment-form-page">
-  <div class="container page-shell equipment-form-shell">
-    <section class="top-brand-bar portal-topbar portal-hero-card equipment-form-topbar">
-      <div class="top-brand-left">
-        <div class="top-brand-logo">+</div>
-        <div class="top-brand-texts">
-          <strong class="top-brand-title">MSO관리팀 업무지원 시스템</strong>
-          <span class="top-brand-sub">장비 등록 · 수정</span>
-        </div>
+<body>
+
+<div class="app-shell">
+
+  <!-- ── 사이드바 ── -->
+  <nav class="sidebar" id="sidebar" role="navigation" aria-label="메인 메뉴">
+
+    <!-- 브랜드 -->
+    <div class="sb-brand">
+      <div class="sb-brand-logo">+</div>
+      <div class="sb-brand-text">
+        <div class="sb-brand-title">MSO관리팀 업무지원 시스템</div>
+        <div class="sb-brand-sub" id="sbVersion">v2.0</div>
       </div>
-
-      <div class="top-brand-actions portal-top-actions equipment-form-top-actions">
-        <a class="portal-header-btn portal-header-btn--secondary" href="../../portal.html">HOME</a>
-        <a class="portal-header-btn portal-header-btn--secondary" href="dashboard.html">대시보드</a>
-        <a class="portal-header-btn portal-header-btn--secondary" href="list.html">장비목록</a>
-      </div>
-    </section>
-
-    <section class="page-hero-simple equipment-form-hero">
-      <div class="equipment-form-hero-copy">
-        <span class="portal-section-kicker">EQUIPMENT FORM</span>
-        <h1 class="page-title" id="pageTitle">장비 등록</h1>
-        <p class="page-desc" id="pageDesc">신규 의료장비 정보를 등록합니다.</p>
-      </div>
-    </section>
-
-    <div id="messageBox" class="message-box"></div>
-
-    <!-- 탭 (단건 등록 / 일괄 등록) — 신규 등록 모드에서만 표시 -->
-    <div class="form-tabs" id="formTabs">
-      <button type="button" class="form-tab is-active" id="tabSingle" onclick="switchFormTab('single')">단건 등록</button>
-      <button type="button" class="form-tab" id="tabBulk" onclick="switchFormTab('bulk')">일괄 등록</button>
     </div>
 
-    <form id="equipmentForm" class="card form-card equipment-form-card">
-      <div class="section-head equipment-form-section-head">
-        <div>
-          <span class="portal-section-kicker">BASIC INFO</span>
-          <h2 class="section-title">기본 정보</h2>
-          <div class="sub-text equipment-form-section-desc">
-            장비 식별, 소속, 구매 및 관리 정보를 입력합니다.
-          </div>
-        </div>
+    <!-- 사용자 -->
+    <div class="sb-user">
+      <div class="sb-user-info">
+        <div class="sb-user-line" id="sbUserLine">로딩 중...</div>
       </div>
+    </div>
 
-      <div class="form-grid two-col">
-        <label class="form-field">
-          <span class="form-label required">장비명</span>
-          <input type="text" id="equipment_name" class="input" placeholder="예: 초음파 진단기" required />
-        </label>
+    <!-- 네비게이션 -->
+    <div class="sb-nav" id="sbNav">
 
-        <label class="form-field">
-          <span class="form-label required">모델명</span>
-          <input type="text" id="model_name" class="input" placeholder="모델명을 입력하세요" required />
-        </label>
+      <!-- 업무 도구 -->
+      <div class="sb-section-label">업무 도구</div>
 
-        <label class="form-field">
-          <span class="form-label required">의원</span>
-          <select id="clinic_code" class="input" required></select>
-        </label>
-
-        <label class="form-field">
-          <span class="form-label required">팀</span>
-          <select id="team_code" class="input" required></select>
-        </label>
-
-        <label class="form-field full-col is-hidden-field">
-          <span class="form-label">부서명</span>
-          <input
-            type="text"
-            id="department_preview"
-            class="input"
-            readonly
-            placeholder="의원 / 팀 선택 시 자동 표시"
-          />
-        </label>
-
-        <label class="form-field">
-          <span class="form-label">제조사</span>
-          <input type="text" id="manufacturer" class="input" placeholder="제조사를 입력하세요" />
-        </label>
-
-        <label class="form-field">
-          <span class="form-label required">시리얼번호</span>
-          <input type="text" id="serial_no" class="input" placeholder="시리얼번호를 입력하세요" required />
-        </label>
-        
-        <label class="form-field">
-          <span class="form-label">제조일자</span>
-          <input type="date" id="manufacture_date" class="input" />
-        </label>
-
-        <label class="form-field">
-          <span class="form-label">취득일자</span>
-          <input type="date" id="purchase_date" class="input" />
-        </label>
-
-        <label class="form-field">
-          <span class="form-label">구매처</span>
-          <input type="text" id="vendor" class="input" placeholder="구매처를 입력하세요" />
-        </label>
-
-        <label class="form-field">
-          <span class="form-label">취득가액</span>
-          <input type="text" inputmode="numeric" id="acquisition_cost" class="input" placeholder="숫자만 입력" />
-        </label>
-
-        <label class="form-field">
-          <span class="form-label">담당자</span>
-          <input type="text" id="manager_name" class="input" placeholder="담당자명을 입력하세요" />
-        </label>
-
-        <label class="form-field">
-          <span class="form-label">담당자 연락처</span>
-          <input type="text" id="manager_phone" class="input" placeholder="연락처를 입력하세요" />
-        </label>
-
-        <label class="form-field">
-          <span class="form-label">유지보수 종료일</span>
-          <input type="date" id="maintenance_end_date" class="input" />
-        </label>
-
-        <label class="form-field">
-          <span class="form-label">상태</span>
-          <select id="status" class="input"></select>
-        </label>
-
-        <label class="form-field">
-          <span class="form-label">위치</span>
-          <input type="text" id="location" class="input" placeholder="예: 3층 진료실" />
-        </label>
-
-        <label class="form-field">
-          <span class="form-label">현재 사용자</span>
-          <input type="text" id="current_user" class="input" placeholder="현재 사용자를 입력하세요" />
-        </label>
-
-        <label class="form-field full-col">
-          <span class="form-label">메모</span>
-          <textarea id="memo" class="textarea" rows="5" placeholder="추가로 관리해야 할 사항을 입력하세요"></textarea>
-        </label>
-
-        <div class="form-field full-col">
-          <span class="form-label">장비 사진</span>
-
-          <div class="photo-upload-box">
-            <div class="form-photo-preview" id="photoPreviewWrap">
-              <img id="photoPreviewImage" class="photo-preview-image is-hidden" alt="장비 사진 미리보기" />
-              <div id="photoPreviewEmpty" class="photo-preview-empty">
-                사진을 불러오지 못했습니다.
-              </div>
-            </div>
-            
-            <div class="form-photo-meta" id="photoExistingMeta" style="display:none;">
-              현재 등록된 사진이 있습니다.
-            </div>
-
-            <div class="photo-upload-actions">
-              <div class="photo-file-control">
-                <input type="file" id="photoInput" class="photo-file-input" accept="image/*" />
-                <label for="photoInput" class="photo-file-trigger">사진 선택</label>
-                <div id="photoFileName" class="photo-file-name">선택된 파일 없음</div>
-                <button type="button" class="btn photo-remove-btn" id="removePhotoBtn">사진 제거</button>
-              </div>
-
-              <div class="photo-upload-help">
-                업로드 전에 자동 압축됩니다. 장비 식별이 가능한 정도의 사진만 올려주세요.
-              </div>
-            </div>
-          </div>
+      <!-- 의료장비 관리 (아코디언) -->
+      <button class="sb-item sb-item-parent" data-menu="equipment" onclick="toggleMenu('equipment')">
+        <div class="sb-item-inner">
+          <i class="ti ti-stethoscope" aria-hidden="true"></i>
+          <span>의료장비 관리</span>
         </div>
-        
-      </div>
-
-      <div class="form-actions">
-        <a href="list.html" class="btn">목록으로</a>
-        <button type="submit" id="submitButton" class="btn btn-primary">
-          <span id="submitButtonText">장비 등록</span>
+        <i class="ti ti-chevron-right sb-item-arrow" aria-hidden="true"></i>
+      </button>
+      <div class="sb-submenu" id="menu-equipment">
+        <button class="sb-sub-item" data-page="equipment/dashboard" onclick="navigate('equipment/dashboard')">
+          <i class="ti ti-layout-dashboard" aria-hidden="true"></i> 대시보드
+        </button>
+        <button class="sb-sub-item" data-page="equipment/list" onclick="navigate('equipment/list')">
+          <i class="ti ti-list" aria-hidden="true"></i> 장비 목록
+        </button>
+        <button class="sb-sub-item" data-page="equipment/form" onclick="navigate('equipment/form')">
+          <i class="ti ti-plus" aria-hidden="true"></i> 장비 등록
         </button>
       </div>
-    </form>
 
-    <!-- 일괄 등록 섹션 -->
-    <div id="bulkSection" class="card form-card equipment-form-card bulk-section" style="display:none;">
-      <div class="section-head equipment-form-section-head">
-        <div>
-          <span class="portal-section-kicker">BULK IMPORT</span>
-          <h2 class="section-title">엑셀 일괄 등록</h2>
-          <div class="sub-text equipment-form-section-desc">
-            엑셀 파일로 여러 장비를 한 번에 등록합니다. 오류 발생 시 전체 롤백됩니다.
-          </div>
+      <!-- 월마감(구매) (아코디언) -->
+      <button class="sb-item sb-item-parent" data-menu="closing" onclick="toggleMenu('closing')">
+        <div class="sb-item-inner">
+          <i class="ti ti-report-money" aria-hidden="true"></i>
+          <span>월마감(구매)</span>
         </div>
-      </div>
-
-      <!-- 템플릿 다운로드 -->
-      <div class="bulk-template-row">
-        <button type="button" class="btn btn-light" id="downloadTemplateBtn">템플릿 다운로드</button>
-        <span class="bulk-template-desc">템플릿을 내려받아 작성 후 업로드해 주세요. <strong>굵은 항목</strong>은 필수값입니다.</span>
-      </div>
-
-      <!-- 파일 업로드 -->
-      <div class="bulk-upload-row">
-        <input type="file" id="bulkFileInput" class="photo-file-input" accept=".xlsx,.xls" />
-        <label for="bulkFileInput" class="photo-file-trigger">파일 선택</label>
-        <span id="bulkFileName" class="photo-file-name">선택된 파일 없음</span>
-      </div>
-
-      <!-- 미리보기 테이블 -->
-      <div id="bulkPreviewWrap" style="display:none;">
-        <div class="bulk-preview-header">
-          <span id="bulkPreviewCount" class="bulk-preview-count"></span>
-          <span id="bulkPreviewError" class="bulk-preview-error"></span>
-        </div>
-        <div class="bulk-table-wrap">
-          <table class="bulk-table" id="bulkPreviewTable"></table>
-        </div>
-      </div>
-
-      <div class="form-actions">
-        <a href="list.html" class="btn">목록으로</a>
-        <button type="button" id="bulkSubmitBtn" class="btn btn-primary" style="display:none;">
-          일괄 등록
+        <i class="ti ti-chevron-right sb-item-arrow" aria-hidden="true"></i>
+      </button>
+      <div class="sb-submenu" id="menu-closing">
+        <button class="sb-sub-item" data-page="closing/closing" data-tab="closing" onclick="navigate('closing/closing','closing')">
+          <i class="ti ti-refresh" aria-hidden="true"></i> 마감 자동화
+        </button>
+        <button class="sb-sub-item" data-page="closing/closing" data-tab="vendor" onclick="navigate('closing/closing','vendor')">
+          <i class="ti ti-building-store" aria-hidden="true"></i> 거래처 관리
+        </button>
+        <button class="sb-sub-item" data-page="closing/closing" data-tab="item" onclick="navigate('closing/closing','item')">
+          <i class="ti ti-flask" aria-hidden="true"></i> 자재코드 관리
+        </button>
+        <button class="sb-sub-item" data-page="closing/closing" data-tab="history" onclick="navigate('closing/closing','history')">
+          <i class="ti ti-calendar-stats" aria-hidden="true"></i> 마감 현황
         </button>
       </div>
-    </div>
-  </div>
 
-  <script src="../../assets/js/core/config.js"></script>
-  <script src="../../assets/js/core/api.js"></script>
-  <script src="../../assets/js/core/utils.js"></script>
-  <script src="../../assets/js/core/auth.js"></script>
-  <script src="../../assets/js/core/org-select.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js"></script>
-  <script src="../../assets/js/equipment/equipment-form.js"></script>
+      <!-- 구매·사용 통계 (아코디언) -->
+      <button class="sb-item sb-item-parent" data-menu="statistics" onclick="toggleMenu('statistics')">
+        <div class="sb-item-inner">
+          <i class="ti ti-chart-bar" aria-hidden="true"></i>
+          <span>구매·사용 통계</span>
+        </div>
+        <i class="ti ti-chevron-right sb-item-arrow" aria-hidden="true"></i>
+      </button>
+      <div class="sb-submenu" id="menu-statistics">
+        <button class="sb-sub-item" data-page="statistics/statistics" data-tab="dashboard" onclick="navigate('statistics/statistics','dashboard')">
+          <i class="ti ti-chart-bar" aria-hidden="true"></i> 통계 조회
+        </button>
+        <button class="sb-sub-item" data-page="statistics/statistics" data-tab="upload" onclick="navigate('statistics/statistics','upload')">
+          <i class="ti ti-upload" aria-hidden="true"></i> 데이터 업로드
+        </button>
+      </div>
 
-  <div id="globalLoading" aria-hidden="true">
-    <div class="global-loading__dialog">
-      <div class="global-loading__spinner" aria-hidden="true"></div>
-      <div class="global-loading__text" id="globalLoadingText">불러오는 중...</div>
+      <!-- 단일 앱들 -->
+      <button class="sb-item" data-page="lj-chart/lj-chart" onclick="navigate('lj-chart/lj-chart')">
+        <i class="ti ti-chart-line" aria-hidden="true"></i> 정도관리(LJ)
+      </button>
+
+      <!-- 업무일정 관리 (아코디언) -->
+      <button class="sb-item sb-item-parent" data-menu="task" onclick="toggleMenu('task')">
+        <div class="sb-item-inner">
+          <i class="ti ti-clipboard-list" aria-hidden="true"></i>
+          <span>업무일정 관리</span>
+        </div>
+        <i class="ti ti-chevron-right sb-item-arrow" aria-hidden="true"></i>
+      </button>
+      <div class="sb-submenu" id="menu-task">
+        <button class="sb-sub-item" data-page="task-manager/task-manager" data-tab="weekly" onclick="navigate('task-manager/task-manager','weekly')">
+          <i class="ti ti-calendar-week" aria-hidden="true"></i> 주간 업무
+        </button>
+        <button class="sb-sub-item" data-page="task-manager/task-manager" data-tab="journal" onclick="navigate('task-manager/task-manager','journal')">
+          <i class="ti ti-notebook" aria-hidden="true"></i> 업무 일지
+        </button>
+        <button class="sb-sub-item" data-page="task-manager/task-manager" data-tab="team" onclick="navigate('task-manager/task-manager','team')">
+          <i class="ti ti-users-group" aria-hidden="true"></i> 팀 일지
+        </button>
+      </div>
+
+      <button class="sb-item" data-page="signage/signage-form" onclick="navigate('signage/signage-form')">
+        <i class="ti ti-photo" aria-hidden="true"></i> 사인물 신청
+      </button>
+
+      <button class="sb-item" data-page="procurement/procurement" onclick="navigate('procurement/procurement')">
+        <i class="ti ti-book-2" aria-hidden="true"></i> 구매규정
+      </button>
+
+      <button class="sb-item" data-page="regulation/regulation-list" onclick="navigate('regulation/regulation-list')">
+        <i class="ti ti-book" aria-hidden="true"></i> 규정 조회
+      </button>
+
+      <div class="sb-divider"></div>
+
+      <!-- 지원 -->
+      <div class="sb-section-label">지원</div>
+
+      <button class="sb-item" data-page="support/support-form" onclick="navigate('support/support-form')">
+        <i class="ti ti-tool" aria-hidden="true"></i> 수정요청
+      </button>
+
+      <button class="sb-item" data-page="support/support-list" onclick="navigate('support/support-list')">
+        <i class="ti ti-list-check" aria-hidden="true"></i> 요청 내역
+      </button>
+
+      <!-- 관리자 (권한 있을 때만 표시) -->
+      <div id="adminSection" style="display:none">
+        <div class="sb-divider"></div>
+        <div class="sb-section-label">관리자</div>
+
+        <button class="sb-item" data-page="admin/users" onclick="navigate('admin/users')">
+          <i class="ti ti-users" aria-hidden="true"></i> 사용자 관리
+        </button>
+
+        <button class="sb-item" data-page="admin/notice-admin" onclick="navigate('admin/notice-admin')">
+          <i class="ti ti-speakerphone" aria-hidden="true"></i> 공지사항 관리
+        </button>
+
+        <button class="sb-item" data-page="admin/support-admin" onclick="navigate('admin/support-admin')">
+          <i class="ti ti-settings" aria-hidden="true"></i> 수정요청 관리
+          <span class="sb-badge" id="sbSupportBadge" style="display:none">0</span>
+        </button>
+
+        <button class="sb-item" data-page="admin/logs" onclick="navigate('admin/logs')">
+          <i class="ti ti-list-details" aria-hidden="true"></i> 시스템 로그
+        </button>
+      </div>
+
+    </div><!-- /sb-nav -->
+
+    <!-- 하단 로그아웃 -->
+    <div class="sb-footer">
+      <button class="sb-logout" onclick="doLogout()">
+        <i class="ti ti-logout" aria-hidden="true"></i>
+        <span>로그아웃</span>
+      </button>
     </div>
-  </div>
+
+  </nav><!-- /sidebar -->
+
+  <!-- 모바일 오버레이 -->
+  <div class="sb-overlay" id="sbOverlay" onclick="closeSidebar()"></div>
+
+  <!-- ── 메인 콘텐츠 ── -->
+  <div class="shell-main">
+
+    <!-- 상단바 -->
+    <header class="shell-topbar">
+      <button class="shell-topbar-hamburger" id="hamburgerBtn"
+              onclick="openSidebar()" aria-label="메뉴 열기">
+        <i class="ti ti-menu-2" aria-hidden="true"></i>
+      </button>
+      <div class="shell-breadcrumb">
+        <span class="shell-breadcrumb-app" id="breadcrumbApp">—</span>
+        <span class="shell-breadcrumb-sep" id="breadcrumbSep" style="display:none">›</span>
+        <span class="shell-breadcrumb-page" id="breadcrumbPage"></span>
+      </div>
+      <div class="shell-topbar-right">
+        <!-- 사용자 정보 제거 — 사이드바에 표시 -->
+      </div>
+    </header>
+
+    <!-- iframe 콘텐츠 영역 -->
+    <div class="shell-content">
+      <iframe
+        class="shell-iframe"
+        id="shellFrame"
+        src=""
+        title="콘텐츠 영역"
+      ></iframe>
+    </div>
+
+  </div><!-- /shell-main -->
+
+</div><!-- /app-shell -->
+
+<script src="assets/js/core/config.js"></script>
+<script src="assets/js/core/utils.js"></script>
+<script src="assets/js/core/api.js"></script>
+<script src="assets/js/core/auth.js"></script>
+<script>
+'use strict';
+
+// ── 메뉴 정의 ───────────────────────────────────────────────
+const MENU_META = {
+  'equipment/dashboard':          { app: '의료장비 관리', page: '대시보드' },
+  'equipment/list':               { app: '의료장비 관리', page: '장비 목록' },
+  'equipment/form':               { app: '의료장비 관리', page: '장비 등록·수정' },
+  'equipment/form':               { app: '의료장비 관리', page: '장비 등록·수정' },
+  'equipment/detail':             { app: '의료장비 관리', page: '장비 상세' },
+  'equipment/history-form':       { app: '의료장비 관리', page: '이력 등록' },
+  'equipment/inventory-form':     { app: '의료장비 관리', page: '재고조사 등록' },
+  'equipment/label-print':        { app: '의료장비 관리', page: 'QR 라벨 출력' },
+  'closing/closing':              { app: '월마감(구매)', page: '' },
+  'statistics/statistics':        { app: '구매·사용 통계', page: '' },
+  'lj-chart/lj-chart':           { app: '정도관리(LJ)', page: '' },
+  'task-manager/task-manager':    { app: '업무일정 관리', page: '' },
+  'signage/signage-form':         { app: '사인물 신청', page: '' },
+  'procurement/procurement':      { app: '구매규정', page: '' },
+  'regulation/regulation-list':  { app: '규정 조회', page: '' },
+  'support/support-form':         { app: '수정요청', page: '새 요청' },
+  'support/support-list':         { app: '수정요청', page: '요청 내역' },
+  'admin/users':                  { app: '관리자', page: '사용자 관리' },
+  'admin/notice-admin':           { app: '관리자', page: '공지사항 관리' },
+  'admin/support-admin':          { app: '관리자', page: '수정요청 관리' },
+  'admin/logs':                   { app: '관리자', page: '시스템 로그' },
+};
+
+const TAB_META = {
+  'closing': {
+    closing: '마감 자동화', vendor: '거래처 관리',
+    item: '자재코드 관리', history: '마감 현황',
+  },
+  'statistics': {
+    dashboard: '통계 조회', upload: '데이터 업로드',
+  },
+  'task-manager': {
+    weekly: '주간 업무', journal: '업무 일지',
+    team: '팀 일지', search: '검색',
+  },
+};
+
+// ── 현재 상태 ────────────────────────────────────────────────
+let currentPage = '';
+let currentTab  = '';
+
+// ── 초기화 ───────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  const user = window.auth?.getSession?.();
+  if (!user) {
+    location.replace(`${CONFIG.SITE_BASE_URL}/index.html`);
+    return;
+  }
+
+  // 사용자 정보 표시
+  renderUserInfo(user);
+
+  // 관리자 메뉴 표시
+  if (String(user.role || '').toLowerCase() === 'admin') {
+    document.getElementById('adminSection').style.display = '';
+  }
+
+  // URL 파라미터 또는 기본 페이지로 시작
+  const params  = new URLSearchParams(location.search);
+  const initPage = params.get('page') || 'equipment/dashboard';
+  const initTab  = params.get('tab')  || '';
+  navigate(initPage, initTab, true);
+});
+
+// ── 사용자 정보 렌더링 ───────────────────────────────────────
+function renderUserInfo(user) {
+  const name   = user.user_name || user.name || user.email || '—';
+  const clinic = user.clinic_name || '';
+
+  // 사이드바 한 줄 표기: 이름 · 소속의원
+  const line = clinic ? name + ' · ' + clinic : name;
+  const lineEl = document.getElementById('sbUserLine');
+  if (lineEl) lineEl.textContent = line;
+}
+
+// ── 페이지 이동 ───────────────────────────────────────────────
+function navigate(page, tab, skipHistory) {
+  const frame   = document.getElementById('shellFrame');
+
+  currentPage = page;
+  currentTab  = tab || '';
+
+  // URL 업데이트
+  if (!skipHistory) {
+    const qs = tab ? `?page=${page}&tab=${tab}` : `?page=${page}`;
+    history.pushState({ page, tab }, '', qs);
+  }
+
+  // 브레드크럼 업데이트
+  updateBreadcrumb(page, tab);
+
+  // 사이드바 활성 표시
+  updateActiveMenu(page, tab);
+
+  // iframe URL 결정
+  let url = `${CONFIG.SITE_BASE_URL}/pages/${page}.html?shell=1`;
+  if (tab) url += `&tab=${tab}`;
+
+  // iframe 로드 전 숨김 → onload 후 표시 (자체 스피너 없이)
+  frame.style.opacity = '0';
+
+  frame.onload = () => {
+    frame.style.opacity = '1';
+
+    // iframe 내부에 탭 전환 신호 전달
+    if (tab) {
+      try {
+        const iframeWin = frame.contentWindow;
+        // 각 앱의 탭 전환 함수 호출 시도
+        const appKey = page.split('/')[0];
+        if (appKey === 'closing' && iframeWin.switchTab) {
+          iframeWin.switchTab(tab);
+        } else if (appKey === 'statistics' && iframeWin.switchStatsTab) {
+          iframeWin.switchStatsTab(tab);
+        } else if (appKey === 'task-manager' && iframeWin.switchTaskTab) {
+          iframeWin.switchTaskTab(tab);
+        }
+      } catch(e) { /* cross-origin 무시 */ }
+    }
+  };
+
+  frame.src = url;
+
+  // 모바일이면 사이드바 닫기
+  if (window.innerWidth <= 768) closeSidebar();
+}
+
+// ── 브레드크럼 ───────────────────────────────────────────────
+function updateBreadcrumb(page, tab) {
+  const meta = MENU_META[page] || { app: page, page: '' };
+  const appKey = page.split('/')[0];
+
+  let pageName = meta.page;
+  if (tab && TAB_META[appKey]?.[tab]) {
+    pageName = TAB_META[appKey][tab];
+  }
+
+  document.getElementById('breadcrumbApp').textContent = meta.app;
+
+  const sepEl  = document.getElementById('breadcrumbSep');
+  const pageEl = document.getElementById('breadcrumbPage');
+
+  if (pageName) {
+    sepEl.style.display  = '';
+    pageEl.textContent = pageName;
+  } else {
+    sepEl.style.display  = 'none';
+    pageEl.textContent = '';
+  }
+}
+
+// ── 사이드바 활성 상태 ───────────────────────────────────────
+function updateActiveMenu(page, tab) {
+  // 모든 활성 제거
+  document.querySelectorAll('.sb-item.active, .sb-sub-item.active').forEach(el => {
+    el.classList.remove('active');
+  });
+
+  // 매칭되는 항목 활성화
+  let matched = null;
+  if (tab) {
+    matched = document.querySelector(
+      `.sb-sub-item[data-page="${page}"][data-tab="${tab}"]`
+    );
+  }
+  if (!matched) {
+    matched = document.querySelector(
+      `.sb-sub-item[data-page="${page}"]`
+    ) || document.querySelector(
+      `.sb-item[data-page="${page}"]`
+    );
+  }
+
+  if (matched) {
+    matched.classList.add('active');
+    // flyout 내부 버튼도 active 동기화는 다음 hover 시 자동 반영
+  }
+}
+
+// ── Flyout 메뉴 (portal 방식) ──────────────────────────────
+let _flyout = null;
+let _flyoutTimer = null;
+let _currentMenuId = null;
+
+function showFlyout(menuId, triggerEl) {
+  hideFlyout();
+  const submenu = document.getElementById(`menu-${menuId}`);
+  if (!submenu) return;
+
+  _currentMenuId = menuId;
+
+  // flyout 엘리먼트 생성 (body에 append)
+  const flyout = document.createElement('div');
+  flyout.className = 'sb-flyout';
+  flyout.id = 'sbFlyout';
+
+  // 서브메뉴 버튼들 복사
+  const items = submenu.querySelectorAll('.sb-sub-item');
+  items.forEach(item => {
+    const btn = item.cloneNode(true);
+    // onclick 속성 복사
+    const origOnclick = item.getAttribute('onclick');
+    if (origOnclick) {
+      btn.setAttribute('onclick', origOnclick);
+    }
+    // active 클래스 동기화
+    if (item.classList.contains('active')) btn.classList.add('active');
+    flyout.appendChild(btn);
+  });
+
+  document.body.appendChild(flyout);
+  _flyout = flyout;
+
+  // 위치 계산 — 트리거 우측, 수직 중앙
+  const rect = triggerEl.getBoundingClientRect();
+  const flyH = flyout.offsetHeight;
+  let top = rect.top + (rect.height / 2) - (flyH / 2);
+
+  // 화면 밖으로 나가지 않게
+  const maxTop = window.innerHeight - flyH - 8;
+  top = Math.max(8, Math.min(top, maxTop));
+
+  flyout.style.left = (rect.right + 4) + 'px';
+  flyout.style.top  = top + 'px';
+
+  // flyout에 마우스 올라오면 유지
+  flyout.addEventListener('mouseenter', () => {
+    clearTimeout(_flyoutTimer);
+  });
+  flyout.addEventListener('mouseleave', () => {
+    _flyoutTimer = setTimeout(hideFlyout, 120);
+  });
+}
+
+function hideFlyout() {
+  if (_flyout) {
+    _flyout.remove();
+    _flyout = null;
+  }
+  _currentMenuId = null;
+}
+
+// 아코디언 토글 — 클릭 시 첫 서브 아이템 이동 (호환용)
+function toggleMenu(menuId) {
+  const submenu = document.getElementById(`menu-${menuId}`);
+  if (!submenu) return;
+  const first = submenu.querySelector('.sb-sub-item');
+  if (first) first.click();
+}
+
+// ── 모바일 사이드바 ─────────────────────────────────────────
+function openSidebar() {
+  document.getElementById('sidebar').classList.add('mobile-open');
+  document.getElementById('sbOverlay').classList.add('mobile-open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('mobile-open');
+  document.getElementById('sbOverlay').classList.remove('mobile-open');
+  document.body.style.overflow = '';
+}
+
+// ── 로그아웃 ─────────────────────────────────────────────────
+function doLogout() {
+  window.auth?.logout?.();
+  location.replace(`${CONFIG.SITE_BASE_URL}/index.html`);
+}
+
+// ── Flyout 이벤트 바인딩 ─────────────────────────────────────
+document.querySelectorAll('.sb-item-parent').forEach(btn => {
+  const menuId = btn.dataset.menu;
+  if (!menuId) return;
+
+  btn.addEventListener('mouseenter', () => {
+    clearTimeout(_flyoutTimer);
+    showFlyout(menuId, btn);
+  });
+
+  btn.addEventListener('mouseleave', () => {
+    _flyoutTimer = setTimeout(hideFlyout, 120);
+  });
+});
+
+// 다른 곳 클릭 시 flyout 닫기
+document.addEventListener('click', (e) => {
+  if (_flyout && !_flyout.contains(e.target)) hideFlyout();
+});
+
+// ── 브라우저 뒤로가기/앞으로가기 ────────────────────────────
+window.addEventListener('popstate', e => {
+  if (e.state?.page) {
+    navigate(e.state.page, e.state.tab || '', true);
+  }
+});
+
+// ── iframe 내부에서 navigate 요청 수신 ──────────────────────
+// 각 페이지에서 parent.shellNavigate(page, tab) 로 호출 가능
+window.shellNavigate = navigate;
+</script>
+
 </body>
 </html>

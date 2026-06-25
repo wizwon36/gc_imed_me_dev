@@ -113,7 +113,7 @@ body { background: #f0f2f5; }
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  align-items: start;
+  align-items: stretch;
   flex-shrink: 0;
 }
 
@@ -214,12 +214,13 @@ body { background: #f0f2f5; }
   grid-template-columns: repeat(2, 1fr);
 }
 
-/* 좌측 장비정보 섹션: 우측 높이에 맞게 stretch */
-.eform-top-row .eform-col--stretch:first-child {
+/* 좌우 컬럼 모두 stretch */
+.eform-top-row .eform-col--stretch {
   display: flex;
   flex-direction: column;
 }
 
+/* 좌측: 장비정보 섹션이 전체 높이 채우기 */
 .eform-top-row .eform-col--stretch:first-child .eform-section {
   flex: 1;
   display: flex;
@@ -228,6 +229,8 @@ body { background: #f0f2f5; }
 
 .eform-top-row .eform-col--stretch:first-child .eform-section .eform-grid {
   flex: 1;
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
   align-content: start;
 }
 
@@ -242,6 +245,18 @@ body { background: #f0f2f5; }
   flex: 1;
   resize: none;
   min-height: 80px;
+}
+
+/* 우측: 담당자 섹션이 남은 공간 채우기 */
+.eform-top-row .eform-col--stretch:last-child .eform-section:last-child {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.eform-top-row .eform-col--stretch:last-child .eform-section:last-child .eform-grid {
+  flex: 1;
+  align-content: start;
 }
 
 .eform-full { grid-column: 1 / -1; }

@@ -540,8 +540,8 @@ function renderHistories(items) {
       '<tr class="sec-tbl-row">' +
         '<td class="sec-tbl-cell sec-tbl-cell--left">' +
           '<span class="sec-tbl-main">' + typeLabel + '</span>' +
-          '<span class="sec-tbl-sub">' + dateLabel + '</span>' +
         '</td>' +
+        '<td class="sec-tbl-cell" style="white-space:nowrap;font-size:11px;color:#6b7280;">' + dateLabel + '</td>' +
         '<td class="sec-tbl-cell sec-tbl-cell--center">' + statusBadge + '</td>' +
         '<td class="sec-tbl-cell sec-tbl-cell--grow">' + desc + '</td>' +
         (hasAction ? '<td class="sec-tbl-cell sec-tbl-cell--action">' +
@@ -556,10 +556,11 @@ function renderHistories(items) {
   area.innerHTML =
     '<table class="sec-tbl">' +
       '<thead class="sec-tbl-head"><tr>' +
-        '<th class="sec-tbl-th" style="width:90px">구분/날짜</th>' +
-        '<th class="sec-tbl-th sec-tbl-th--center" style="width:64px">상태</th>' +
+        '<th class="sec-tbl-th" style="width:70px">구분</th>' +
+        '<th class="sec-tbl-th" style="width:76px">날짜</th>' +
+        '<th class="sec-tbl-th sec-tbl-th--center" style="width:60px">상태</th>' +
         '<th class="sec-tbl-th">내용</th>' +
-        (hasAction ? '<th class="sec-tbl-th sec-tbl-th--center" style="width:80px">처리</th>' : '') +
+        (hasAction ? '<th class="sec-tbl-th sec-tbl-th--center" style="width:72px">처리</th>' : '') +
       '</tr></thead>' +
       '<tbody>' + rows + '</tbody>' +
     '</table>';
@@ -589,9 +590,9 @@ function renderInventoryLogs(items) {
 
     return (
       '<tr class="sec-tbl-row">' +
-        '<td class="sec-tbl-cell sec-tbl-cell--left">' +
-          '<span class="sec-tbl-main">' + statusLabel + '</span>' +
-          '<span class="sec-tbl-sub">' + dateLabel + '</span>' +
+        '<td class="sec-tbl-cell" style="white-space:nowrap;font-size:11px;color:#6b7280;">' + dateLabel + '</td>' +
+        '<td class="sec-tbl-cell sec-tbl-cell--center">' +
+          '<span class="sec-tbl-main" style="font-size:12px;">' + statusLabel + '</span>' +
         '</td>' +
         '<td class="sec-tbl-cell sec-tbl-cell--center">' + checker + '</td>' +
         '<td class="sec-tbl-cell sec-tbl-cell--grow">' + dept + '</td>' +
@@ -603,10 +604,11 @@ function renderInventoryLogs(items) {
   area.innerHTML =
     '<table class="sec-tbl">' +
       '<thead class="sec-tbl-head"><tr>' +
-        '<th class="sec-tbl-th" style="width:90px">상태/날짜</th>' +
-        '<th class="sec-tbl-th sec-tbl-th--center" style="width:70px">점검자</th>' +
+        '<th class="sec-tbl-th" style="width:76px">날짜</th>' +
+        '<th class="sec-tbl-th sec-tbl-th--center" style="width:60px">상태</th>' +
+        '<th class="sec-tbl-th sec-tbl-th--center" style="width:64px">점검자</th>' +
         '<th class="sec-tbl-th">부서</th>' +
-        '<th class="sec-tbl-th sec-tbl-th--center" style="width:44px">QR</th>' +
+        '<th class="sec-tbl-th sec-tbl-th--center" style="width:36px">QR</th>' +
       '</tr></thead>' +
       '<tbody>' + rows + '</tbody>' +
     '</table>';

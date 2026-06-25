@@ -16,7 +16,7 @@
       document.documentElement.classList.add('in-shell');
   </script>
 </head>
-<body class="lj-data-page">
+<body class="qc-data-page">
 
 <div class="lj-page">
 
@@ -65,7 +65,7 @@
   </div>
 
   <!-- 본문: 항목 선택 시 표시 -->
-  <div id="dataBody" style="display:none;" class="lj-data-body">
+  <div id="dataBody" style="display:none;" class="qc-data-body">
 
     <!-- 설정 표시 (KPI) -->
     <div class="lj-card" id="settingsSection">
@@ -76,7 +76,7 @@
     </div>
 
     <!-- 데이터 입력 + 테이블 -->
-    <div class="lj-card lj-data-entry-card" id="dataEntrySection">
+    <div class="lj-card qc-data-entry-card" id="dataEntrySection">
       <div class="lj-card-head">
         <span class="lj-card-title"><i class="ti ti-pencil-plus"></i> QC 데이터 입력</span>
         <button type="button" id="sampleDataBtn" class="btn btn-sm" style="display:none;">
@@ -107,12 +107,12 @@
         </div>
       </div>
       <!-- 데이터 테이블 -->
-      <div class="lj-data-table-wrap" id="dataTableWrap">
+      <div class="qc-data-table-wrap" id="dataTableWrap">
         <div class="lj-empty" id="dataEmptyState">
           <i class="ti ti-clipboard" style="font-size:32px;color:#d1d5db;"></i>
           <p class="lj-empty-desc">입력된 데이터가 없습니다</p>
         </div>
-        <table class="lj-data-table" id="dataTable" style="display:none;">
+        <table class="qc-data-table" id="dataTable" style="display:none;">
           <thead id="dataTableHead">
             <tr>
               <th style="width:110px;">측정일</th>
@@ -150,7 +150,7 @@
         </span>
         <span style="font-size:11px;color:#9ca3af;">노란색: 경고 / 빨간색: 거부</span>
       </div>
-      <div class="lj-chart-wrap">
+      <div class="qc-chart-wrap">
         <canvas id="ljChartCanvas"></canvas>
       </div>
     </div>

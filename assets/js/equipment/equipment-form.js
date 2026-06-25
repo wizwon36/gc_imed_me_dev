@@ -1,3 +1,22 @@
+// ── shell 네비게이션 헬퍼 ──────────────────────────────────────
+function shellNav(page, extraQuery) {
+  try {
+    if (window.parent && window.parent.shellNavigate) {
+      window.parent.shellNavigate(page, '', false, extraQuery || null);
+    } else {
+      var url = CONFIG.SITE_BASE_URL + '/pages/' + page + '.html';
+      if (extraQuery) {
+        url += '?' + Object.keys(extraQuery).map(function(k) {
+          return encodeURIComponent(k) + '=' + encodeURIComponent(extraQuery[k]);
+        }).join('&');
+      }
+      location.href = url;
+    }
+  } catch(e) {
+    location.href = CONFIG.SITE_BASE_URL + '/pages/' + page + '.html';
+  }
+}
+
 let currentEquipmentId = '';
 let isEditMode = false;
 let currentEquipment = null;
@@ -657,9 +676,9 @@ async function handleSubmit(event) {
     }
 
     if (equipmentId) {
-      location.href = `detail.html?id=${encodeURIComponent(equipmentId)}`;
+      shellNav('equipment/detail', { id: equipmentId });
     } else {
-      location.href = 'dashboard.html';
+      shellNav('equipment/list');
     }
   } catch (error) {
     const msg = error.message || '장비 저장 중 오류가 발생했습니다.';
@@ -677,6 +696,12 @@ async function handleSubmit(event) {
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
+  // 목록으로 버튼
+  var cancelBtn = document.getElementById('cancelBtn');
+  if (cancelBtn) {
+    cancelBtn.addEventListener('click', function() { shellNav('equipment/list'); });
+  }
+
   const user = window.auth?.requireAuth?.();
   if (!user) return;
 
@@ -982,7 +1007,7 @@ async function handleBulkSubmit(rows, userEmail) {
     });
 
     alert(`${result.data?.created_count || items.length}건이 등록되었습니다.`);
-    location.href = 'list.html';
+    shellNav('equipment/list');
 
   } catch (error) {
     showMessage(error.message || '일괄 등록 중 오류가 발생했습니다.', 'error');

@@ -1,10 +1,10 @@
 /* ============================================================
- * lj-items.css — 검사항목 관리 페이지
+ * qc-items.css — 검사항목 관리 페이지
  * ============================================================ */
 @import url("qc-common.css");
 
 /* ── 2단 본문 ── */
-.lj-items-body {
+.qc-items-body {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
@@ -13,16 +13,16 @@
   overflow: hidden;
 }
 
-.lj-items-detail,
-.lj-items-groups {
+.qc-items-detail,
+.qc-items-groups {
   display: flex;
   flex-direction: column;
   min-height: 0;
   overflow: hidden;
 }
 
-.lj-items-detail > *:last-child,
-.lj-items-groups > *:last-child {
+.qc-items-detail > *:last-child,
+.qc-items-groups > *:last-child {
   flex: 1;
   overflow-y: auto;
   min-height: 0;

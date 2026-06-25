@@ -211,7 +211,7 @@ function buildEquipmentCard(item) {
   }
 
   rightActions = window.innerWidth > 768
-    ? '<a class="btn" href="label-print.html?equipment_id=' + encodeURIComponent(item.equipment_id || '') + '">라벨출력</a>'
+    ? '<button class="btn" onclick="openListLabelModal(\'' + escapeHtml(item.equipment_id || '') + '\')">라벨출력</button>'
     : '';
 
   return (
@@ -270,7 +270,7 @@ function buildEquipmentRow(item) {
   }
 
   if (window.innerWidth > 768) {
-    actions += '<a class="tbl-btn" href="label-print.html?equipment_id=' + encodeURIComponent(item.equipment_id || '') + '">라벨</a>';
+    actions += '<button class="tbl-btn" onclick="openListLabelModal(\'' + escapeHtml(item.equipment_id || '') + '\')">라벨</button>';
   }
 
   return (
@@ -315,7 +315,7 @@ function getActionButtons(item) {
     btns += '<a class="tbl-btn tbl-btn--primary" href="form.html?id=' + id + '&shell=1" onclick="saveListState()">수정</a>';
   }
   if (equipmentListState.canEdit) {
-    btns += '<button class="tbl-btn" onclick="printSingleLabel(\'' + id + '\')">라벨</button>';
+    btns += '<button class="tbl-btn" onclick="openListLabelModal(\'' + id + '\')">라벨</button>';
   }
   return btns;
 }
@@ -1331,4 +1331,138 @@ function printLabelsOverlay(ids, sizeClass, layout) {
       if (el) el.remove();
     }, 500);
   }, 400);
+}
+
+
+// ================================================================
+// 장비목록 단건 라벨 출력 모달
+// ================================================================
+
+function openListLabelModal(equipmentId) {
+  // 현재 로드된 데이터에서 장비 찾기
+  var items = equipmentListState.currentItems || [];
+  var item  = items.find(function(i) { return i.equipment_id === equipmentId; });
+
+  // 기존 오버레이 제거
+  var prev = document.getElementById('listLabelModalOverlay');
+  if (prev) prev.remove();
+
+  // 오버레이 생성
+  var overlay = document.createElement('div');
+  overlay.id  = 'listLabelModalOverlay';
+  overlay.className = 'list-label-modal-overlay';
+  overlay.innerHTML = (
+    '<div class="list-label-modal-backdrop"></div>' +
+    '<div class="list-label-modal-dialog">' +
+      '<div class="list-label-modal-head">' +
+        '<div class="list-label-modal-head-left">' +
+          '<div class="list-label-modal-icon"><i class="ti ti-tag"></i></div>' +
+          '<div>' +
+            '<div class="list-label-modal-title">라벨 출력</div>' +
+            '<div class="list-label-modal-subtitle">QR 포함 장비 식별 라벨을 인쇄합니다</div>' +
+          '</div>' +
+        '</div>' +
+        '<button type="button" class="list-label-modal-close" id="listLabelClose"><i class="ti ti-x"></i></button>' +
+      '</div>' +
+      '<div class="list-label-modal-body">' +
+        '<div class="label-modal-toolbar">' +
+          '<label class="form-label" style="margin:0;white-space:nowrap;">라벨 크기</label>' +
+          '<select id="listLabelSizeSelect" class="input" style="width:140px;height:30px;font-size:12px;">' +
+            '<option value="size-90x48" selected>90 × 48 mm</option>' +
+            '<option value="size-70x40">70 × 40 mm</option>' +
+            '<option value="size-50x30">50 × 30 mm</option>' +
+          '</select>' +
+          '<button type="button" class="btn btn-sm btn-primary" id="listLabelPrintBtn">' +
+            '<i class="ti ti-printer"></i> 인쇄' +
+          '</button>' +
+        '</div>' +
+        '<div class="label-modal-preview">' +
+          '<div class="label-sheet-wrap">' +
+            '<div class="device-label size-90x48" id="listLabelDevice">' +
+              '<div class="device-label-main">' +
+                '<div class="label-hospital">녹십자아이메드 의료장비 관리시스템</div>' +
+                '<div class="label-title" id="llm_name">-</div>' +
+                '<div class="label-info-block">' +
+                  '<div class="label-row label-row-emphasis">' +
+                    '<div class="label-key">관리번호</div>' +
+                    '<div class="label-value label-value-id" id="llm_id">-</div>' +
+                  '</div>' +
+                  '<div class="label-row" id="llm_row_model">' +
+                    '<div class="label-key">모델명</div>' +
+                    '<div class="label-value" id="llm_model">-</div>' +
+                  '</div>' +
+                  '<div class="label-row" id="llm_row_dept">' +
+                    '<div class="label-key">사용부서</div>' +
+                    '<div class="label-value" id="llm_dept">-</div>' +
+                  '</div>' +
+                  '<div class="label-row" id="llm_row_loc">' +
+                    '<div class="label-key">위치</div>' +
+                    '<div class="label-value" id="llm_loc">-</div>' +
+                  '</div>' +
+                '</div>' +
+              '</div>' +
+              '<div class="qr-panel"><div id="llm_qr" class="label-qr-box"></div></div>' +
+            '</div>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+    '</div>'
+  );
+
+  document.body.appendChild(overlay);
+
+  // 데이터 채우기
+  function setT(id, val) { var el = document.getElementById(id); if (el) el.textContent = val || '-'; }
+  setT('llm_name',  item && item.equipment_name);
+  setT('llm_id',    item && item.equipment_id || equipmentId);
+  setT('llm_model', item && item.model_name);
+  setT('llm_dept',  item && item.department);
+  setT('llm_loc',   item && item.location);
+
+  listLabelApplySize('size-90x48', equipmentId);
+
+  // 이벤트
+  document.getElementById('listLabelClose').addEventListener('click', closeListLabelModal);
+  overlay.querySelector('.list-label-modal-backdrop').addEventListener('click', closeListLabelModal);
+
+  document.getElementById('listLabelSizeSelect').addEventListener('change', function() {
+    listLabelApplySize(this.value, equipmentId);
+  });
+
+  document.getElementById('listLabelPrintBtn').addEventListener('click', function() {
+    window.print();
+  });
+
+  setTimeout(function() { overlay.classList.add('is-open'); }, 10);
+}
+
+function closeListLabelModal() {
+  var overlay = document.getElementById('listLabelModalOverlay');
+  if (overlay) overlay.remove();
+}
+
+function listLabelApplySize(sizeClass, equipmentId) {
+  var label = document.getElementById('listLabelDevice');
+  if (label) {
+    label.classList.remove('size-90x48', 'size-70x40', 'size-50x30');
+    label.classList.add(sizeClass);
+  }
+  var rowModel = document.getElementById('llm_row_model');
+  var rowDept  = document.getElementById('llm_row_dept');
+  var rowLoc   = document.getElementById('llm_row_loc');
+  if (rowModel) rowModel.style.display = sizeClass === 'size-50x30' ? 'none' : '';
+  if (rowDept)  rowDept.style.display  = sizeClass === 'size-50x30' ? 'none' : '';
+  if (rowLoc)   rowLoc.style.display   = (sizeClass === 'size-70x40' || sizeClass === 'size-50x30') ? 'none' : '';
+
+  var qrEl = document.getElementById('llm_qr');
+  if (!qrEl) return;
+  qrEl.innerHTML = '';
+
+  var url = (typeof CONFIG !== 'undefined' ? CONFIG.SITE_BASE_URL : '') +
+            '/pages/equipment/public-detail.html?id=' + encodeURIComponent(equipmentId);
+  var qrSize = sizeClass === 'size-70x40' ? 64 : sizeClass === 'size-50x30' ? 48 : 84;
+
+  if (typeof QRCode !== 'undefined' && equipmentId) {
+    new QRCode(qrEl, { text: url, width: qrSize, height: qrSize });
+  }
 }

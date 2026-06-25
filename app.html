@@ -167,9 +167,21 @@
       </div>
 
       <!-- 단일 앱들 -->
-      <button class="sb-item" data-page="lj-chart/lj-chart" onclick="navigate('lj-chart/lj-chart')">
-        <i class="ti ti-chart-line" aria-hidden="true"></i> 정도관리(LJ)
+      <!-- 정도관리 -->
+      <button class="sb-item sb-item-parent" data-menu="lj" onclick="toggleSubMenu('lj')">
+        <div class="sb-item-inner">
+          <i class="ti ti-chart-line" aria-hidden="true"></i> 정도관리(LJ)
+        </div>
+        <i class="ti ti-chevron-right sb-item-arrow" aria-hidden="true"></i>
       </button>
+      <div class="sb-submenu" id="menu-lj">
+        <button class="sb-sub-item" data-page="lj-chart/items" onclick="navigate('lj-chart/items')">
+          <i class="ti ti-flask" aria-hidden="true"></i> 검사항목 관리
+        </button>
+        <button class="sb-sub-item" data-page="lj-chart/data" onclick="navigate('lj-chart/data')">
+          <i class="ti ti-pencil-plus" aria-hidden="true"></i> 데이터 입력
+        </button>
+      </div>
 
       <!-- 업무일정 관리 (아코디언) -->
       <button class="sb-item sb-item-parent" data-menu="task" onclick="toggleMenu('task')">
@@ -307,7 +319,8 @@ const MENU_META = {
   'equipment/label-print':        { app: '의료장비 관리', page: 'QR 라벨 출력' },
   'closing/closing':              { app: '월마감(구매)', page: '' },
   'statistics/statistics':        { app: '구매·사용 통계', page: '' },
-  'lj-chart/lj-chart':           { app: '정도관리(LJ)', page: '' },
+  'lj-chart/items':              { app: '정도관리(LJ)', page: '검사항목 관리' },
+  'lj-chart/data':               { app: '정도관리(LJ)', page: '데이터 입력' },
   'task-manager/task-manager':    { app: '업무일정 관리', page: '' },
   'signage/signage-form':         { app: '사인물 신청', page: '' },
   'procurement/procurement':      { app: '구매규정', page: '' },
@@ -469,6 +482,13 @@ function updateActiveMenu(page, tab) {
     var subMenu = document.getElementById('menu-equipment-form');
     if (subMenu && !subMenu.classList.contains('is-open')) {
       toggleSubMenu('equipment-form');
+    }
+  }
+  // 정도관리 sub-accordion 자동 열기
+  if (page === 'lj-chart/items' || page === 'lj-chart/data') {
+    var ljMenu = document.getElementById('menu-lj');
+    if (ljMenu && !ljMenu.classList.contains('is-open')) {
+      toggleSubMenu('lj-chart');
     }
   }
   // 모든 활성 제거

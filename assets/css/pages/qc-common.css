@@ -109,3 +109,52 @@ function ljSetupOrgFilter(orgResult, onChangeCallback) {
   const filterRow = $('deptFilterRow');
   if (filterRow) filterRow.style.display = 'none';
 }
+
+/* ── 카드 (의료장비 페이지 스타일 기준) ── */
+.lj-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+  margin-top: 0;
+}
+
+.lj-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 14px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e5e7eb;
+  flex-shrink: 0;
+  gap: 8px;
+}
+
+.lj-card-title {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #374151;
+}
+
+.lj-card-title i { font-size: 14px; color: #6b7280; }
+
+.lj-card-count { font-size: 11px; color: #9ca3af; }
+
+.lj-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 32px 20px;
+  text-align: center;
+}
+
+.lj-empty-title { font-size: 13px; font-weight: 700; color: #374151; margin: 0; }
+.lj-empty-desc  { font-size: 12px; color: #9ca3af; margin: 0; line-height: 1.5; }

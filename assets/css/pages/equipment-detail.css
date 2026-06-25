@@ -123,7 +123,7 @@
 
 .det-card--info .info-row--wide .info-cell-value {
   flex: 1;
-  min-height: 0;
+  min-height: 80px;  /* 내용 없어도 박스 영역 확보 */
   font-size: 12px;
   font-weight: 400;
   color: #374151;
@@ -132,7 +132,7 @@
   line-height: 1.6;
   overflow-y: auto;
   background: #f8fafc;
-  border: 1px solid #f0f0f0;
+  border: 1px solid #e5e7eb;
   border-radius: 6px;
   padding: 8px 10px;
 }

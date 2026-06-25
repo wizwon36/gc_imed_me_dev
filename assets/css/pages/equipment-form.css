@@ -1,422 +1,287 @@
 /* ============================================================
- * equipment-list.css — 장비 목록 (데이터 테이블)
- * 스크롤 없이 20행이 화면에 딱 맞게
+ * equipment-form.css — 장비 등록·수정 (shell 스타일)
  * ============================================================ */
 
-.equipment-list-page { background: #f0f2f5; }
+html, body { height: 100%; margin: 0; }
+body { background: #f0f2f5; }
 
-/* ── 전체 페이지 컨테이너 ── */
-.eq-page {
+/* ── 페이지 구조 ── */
+.eform-page {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 48px); /* shell topbar */
-  overflow: hidden;
-  padding: 10px 16px;
+  height: 100vh;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 10px 14px;
   gap: 8px;
   box-sizing: border-box;
 }
 
-/* 빈 요소는 gap 안 먹게 */
-.eq-page > :empty { display: none; }
+.eform-page::-webkit-scrollbar { width: 4px; }
+.eform-page::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
 
-/* ── 필터 바 ── */
-.eq-filter-bar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 7px 12px;
-  flex-shrink: 0;
-  height: 46px;
-  box-sizing: border-box;
-}
-
-.eq-filter-form {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex: 1;
-  min-width: 0;
-}
-
-.eq-filter-keyword {
-  position: relative;
-  flex: 2;
-  min-width: 0;
-}
-
-.eq-filter-icon {
-  position: absolute;
-  left: 9px;
-  top: 50%;
-  transform: translateY(-50%);
-  font-size: 13px;
-  color: #9ca3af;
-  pointer-events: none;
-  z-index: 1;
-  line-height: 1;
-  width: 13px;
-  text-align: center;
-}
-
-.eq-filter-input {
-  width: 100% !important;
-  height: 30px !important;
-  padding: 0 10px 0 30px !important; /* 아이콘 영역 확보 — !important로 common.css 덮어쓰기 */
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  background: #f9fafb;
-  font-size: 12px !important;
-  color: #111827;
-  outline: none;
-  box-sizing: border-box !important;
-  transition: border-color 0.15s, background 0.15s;
-}
-
-.eq-filter-input:focus {
-  border-color: #2563eb;
-  background: #fff;
-  box-shadow: 0 0 0 2px rgba(37,99,246,0.08);
-}
-
-.eq-filter-input::placeholder { color: #9ca3af; }
-
-.eq-filter-select {
-  height: 30px;
-  padding: 0 22px 0 8px;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  background: #f9fafb;
-  font-size: 12px;
-  color: #374151;
-  outline: none;
-  cursor: pointer;
-  flex: 1;
-  min-width: 72px;
-  max-width: 120px;
-  transition: border-color 0.15s;
-  appearance: none;
-  -webkit-appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%23adb5bd' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 7px center;
-}
-
-.eq-filter-select:focus { border-color: #2563eb; background-color: #fff; }
-
-.eq-filter-btn {
-  height: 30px;
-  padding: 0 12px;
-  font-size: 12px;
-  border-radius: 6px;
-  white-space: nowrap;
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.eq-filter-btn i { font-size: 12px; }
-
-.eq-excel-btn {
-  height: 30px;
-  padding: 0 10px;
-  font-size: 12px;
-  border-radius: 6px;
-  white-space: nowrap;
-  flex-shrink: 0;
-  display: none; /* JS가 show/hide */
-  align-items: center;
-  gap: 4px;
-}
-
-.eq-excel-btn.visible { display: inline-flex; }
-
-.eq-register-btn {
-  height: 30px;
-  padding: 0 12px;
-  font-size: 12px;
-  border-radius: 6px;
-  white-space: nowrap;
-  flex-shrink: 0;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  text-decoration: none;
-}
-
-/* ── 툴바 ── */
-.eq-toolbar {
+/* ── 액션바 ── */
+.eform-actionbar {
   display: flex;
   align-items: center;
   justify-content: space-between;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px 14px;
   flex-shrink: 0;
-  min-height: 0;
-  /* 숨겨진 버튼들(라벨출력/검수확인서)이 표시될 때만 공간 확보 */
+  gap: 12px;
 }
 
-/* 툴바가 비어있으면 gap을 먹지 않도록 */
-.eq-toolbar:empty,
-.eq-toolbar .eq-toolbar-left:empty { display: none; }
+.eform-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
 
-.eq-toolbar-left, .eq-toolbar-right {
+.eform-title {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111827;
+  white-space: nowrap;
+}
+
+.eform-desc {
+  font-size: 11px;
+  color: #9ca3af;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.eform-actionbar-right {
   display: flex;
   align-items: center;
   gap: 6px;
+  flex-shrink: 0;
 }
 
-.eq-summary {
-  font-size: 11px;
-  color: #6b7280;
-  font-weight: 500;
+/* ── 탭 ── */
+.eform-tabs {
+  display: flex;
+  gap: 4px;
+  flex-shrink: 0;
 }
 
-.eq-select-sm {
-  height: 24px;
-  padding: 0 18px 0 6px;
+.eform-tab {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 14px;
   border: 1px solid #e5e7eb;
-  border-radius: 4px;
-  font-size: 11px;
-  color: #374151;
+  border-radius: 6px;
   background: #fff;
-  outline: none;
+  font-size: 12px;
+  font-weight: 600;
+  color: #6b7280;
   cursor: pointer;
-  appearance: none;
-  -webkit-appearance: none;
+  transition: all 0.12s;
 }
 
-/* ── 콘텐츠 영역 ── */
-/* 정확한 높이:
-   100vh - 48(shell topbar) - 10(pt) - 10(pb) - 8(gap1) - 46(filterbar) - 8(gap2) - 22(toolbar) - 8(gap3) - 30(pagination) = 100vh - 190px
-*/
-.eq-content {
-  flex: 1;
-  min-height: 0;
+.eform-tab:hover { background: #f8fafc; color: #374151; }
+.eform-tab.is-active {
+  background: #0b1630;
+  border-color: #0b1630;
+  color: #fff;
+}
+
+.eform-tab i { font-size: 14px; }
+
+/* ── 본문 ── */
+.eform-body {
   display: flex;
   flex-direction: column;
-  gap: 0;
-  overflow: hidden;
-  justify-content: flex-start; /* 테이블이 적어도 위에서 시작 */
-}
-
-.equipment-list-grid {
+  gap: 8px;
   flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
 }
 
-/* 카드 뷰 숨김 */
-.equipment-cards-wrap { display: none !important; }
-
-/* ── 테이블 래퍼 — JS가 height를 데이터 수 기반으로 주입 ── */
-.equipment-table-wrap {
-  flex: 0 0 auto; /* 데이터 수만큼만 차지 */
-  overflow: hidden;
+/* ── 섹션 ── */
+.eform-section {
+  background: #fff;
   border: 1px solid #e5e7eb;
   border-radius: 8px;
-  background: #fff;
+  overflow: hidden;
+}
+
+.eform-section-head {
   display: flex;
-  flex-direction: column;
-}
-
-/* ── 테이블 ── */
-.equipment-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 12px;
-  table-layout: fixed;
-  flex: 1;
-}
-
-/* 컬럼 너비 */
-.equipment-tbl-th--name   { width: 14%; }
-.equipment-tbl-th--id     { width: 10%; }
-.equipment-tbl-th--model  { width: 9%; }
-.equipment-tbl-th--dept   { width: 14%; }
-.equipment-tbl-th--mfr    { width: 9%; }
-.equipment-tbl-th--serial { width: 10%; }
-.equipment-tbl-th--loc    { width: 7%; }
-.equipment-tbl-th--status { width: 6%; }
-.equipment-tbl-th--actions{ width: 10%; }
-
-/* ── 헤더 ── */
-.equipment-tbl-th {
-  height: 32px;
-  padding: 0 10px;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
   background: #f8fafc;
   border-bottom: 1px solid #e5e7eb;
-  border-right: 1px solid #e5e7eb;
-  text-align: left;
-  font-size: 11px;
-  font-weight: 700;
-  color: #4b5563;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  vertical-align: middle;
-  box-sizing: border-box;
-}
-
-.equipment-tbl-th:last-child { border-right: none; }
-.equipment-tbl-th--status  { text-align: center; }
-.equipment-tbl-th--actions { text-align: center; }
-
-/* thead는 고정 */
-.equipment-table thead { display: table-header-group; }
-
-/* tbody는 나머지 공간을 채움 */
-.equipment-table tbody { display: table-row-group; }
-
-/* ── 행 — JS가 높이를 동적 계산해서 주입 ── */
-.equipment-tbl-row {
-  height: 36px;
-  border-bottom: 1px solid #f0f0f0;
-  transition: background 0.1s;
-}
-
-.equipment-tbl-row:last-child { border-bottom: none; }
-.equipment-tbl-row:hover { background: #f0f5ff; }
-
-/* ── 셀 ── */
-.equipment-tbl-cell {
-  height: 36px;
-  padding: 0 10px;
-  vertical-align: middle;
-  color: #374151;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
   font-size: 12px;
-  border-right: 1px solid #f0f0f0;
-  box-sizing: border-box;
+  font-weight: 700;
+  color: #374151;
 }
 
-.equipment-tbl-cell:last-child { border-right: none; }
-.equipment-tbl-cell--name   { font-weight: 600; color: #111827; }
-.equipment-tbl-cell--id     { font-size: 11px; color: #6b7280; font-family: 'Consolas', monospace; }
-.equipment-tbl-cell--serial { font-size: 11px; font-family: 'Consolas', monospace; }
-.equipment-tbl-cell--status { text-align: center; }
-.equipment-tbl-cell--actions { text-align: center; padding: 0 6px; }
+.eform-section-head i {
+  font-size: 14px;
+  color: #6b7280;
+}
 
-.equipment-tbl-actions {
+.eform-section-desc {
+  font-size: 11px;
+  font-weight: 400;
+  color: #9ca3af;
+  margin-left: 4px;
+}
+
+/* ── 그리드 ── */
+.eform-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  padding: 12px 14px;
+}
+
+.eform-full { grid-column: 1 / -1; }
+
+/* form-field/form-label은 common.css 그대로 활용 */
+.eform-grid .form-field { gap: 3px; }
+.eform-grid .form-label { font-size: 11px; font-weight: 600; color: #4b5563; }
+.eform-grid .input { height: 32px; font-size: 12px; }
+.eform-grid textarea.input { height: auto; min-height: 60px; padding: 6px 10px; }
+
+/* ── 사진 영역 ── */
+.eform-photo-wrap {
+  display: grid;
+  grid-template-columns: 160px 1fr;
+  gap: 14px;
+  padding: 12px 14px;
+  align-items: start;
+}
+
+.eform-photo-preview {
+  width: 160px;
+  height: 120px;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  background: #f9fafb;
+  overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 4px;
-}
-
-/* ── 테이블 버튼 ── */
-.tbl-btn {
-  display: inline-flex;
-  align-items: center;
-  height: 20px;
-  padding: 0 7px;
-  border: 1px solid #e5e7eb;
-  border-radius: 3px;
-  font-size: 11px;
-  font-weight: 600;
-  color: #374151;
-  background: #fff;
-  cursor: pointer;
-  text-decoration: none;
-  white-space: nowrap;
-  transition: background 0.1s, border-color 0.1s;
-}
-
-.tbl-btn:hover { background: #f3f4f6; border-color: #d1d5db; }
-.tbl-btn--primary { background: #111827; border-color: #111827; color: #fff; }
-.tbl-btn--primary:hover { background: #1f2937; }
-
-/* ── 상태 뱃지 ── */
-.status-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  height: 16px;
-  padding: 0 5px;
-  border-radius: 3px;
-  font-size: 10px;
-  font-weight: 700;
-  border: 1px solid transparent;
-  white-space: nowrap;
-}
-
-.is-in-use     { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
-.is-repairing  { background: #fff7ed; color: #9a3412; border-color: #fed7aa; }
-.is-inspecting { background: #eff6ff; color: #1e40af; border-color: #bfdbfe; }
-.is-stored     { background: #f9fafb; color: #374151; border-color: #e5e7eb; }
-.is-disposed   { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
-
-/* ── 빈 상태 ── */
-.equipment-list-grid .empty-box {
-  border-radius: 8px;
-  border: 1px solid #e5e7eb;
-  min-height: 120px;
-}
-
-/* ── 페이지네이션 ── */
-.pagination-area {
   flex-shrink: 0;
-  height: 36px;
+}
+
+.eform-photo-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.eform-photo-img.is-hidden { display: none; }
+
+.eform-photo-empty {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  gap: 3px;
-  box-sizing: border-box;
-  margin-top: 6px;
+  gap: 4px;
+  color: #9ca3af;
+  font-size: 11px;
 }
 
-.pagination-btn {
-  display: inline-flex;
+.eform-photo-empty i { font-size: 24px; opacity: 0.4; }
+
+.eform-photo-right {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.eform-photo-meta {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  min-width: 26px;
-  height: 26px;
-  padding: 0 6px;
-  border: 1px solid #e5e7eb;
-  border-radius: 4px;
-  background: #fff;
-  color: #374151;
+  gap: 4px;
   font-size: 12px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.1s;
+  color: #374151;
 }
 
-.pagination-btn:hover { background: #f3f4f6; border-color: #d1d5db; }
-.pagination-btn.is-active { background: #eff6ff; border-color: #bfdbfe; color: #1d4ed8; }
-.pagination-btn:disabled { opacity: 0.4; cursor: default; }
-
-/* ── 모바일 ── */
-@media (max-width: 768px) {
-  .eq-page { padding: 8px 10px; height: auto; overflow: auto; }
-  .eq-filter-bar { height: auto; flex-wrap: wrap; }
-  .eq-filter-form { flex-wrap: wrap; }
-  .eq-filter-keyword { flex: 1 1 100%; }
-  .eq-filter-select { flex: 1 1 calc(50% - 3px); max-width: none; }
-  .eq-filter-btn { flex: 1; justify-content: center; }
-  .eq-register-btn { width: 100%; justify-content: center; }
-  .eq-toolbar { height: auto; }
-  .eq-content { overflow: auto; }
-  .equipment-table-wrap { overflow-x: auto; overflow-y: auto; }
-
-  .equipment-cards-wrap { display: grid !important; grid-template-columns: 1fr; gap: 8px; }
-  .equipment-table-wrap { display: none !important; }
-
-  .equipment-card { border: 1px solid #e5e7eb; border-radius: 8px; background: #fff; overflow: hidden; }
-  .equipment-card-head { display: flex; align-items: flex-start; justify-content: space-between; padding: 10px 12px 8px; border-bottom: 1px solid #f3f4f6; gap: 8px; }
-  .equipment-card-title-wrap { min-width: 0; }
-  .equipment-card-title { font-size: 13px; font-weight: 700; color: #111827; margin: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .equipment-card-sub { font-size: 10px; color: #9ca3af; margin-top: 2px; }
-  .equipment-card-grid { display: flex; flex-direction: column; padding: 8px 12px; }
-  .equipment-card-row { display: grid; grid-template-columns: 52px 1fr; gap: 6px; padding: 3px 0; border-bottom: 1px solid #f9fafb; }
-  .equipment-card-row:last-child { border-bottom: none; }
-  .equipment-card-label { font-size: 10px; color: #9ca3af; font-weight: 600; }
-  .equipment-card-value { font-size: 11px; color: #374151; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .equipment-card-actions { display: flex; gap: 6px; padding: 8px 12px; border-top: 1px solid #f3f4f6; background: #f9fafb; }
-  .equipment-card-actions .tbl-btn { height: 28px; font-size: 12px; }
+.eform-photo-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
 }
+
+.eform-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
+}
+
+.eform-file-name {
+  font-size: 11px;
+  color: #6b7280;
+}
+
+.eform-photo-help {
+  font-size: 11px;
+  color: #9ca3af;
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* ── 일괄 등록 ── */
+.eform-bulk-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.eform-bulk-desc { font-size: 12px; color: #6b7280; }
+
+.eform-bulk-upload {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.eform-bulk-preview-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 14px;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.eform-bulk-count { font-size: 12px; font-weight: 600; color: #374151; }
+.eform-bulk-error { font-size: 12px; color: #b91c1c; }
+
+.eform-bulk-table-wrap {
+  overflow-x: auto;
+  padding: 0 14px 14px;
+}
+
+.eform-bulk-actions {
+  padding: 10px 14px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* bulk-table은 기존 스타일 유지 */
+.bulk-table { border-collapse: collapse; font-size: 11px; min-width: 600px; }
+.bulk-table th, .bulk-table td {
+  border: 1px solid #e5e7eb;
+  padding: 5px 8px;
+  white-space: nowrap;
+}
+.bulk-table th { background: #f8fafc; font-weight: 700; color: #374151; }
+.bulk-table tr:hover td { background: #f8faff; }
+.bulk-cell-error { background: #fef2f2 !important; color: #b91c1c; }
+
+/* ── message-box ── */
+.message-box { flex-shrink: 0; }

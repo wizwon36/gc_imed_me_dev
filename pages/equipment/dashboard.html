@@ -469,11 +469,24 @@ function renderDept(list) {
     return;
   }
   var max = Math.max.apply(null, list.map(function(d) { return d.count || 0; }));
+
+  // 의원이 2개 이상이면 scope=all — 팀명 중복 가능성 있으므로 의원명 prefix 표시
+  var clinicCodes = {};
+  list.forEach(function(d) { if (d.clinic_code) clinicCodes[d.clinic_code] = true; });
+  var multiClinic = Object.keys(clinicCodes).length > 1;
+
   el.innerHTML = list.map(function(d, i) {
     var pct = max > 0 ? Math.round((d.count / max) * 100) : 0;
-    var label = d.department
+    var teamName = d.department
       ? d.department.replace(/^.*\/\s*/, '')
       : (d.team_name || '미지정');
+    // 의원 여러 개면 "의원명 · 팀명", 하나면 팀명만
+    var clinicName = d.department
+      ? d.department.replace(/\s*\/.*$/, '').trim()
+      : '';
+    var label = multiClinic && clinicName
+      ? clinicName + ' · ' + teamName
+      : teamName;
     var teamCode = d.team_code || '';
     return (
       '<div class="db-dept-row" data-idx="' + i + '" data-team="' + esc(teamCode) + '" onclick="onDeptClick(this,' + i + ')">' +
@@ -493,7 +506,9 @@ function renderDept(list) {
       '<span style="font-size:11px;color:#9ca3af;margin-top:4px;">부서를 선택하면 장비 목록이 표시됩니다</span>' +
       '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;justify-content:center;">';
     list.forEach(function(d, i) {
-      var label = d.department ? d.department.replace(/^.*\/\s*/, '') : (d.team_name || '미지정');
+      var teamName2 = d.department ? d.department.replace(/^.*\/\s*/, '') : (d.team_name || '미지정');
+      var clinicName2 = d.department ? d.department.replace(/\s*\/.*$/, '').trim() : '';
+      var label = multiClinic && clinicName2 ? clinicName2 + ' · ' + teamName2 : teamName2;
       btnHtml += '<button onclick="onDeptClick(document.querySelectorAll(\'.db-dept-row\')[' + i + '],' + i + ')" ' +
         'style="padding:4px 10px;border:1px solid #e5e7eb;border-radius:5px;background:#fff;font-size:11px;font-weight:600;color:#374151;cursor:pointer;">' +
         esc(label) + ' ' + (d.count || 0) + '건</button>';
@@ -512,9 +527,15 @@ function onDeptClick(rowEl, idx) {
   var dept = deptList[idx];
   if (!dept) return;
 
-  var label = dept.department
+  var teamName3 = dept.department
     ? dept.department.replace(/^.*\/\s*/, '')
     : (dept.team_name || '미지정');
+  var clinicName3 = dept.department ? dept.department.replace(/\s*\/.*$/, '').trim() : '';
+  var deptList3 = (_dashData && _dashData.department_summary) || [];
+  var clinicCodes3 = {};
+  deptList3.forEach(function(d) { if (d.clinic_code) clinicCodes3[d.clinic_code] = true; });
+  var multiClinic3 = Object.keys(clinicCodes3).length > 1;
+  var label = multiClinic3 && clinicName3 ? clinicName3 + ' · ' + teamName3 : teamName3;
 
   renderDeptDetail(label, dept.team_code || '', dept.count || 0);
 }

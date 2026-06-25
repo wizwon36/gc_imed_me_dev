@@ -553,15 +553,19 @@ function showFlyout(menuId, triggerEl) {
           flyout2.style.left = (r.right + 4) + 'px';
           flyout2.style.top  = top2 + 'px';
           flyout2.addEventListener('mouseleave', function() {
-            flyout2.remove();
+            // 부모(sb-flyout-parent)로 돌아갔는지 확인 후 제거
+            setTimeout(function() {
+              var f2 = document.getElementById('sbFlyout2');
+              if (f2 && !f2.matches(':hover') && !btn.matches(':hover')) f2.remove();
+            }, 150);
           });
         });
         btn.addEventListener('mouseleave', function(e) {
           // 2차 flyout으로 마우스 이동 시 유지
           setTimeout(function() {
             var f2 = document.getElementById('sbFlyout2');
-            if (f2 && !f2.matches(':hover')) f2.remove();
-          }, 80);
+            if (f2 && !f2.matches(':hover') && !btn.matches(':hover')) f2.remove();
+          }, 150);
         });
       }
       flyout.appendChild(btn);

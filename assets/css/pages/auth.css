@@ -61,9 +61,9 @@ body.auth-page {
 }
 
 .auth-panel-logo {
-  width: 44px;
-  height: 44px;
-  border-radius: 12px;
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
   background: linear-gradient(135deg, #22c55e, #2563eb);
   display: flex;
   align-items: center;
@@ -559,11 +559,11 @@ body.auth-page {
   .auth-panel {
     width: 100%;
     min-width: 0;
-    padding: 32px 24px;
+    padding: 20px 24px;
   }
 
-  .auth-panel-title { font-size: 22px; }
-  .auth-panel-desc  { margin-bottom: 20px; }
+  .auth-panel-title { font-size: 20px; }
+  .auth-panel-apps  { margin-top: 12px; }
 
   .auth-form-panel {
     flex: none;
@@ -579,7 +579,7 @@ body.auth-page {
 }
 
 @media (max-width: 480px) {
-  .auth-panel { padding: 24px 20px; }
+  .auth-panel { padding: 16px 20px; }
   .auth-form-panel { padding: 24px 16px 36px; }
   .auth-card { padding: 18px; border-radius: 12px; }
   .change-card { padding: 22px; border-radius: 12px; }

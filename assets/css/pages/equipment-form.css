@@ -130,16 +130,18 @@ body { background: #f0f2f5; }
   flex-shrink: 0;
 }
 
-.eform-photo-row .eform-photo-wrap {
+.eform-photo-row .eform-photo-body {
   flex: 1;
   min-height: 0;
-  padding: 12px 14px;
 }
 
-.eform-photo-row .eform-photo-preview {
-  flex: 1;
+.eform-photo-row .eform-photo-preview-panel {
   min-height: 0;
-  height: auto;
+  height: 100%;
+}
+
+.eform-photo-row .eform-photo-dropzone {
+  flex: 1;
 }
 
 /* 좌/우 컬럼 */
@@ -231,25 +233,46 @@ body { background: #f0f2f5; }
 .eform-grid textarea.input { height: auto; min-height: 60px; padding: 6px 10px; }
 
 /* ── 사진 영역 ── */
-.eform-photo-wrap {
-  display: grid;
-  grid-template-columns: 160px 1fr;
-  gap: 14px;
-  padding: 12px 14px;
-  align-items: start;
+.eform-file-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  overflow: hidden;
 }
 
-.eform-photo-preview {
-  width: 160px;
-  height: 120px;
+.eform-file-name { font-size: 11px; color: #374151; font-weight: 500; }
+
+/* 사진 섹션 헤더 우측 액션 */
+.eform-photo-head-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  color: #374151;
+}
+
+/* 사진 본문 — 좌: 미리보기 / 우: 업로드 */
+.eform-photo-body {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 12px;
+  padding: 12px 14px;
+  flex: 1;
+  min-height: 0;
+}
+
+/* 미리보기 패널 */
+.eform-photo-preview-panel {
+  background: #f0f2f5;
   border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  background: #f9fafb;
+  border-radius: 8px;
   overflow: hidden;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
+  min-height: 120px;
 }
 
 .eform-photo-img {
@@ -260,56 +283,76 @@ body { background: #f0f2f5; }
 
 .eform-photo-img.is-hidden { display: none; }
 
-.eform-photo-empty {
+.eform-photo-empty-panel {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 4px;
-  color: #9ca3af;
+  gap: 6px;
+  color: #d1d5db;
   font-size: 11px;
 }
 
-.eform-photo-empty i { font-size: 24px; opacity: 0.4; }
+.eform-photo-empty-panel i { font-size: 32px; }
 
-.eform-photo-right {
+/* 업로드 패널 */
+.eform-photo-upload-panel {
   display: flex;
   flex-direction: column;
   gap: 8px;
 }
 
-.eform-photo-meta {
+/* 드롭존 */
+.eform-photo-dropzone {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  gap: 4px;
+  justify-content: center;
+  gap: 6px;
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  padding: 20px 16px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+  text-align: center;
+  flex: 1;
+  min-height: 80px;
+  background: #fafafa;
+}
+
+.eform-photo-dropzone:hover {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.eform-photo-dropzone i {
+  font-size: 28px;
+  color: #9ca3af;
+  transition: color 0.15s;
+}
+
+.eform-photo-dropzone:hover i { color: #2563eb; }
+
+.eform-photo-drop-title {
   font-size: 12px;
+  font-weight: 600;
   color: #374151;
 }
 
-.eform-photo-actions {
+.eform-photo-drop-sub {
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+/* 파일 선택 후 info */
+.eform-photo-file-info {
   display: flex;
   align-items: center;
   gap: 8px;
-  flex-wrap: wrap;
-}
-
-.eform-file-input {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  opacity: 0;
-  overflow: hidden;
-}
-
-.eform-file-name {
-  font-size: 11px;
-  color: #6b7280;
-}
-
-.eform-photo-help {
-  font-size: 11px;
-  color: #9ca3af;
-  margin: 0;
-  line-height: 1.5;
+  padding: 8px 10px;
+  background: #f0fdf4;
+  border: 1px solid #bbf7d0;
+  border-radius: 6px;
+  font-size: 12px;
 }
 
 /* ── 일괄 등록 ── */

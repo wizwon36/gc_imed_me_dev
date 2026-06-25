@@ -4,153 +4,125 @@ function formatDisplayDate(value) {
   var raw = String(value || '').trim();
   if (!raw) return '-';
   if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
-
-  var dateOnlyMatch = raw.match(/^(\d{4}-\d{2}-\d{2})[T\s]/);
-  if (dateOnlyMatch) return dateOnlyMatch[1];
-
-  var parsed = new Date(raw);
-  if (!isNaN(parsed.getTime())) {
-    var yyyy = parsed.getFullYear();
-    var mm = String(parsed.getMonth() + 1).padStart(2, '0');
-    var dd = String(parsed.getDate()).padStart(2, '0');
-    return yyyy + '-' + mm + '-' + dd;
+  var m = raw.match(/^(\d{4}-\d{2}-\d{2})[T\s]/);
+  if (m) return m[1];
+  var p = new Date(raw);
+  if (!isNaN(p.getTime())) {
+    return p.getFullYear() + '-' +
+      String(p.getMonth() + 1).padStart(2, '0') + '-' +
+      String(p.getDate()).padStart(2, '0');
   }
-
   return raw;
 }
 
-function statusLabelPublic(value) {
-  var map = {
-    IN_USE: '사용중',
-    REPAIRING: '수리중',
-    INSPECTING: '점검중',
-    STORED: '보관',
-    DISPOSED: '폐기'
-  };
-  return map[String(value || '').trim()] || (value || '-');
+function statusLabelPublic(v) {
+  return { IN_USE:'사용중', REPAIRING:'수리중', INSPECTING:'점검중', STORED:'보관', DISPOSED:'폐기' }[String(v||'').trim()] || (v||'-');
 }
 
-function statusClassPublic(value) {
-  var map = {
-    IN_USE: 'is-in-use',
-    REPAIRING: 'is-repairing',
-    INSPECTING: 'is-inspecting',
-    STORED: 'is-stored',
-    DISPOSED: 'is-disposed'
-  };
-  return map[String(value || '').trim()] || '';
+function statusClassPublic(v) {
+  return { IN_USE:'is-in-use', REPAIRING:'is-repairing', INSPECTING:'is-inspecting', STORED:'is-stored', DISPOSED:'is-disposed' }[String(v||'').trim()] || '';
 }
 
-function renderPublicInfo(item) {
-  var grid = document.getElementById('publicInfoGrid');
-  if (!grid) return;
-
-  var fields = [
-    { label: '장비번호',      value: item.equipment_id },
-    { label: '장비명',        value: item.equipment_name },
-    { label: '모델명',        value: item.model_name },
-    { label: '제조사',        value: item.manufacturer },
-    { label: '사용부서',      value: item.department },
-    { label: '현재 위치',     value: item.location },
-    { label: '유지보수 종료', value: formatDisplayDate(item.maintenance_end_date) },
-    { label: '현재 상태',     value: item.status, isStatus: true },
-    { label: '담당자',        value: item.manager_name },
-    { label: '연락처',        value: item.manager_phone }
-  ];
-
-  function buildInfoCell(field) {
-    var valueHtml;
-    if (field.isStatus) {
-      valueHtml = '<span class="status-badge ' + statusClassPublic(field.value) + '">' +
-        escapeHtml(statusLabelPublic(field.value)) + '</span>';
-    } else {
-      var display = (!field.value || field.value === '') ? '-' : field.value;
-      valueHtml = escapeHtml(display);
-    }
-    return (
-      '<div class="info-cell">' +
-        '<span class="info-cell-label">' + escapeHtml(field.label) + '</span>' +
-        '<span class="info-cell-value">' + valueHtml + '</span>' +
-      '</div>'
-    );
-  }
-
-  var rows = [];
-  var i = 0;
-  while (i < fields.length) {
-    var f = fields[i];
-    var next = (fields[i + 1]) ? fields[i + 1] : null;
-    if (next) {
-      rows.push('<div class="info-row">' + buildInfoCell(f) + buildInfoCell(next) + '</div>');
-      i += 2;
-    } else {
-      rows.push('<div class="info-row">' + buildInfoCell(f) + '</div>');
-      i++;
-    }
-  }
-
-  grid.innerHTML = rows.join('');
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-function renderPublicHero(item) {
-  var nameEl = document.getElementById('heroEquipmentName');
-  var idEl = document.getElementById('heroEquipmentId');
-  var badgeEl = document.getElementById('heroStatusBadge');
-
-  if (nameEl) nameEl.textContent = item.equipment_name || '-';
-  if (idEl) idEl.textContent = item.equipment_id || '-';
-  if (badgeEl) {
-    badgeEl.textContent = statusLabelPublic(item.status);
-    badgeEl.className = 'status-badge ' + statusClassPublic(item.status);
-  }
+function row(label, value) {
+  return '<div class="pub-info-row">' +
+    '<div class="pub-info-label">' + esc(label) + '</div>' +
+    '<div class="pub-info-value">' + esc(value || '-') + '</div>' +
+  '</div>';
 }
 
-function renderLoginBanner() {
-  var banner = document.getElementById('loginBanner');
-  if (banner) banner.style.display = '';
+function renderPage(item, isLoggedIn) {
+  var body = document.getElementById('pubBody');
+  if (!body) return;
+
+  var statusBadge = '<span class="status-badge ' + statusClassPublic(item.status) + '">' +
+    esc(statusLabelPublic(item.status)) + '</span>';
+
+  var dept = item.department || '-';
+
+  var heroHtml =
+    '<div class="pub-hero">' +
+      '<div>' +
+        '<div class="pub-hero-name">' + esc(item.equipment_name || '-') + '</div>' +
+        '<div class="pub-hero-id">' + esc(item.equipment_id || '-') + '</div>' +
+        '<div class="pub-hero-dept"><i class="ti ti-building-hospital"></i>' + esc(dept) + '</div>' +
+      '</div>' +
+      '<div class="pub-hero-badge">' + statusBadge + '</div>' +
+    '</div>';
+
+  var noticeHtml =
+    '<div class="pub-notice">' +
+      '<i class="ti ti-info-circle"></i>' +
+      'QR코드로 접근한 공개 장비 정보 페이지입니다. 일부 정보만 표시됩니다.' +
+    '</div>';
+
+  var loginNoticeHtml = !isLoggedIn ?
+    '<div class="pub-notice pub-login-notice">' +
+      '<i class="ti ti-lock"></i>' +
+      '전체 정보 및 이력을 확인하려면 <a href="../../index.html">로그인</a>이 필요합니다.' +
+    '</div>' : '';
+
+  var infoHtml =
+    '<div class="pub-card">' +
+      '<div class="pub-card-head"><i class="ti ti-info-circle"></i> 장비 기본 정보</div>' +
+      '<div class="pub-info-list">' +
+        row('장비번호',      item.equipment_id) +
+        row('모델명',        item.model_name) +
+        row('제조사',        item.manufacturer) +
+        row('사용부서',      item.department) +
+        row('현재 위치',     item.location) +
+        row('유지보수 종료', formatDisplayDate(item.maintenance_end_date)) +
+      '</div>' +
+    '</div>';
+
+  var contactHtml = (item.manager_name || item.manager_phone) ?
+    '<div class="pub-card">' +
+      '<div class="pub-card-head"><i class="ti ti-user"></i> 담당자 정보</div>' +
+      '<div class="pub-info-list">' +
+        row('담당자',  item.manager_name) +
+        row('연락처',  item.manager_phone) +
+      '</div>' +
+    '</div>' : '';
+
+  var detailBtnHtml = isLoggedIn ?
+    '<a href="detail.html?id=' + encodeURIComponent(item.equipment_id || '') + '" class="pub-detail-btn">' +
+      '<i class="ti ti-file-description"></i> 전체 상세 정보 보기' +
+    '</a>' : '';
+
+  body.innerHTML = heroHtml + noticeHtml + loginNoticeHtml + infoHtml + contactHtml + detailBtnHtml;
 }
 
 async function loadPublicEquipment() {
-  var equipmentId = getQueryParam('id');
-  currentEquipmentId = equipmentId;
+  var equipmentId = new URLSearchParams(location.search).get('id');
+  currentEquipmentId = equipmentId || '';
+
+  var body = document.getElementById('pubBody');
 
   if (!equipmentId) {
-    showMessage('장비 정보를 찾을 수 없습니다.', 'error');
+    if (body) body.innerHTML = '<div class="pub-error"><i class="ti ti-alert-circle"></i> 장비 정보를 찾을 수 없습니다.</div>';
     return;
   }
 
-  showGlobalLoading('장비 정보를 불러오는 중...');
+  if (typeof showGlobalLoading === 'function') showGlobalLoading('장비 정보를 불러오는 중...');
 
   try {
     var result = await apiGet('getEquipmentPublic', { id: equipmentId });
     var item = (result && result.data) ? result.data : {};
 
-    renderPublicHero(item);
-    renderPublicInfo(item);
+    var session = window.auth && typeof window.auth.getSession === 'function'
+      ? window.auth.getSession() : null;
+    var isLoggedIn = !!(session && (session.user_email || session.email));
 
-    // 로그인 여부 확인 — auth.getSession() 사용으로 통일
-    var sessionRaw = (window.auth && typeof window.auth.getSession === 'function')
-      ? window.auth.getSession()
-      : null;
-
-    var detailBtn = document.getElementById('goToDetailBtn');
-    if (detailBtn) {
-      if (sessionRaw && sessionRaw.user_email) {
-        detailBtn.href = 'detail.html?id=' + encodeURIComponent(equipmentId);
-        detailBtn.style.display = '';
-      } else {
-        detailBtn.style.display = 'none';
-        renderLoginBanner();
-      }
-      if (typeof applyTopActionsColClass === 'function') applyTopActionsColClass();
-    }
-  } catch (error) {
-    showMessage(error.message || '장비 정보를 불러오지 못했습니다.', 'error');
+    renderPage(item, isLoggedIn);
+  } catch (e) {
+    if (body) body.innerHTML = '<div class="pub-error"><i class="ti ti-alert-circle"></i> ' +
+      escapeHtml(e.message || '장비 정보를 불러오지 못했습니다.') + '</div>';
   } finally {
-    hideGlobalLoading();
+    if (typeof hideGlobalLoading === 'function') hideGlobalLoading(true);
   }
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-  loadPublicEquipment();
-});
+document.addEventListener('DOMContentLoaded', loadPublicEquipment);

@@ -10,15 +10,11 @@ body { background: #f0f2f5; }
   display: flex;
   flex-direction: column;
   height: 100vh;
-  overflow-y: auto;
-  overflow-x: hidden;
+  overflow: hidden;
   padding: 10px 14px;
   gap: 8px;
   box-sizing: border-box;
 }
-
-.eform-page::-webkit-scrollbar { width: 4px; }
-.eform-page::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
 
 /* ── 액션바 ── */
 .eform-actionbar {
@@ -107,7 +103,10 @@ body { background: #f0f2f5; }
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 8px;
-  align-items: start;
+  align-items: stretch;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
 }
 
 /* 좌/우 컬럼 */
@@ -116,6 +115,43 @@ body { background: #f0f2f5; }
   flex-direction: column;
   gap: 8px;
   min-height: 0;
+  overflow: hidden;
+}
+
+/* stretch 컬럼: 마지막 섹션이 남은 공간 전부 차지 */
+.eform-col--stretch {
+  overflow: hidden;
+}
+
+.eform-col--stretch .eform-section--grow {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.eform-section--grow .eform-photo-wrap {
+  flex: 1;
+  min-height: 0;
+}
+
+.eform-section--grow .eform-photo-preview {
+  flex: 1;
+  min-height: 0;
+  height: auto;
+}
+
+/* 장비정보 섹션도 남은 공간 차지 */
+.eform-col--stretch .eform-section:last-of-type:not(.eform-section--grow) {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.eform-col--stretch .eform-section:last-of-type:not(.eform-section--grow) .eform-grid {
+  flex: 1;
 }
 
 /* ── 섹션 ── */

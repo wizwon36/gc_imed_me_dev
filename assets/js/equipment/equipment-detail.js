@@ -544,7 +544,11 @@ function renderHistories(items) {
         '</td>' +
         '<td class="sec-tbl-cell sec-tbl-cell--center">' + statusBadge + '</td>' +
         '<td class="sec-tbl-cell sec-tbl-cell--grow">' + desc + '</td>' +
-        (hasAction ? '<td class="sec-tbl-cell sec-tbl-cell--action">' + (actionBtns || '') + '</td>' : '') +
+        (hasAction ? '<td class="sec-tbl-cell sec-tbl-cell--action">' +
+          (actionBtns || (String(item.result_status) === 'COMPLETED'
+            ? '<span class="timeline-badge badge-green" style="font-size:10px;">완료</span>'
+            : '')) +
+        '</td>' : '') +
       '</tr>'
     );
   }).join('');

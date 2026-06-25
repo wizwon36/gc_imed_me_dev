@@ -93,14 +93,22 @@
 /* 기본정보 그리드가 카드 남은 공간 전체 차지 */
 .det-card--info .info-tile-grid {
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
+}
+
+/* 일반 행은 수축하지 않도록 */
+.det-card--info .info-row {
+  flex-shrink: 0;
 }
 
 /* 비고 행이 남은 세로 공간 전부 차지 */
 .det-card--info .info-row--wide {
   flex: 1;
   min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 /* 비고 셀: 라벨 상단 고정, 값 아래 전체 */

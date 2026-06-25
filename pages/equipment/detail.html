@@ -35,10 +35,8 @@
   <!-- ── 메인 레이아웃 (3열) ── -->
   <div class="det-body">
 
-    <!-- 1열: 기본정보 + 사진 + QR -->
+    <!-- 1열: 기본정보 (1단) -->
     <div class="det-col-info">
-
-      <!-- 기본 정보 -->
       <div class="det-card det-card--info">
         <div class="det-card-head">
           <span class="det-card-title">기본 정보</span>
@@ -47,39 +45,9 @@
           <div class="empty-box">불러오는 중...</div>
         </div>
       </div>
-
-      <!-- 사진 + QR 나란히 -->
-      <div class="det-media-row">
-        <div class="det-card det-card--photo">
-          <div class="det-card-head">
-            <span class="det-card-title">장비 사진</span>
-            <div class="det-card-actions">
-              <button type="button" id="photoOpenBtn"   class="btn btn-sm" style="display:none;">새 창</button>
-              <button type="button" id="photoDeleteBtn" class="btn btn-sm btn-danger" style="display:none;">삭제</button>
-            </div>
-          </div>
-          <div id="detailPhotoWrap" class="det-photo-wrap">
-            <img id="detailPhotoImage" class="det-photo-img is-hidden" alt="장비 사진" />
-            <div id="detailPhotoEmpty" class="det-photo-empty">등록된 사진이 없습니다.</div>
-          </div>
-        </div>
-
-        <div class="det-card det-card--qr">
-          <div class="det-card-head">
-            <span class="det-card-title">QR 코드</span>
-          </div>
-          <div class="det-qr-panel">
-            <div id="qrBox" class="det-qr-box">
-              <div class="empty-box">불러오는 중...</div>
-            </div>
-            <div id="qrText" class="det-qr-text">—</div>
-          </div>
-        </div>
-      </div>
-
     </div><!-- /det-col-info -->
 
-    <!-- 2열: 수리 / 점검 이력 -->
+    <!-- 2열: 수리/점검 이력 + 재고조사 이력 -->
     <div class="det-col-history">
       <div class="det-card">
         <div class="det-card-head">
@@ -93,10 +61,6 @@
           <div class="empty-box">불러오는 중...</div>
         </div>
       </div>
-    </div><!-- /det-col-history -->
-
-    <!-- 3열: 재고조사 이력 -->
-    <div class="det-col-inventory">
       <div class="det-card">
         <div class="det-card-head">
           <span class="det-card-title">재고조사 이력</span>
@@ -109,7 +73,36 @@
           <div class="empty-box">불러오는 중...</div>
         </div>
       </div>
-    </div><!-- /det-col-inventory -->
+    </div><!-- /det-col-history -->
+
+    <!-- 3열: 장비사진 + QR코드 -->
+    <div class="det-col-media">
+      <div class="det-card det-card--photo">
+        <div class="det-card-head">
+          <span class="det-card-title">장비 사진</span>
+          <div class="det-card-actions">
+            <button type="button" id="photoOpenBtn"   class="btn btn-sm" style="display:none;">새 창</button>
+            <button type="button" id="photoDeleteBtn" class="btn btn-sm btn-danger" style="display:none;">삭제</button>
+          </div>
+        </div>
+        <div id="detailPhotoWrap" class="det-photo-wrap">
+          <img id="detailPhotoImage" class="det-photo-img is-hidden" alt="장비 사진" />
+          <div id="detailPhotoEmpty" class="det-photo-empty">등록된 사진이 없습니다.</div>
+        </div>
+      </div>
+
+      <div class="det-card det-card--qr">
+        <div class="det-card-head">
+          <span class="det-card-title">QR 코드</span>
+        </div>
+        <div class="det-qr-panel">
+          <div id="qrBox" class="det-qr-box">
+            <div class="empty-box">불러오는 중...</div>
+          </div>
+          <div id="qrText" class="det-qr-text">—</div>
+        </div>
+      </div>
+    </div><!-- /det-col-media -->
 
   </div><!-- /det-body -->
 

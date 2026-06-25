@@ -538,10 +538,10 @@ function renderHistories(items) {
 
     return (
       '<tr class="sec-tbl-row">' +
+        '<td class="sec-tbl-cell" style="white-space:nowrap;font-size:11px;color:#6b7280;">' + dateLabel + '</td>' +
         '<td class="sec-tbl-cell sec-tbl-cell--left">' +
           '<span class="sec-tbl-main">' + typeLabel + '</span>' +
         '</td>' +
-        '<td class="sec-tbl-cell" style="white-space:nowrap;font-size:11px;color:#6b7280;">' + dateLabel + '</td>' +
         '<td class="sec-tbl-cell sec-tbl-cell--center">' + statusBadge + '</td>' +
         '<td class="sec-tbl-cell sec-tbl-cell--grow">' + desc + '</td>' +
         (hasAction ? '<td class="sec-tbl-cell sec-tbl-cell--action">' +
@@ -556,8 +556,8 @@ function renderHistories(items) {
   area.innerHTML =
     '<table class="sec-tbl">' +
       '<thead class="sec-tbl-head"><tr>' +
-        '<th class="sec-tbl-th" style="width:70px">구분</th>' +
         '<th class="sec-tbl-th" style="width:76px">날짜</th>' +
+        '<th class="sec-tbl-th" style="width:70px">구분</th>' +
         '<th class="sec-tbl-th sec-tbl-th--center" style="width:60px">상태</th>' +
         '<th class="sec-tbl-th">내용</th>' +
         (hasAction ? '<th class="sec-tbl-th sec-tbl-th--center" style="width:72px">처리</th>' : '') +

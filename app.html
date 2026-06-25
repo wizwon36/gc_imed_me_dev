@@ -54,7 +54,10 @@
           <i class="ti ti-list" aria-hidden="true"></i> 장비 목록
         </button>
         <button class="sb-sub-item" data-page="equipment/form" onclick="navigate('equipment/form')">
-          <i class="ti ti-plus" aria-hidden="true"></i> 장비 등록
+          <i class="ti ti-forms" aria-hidden="true"></i> 단건 등록
+        </button>
+        <button class="sb-sub-item" data-page="equipment/form-bulk" onclick="navigate('equipment/form-bulk')">
+          <i class="ti ti-table-import" aria-hidden="true"></i> 일괄 등록
         </button>
       </div>
 
@@ -231,6 +234,7 @@ const MENU_META = {
   'equipment/dashboard':          { app: '의료장비 관리', page: '대시보드' },
   'equipment/list':               { app: '의료장비 관리', page: '장비 목록' },
   'equipment/form':               { app: '의료장비 관리', page: '장비 등록' },
+  'equipment/form-bulk':          { app: '의료장비 관리', page: '일괄 등록' },
   'equipment/form':               { app: '의료장비 관리', page: '장비 등록·수정' },
   'equipment/detail':             { app: '의료장비 관리', page: '장비 상세' },
   'equipment/history-form':       { app: '의료장비 관리', page: '이력 등록' },
@@ -323,7 +327,16 @@ function navigate(page, tab, skipHistory) {
   updateActiveMenu(page, tab);
 
   // iframe URL 결정
-  let url = `${CONFIG.SITE_BASE_URL}/pages/${page}.html?shell=1`;
+  // equipment/form-bulk → form.html?mode=bulk 로 매핑
+  const PAGE_URL_MAP = {
+    'equipment/form-bulk': 'equipment/form'
+  };
+  const PAGE_QUERY_MAP = {
+    'equipment/form-bulk': '&mode=bulk'
+  };
+  const actualPage = PAGE_URL_MAP[page] || page;
+  const extraQueryStr = PAGE_QUERY_MAP[page] || '';
+  let url = `${CONFIG.SITE_BASE_URL}/pages/${actualPage}.html?shell=1` + extraQueryStr;
   if (tab) url += `&tab=${tab}`;
 
   // iframe 로드 전 숨김 → onload 후 표시 (자체 스피너 없이)

@@ -974,6 +974,18 @@ function renderBulkPreview(rows) {
   errorEl.textContent = errorRows.length ? `오류 ${errorRows.length}건 — 수정 후 다시 업로드해 주세요.` : '';
   submitBtn.style.display = errorRows.length === 0 ? '' : 'none';
 
+  // Step 3 상태 메시지 업데이트
+  const statusMsg = qs('#bulkStatusMsg');
+  if (statusMsg) {
+    if (errorRows.length === 0) {
+      statusMsg.style.display = 'none';
+    } else {
+      statusMsg.textContent = `오류 ${errorRows.length}건이 있습니다. 파일을 수정 후 다시 업로드해 주세요.`;
+      statusMsg.style.display = '';
+      statusMsg.style.color = '#b91c1c';
+    }
+  }
+
   const displayCols = BULK_COLUMNS.slice(0, 8); // 미리보기는 주요 컬럼만
 
   const thead = `<thead><tr>${displayCols.map(c =>
@@ -1069,6 +1081,12 @@ function initBulkSection(user, isAppAdmin) {
 
   qs('#bulkFileInput')?.addEventListener('change', async function() {
     const file = this.files?.[0];
+    const nameEl = qs('#bulkFileName');
+    const dropzone = qs('#bulkDropzone');
+    if (file) {
+      if (nameEl) { nameEl.textContent = file.name; nameEl.style.display = ''; }
+      if (dropzone) dropzone.style.display = 'none';
+    }
     if (!file) return;
     qs('#bulkFileName').textContent = file.name;
     clearMessage();

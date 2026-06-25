@@ -428,3 +428,163 @@
   .equipment-card-actions { display: flex; gap: 6px; padding: 8px 12px; border-top: 1px solid #f3f4f6; background: #f9fafb; }
   .equipment-card-actions .tbl-btn { height: 28px; font-size: 12px; }
 }
+
+/* ================================================================
+ * 라벨 출력 모달
+ * ================================================================ */
+
+/* detail 페이지용 */
+.det-modal-dialog--label { width: 520px; }
+
+.det-modal-body--label {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.det-modal-icon--label { background: rgba(245,158,11,0.18); color: #fbbf24; }
+
+/* list 페이지용 오버레이 모달 */
+.list-label-modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+}
+.list-label-modal-overlay.is-open { display: flex; }
+
+.list-label-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(11,22,48,0.5);
+}
+
+.list-label-modal-dialog {
+  position: relative;
+  z-index: 1;
+  background: #fff;
+  border-radius: 8px;
+  width: 520px;
+  max-width: calc(100vw - 32px);
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.16);
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+}
+
+.list-label-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: #0b1630;
+  flex-shrink: 0;
+}
+
+.list-label-modal-head-left {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.list-label-modal-icon {
+  width: 26px;
+  height: 26px;
+  border-radius: 4px;
+  background: rgba(245,158,11,0.2);
+  color: #fbbf24;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+}
+
+.list-label-modal-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #fff;
+}
+
+.list-label-modal-subtitle {
+  font-size: 10px;
+  color: rgba(255,255,255,0.45);
+  margin-top: 1px;
+}
+
+.list-label-modal-close {
+  width: 24px;
+  height: 24px;
+  border: none;
+  background: rgba(255,255,255,0.07);
+  border-radius: 4px;
+  cursor: pointer;
+  color: rgba(255,255,255,0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+}
+.list-label-modal-close i { font-size: 12px; }
+.list-label-modal-close:hover { background: rgba(255,255,255,0.14); color: #fff; }
+
+.list-label-modal-body {
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 공통 라벨 모달 내부 */
+.label-modal-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.label-modal-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f0f2f5;
+  border-radius: 6px;
+  padding: 20px;
+  min-height: 180px;
+}
+
+.label-sheet-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 인쇄 시 라벨 모달만 출력 */
+@media print {
+  body > *:not(#listLabelModalOverlay):not(#labelModal) { display: none !important; }
+  #listLabelModalOverlay .list-label-modal-head,
+  #listLabelModalOverlay .list-label-modal-body > .label-modal-toolbar,
+  #listLabelModalOverlay .list-label-modal-backdrop,
+  #labelModal .det-modal-head,
+  #labelModal .label-modal-toolbar,
+  #labelModal .det-modal-backdrop { display: none !important; }
+  #listLabelModalOverlay,
+  #labelModal {
+    display: flex !important;
+    position: static !important;
+    background: none !important;
+  }
+  .list-label-modal-dialog,
+  .det-modal-dialog--label {
+    box-shadow: none !important;
+    border: none !important;
+    width: auto !important;
+  }
+  .label-modal-preview {
+    background: none !important;
+    padding: 0 !important;
+  }
+}

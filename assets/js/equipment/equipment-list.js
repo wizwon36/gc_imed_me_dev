@@ -232,7 +232,7 @@ function buildEquipmentCard(item) {
         '</div>' +
         '<div class="equipment-card-row">' +
           '<span class="equipment-card-label">부서</span>' +
-          '<span class="equipment-card-value">' + escapeHtml(item.department || '-') + '</span>' +
+          '<span class="equipment-card-value">' + escapeHtml((item.clinic_name || '') + (item.clinic_name && item.team_name ? ' / ' : '') + (item.team_name || '') || '-') + '</span>' +
         '</div>' +
         '<div class="equipment-card-row">' +
           '<span class="equipment-card-label">제조사</span>' +
@@ -278,7 +278,8 @@ function buildEquipmentRow(item) {
       '<td class="equipment-tbl-cell equipment-tbl-cell--name">' + escapeHtml(item.equipment_name || '-') + '</td>' +
       '<td class="equipment-tbl-cell equipment-tbl-cell--id">' + escapeHtml(item.equipment_id || '-') + '</td>' +
       '<td class="equipment-tbl-cell">' + escapeHtml(item.model_name || '-') + '</td>' +
-      '<td class="equipment-tbl-cell">' + escapeHtml(item.department || '-') + '</td>' +
+      '<td class="equipment-tbl-cell">' + escapeHtml(item.clinic_name || '-') + '</td>' +
+      '<td class="equipment-tbl-cell">' + escapeHtml(item.team_name   || '-') + '</td>' +
       '<td class="equipment-tbl-cell">' + escapeHtml(item.manufacturer || '-') + '</td>' +
       '<td class="equipment-tbl-cell equipment-tbl-cell--serial">' + escapeHtml(item.serial_no || '-') + '</td>' +
       '<td class="equipment-tbl-cell">' + escapeHtml(item.location || '-') + '</td>' +
@@ -340,12 +341,11 @@ function renderEquipmentList(items) {
       }
     },
     { headerName: '모델명', field: 'model_name', width: 130 },
-    { headerName: '부서', field: 'clinic_name', width: 160,
-      cellRenderer: function(p) {
-        var d = p.data;
-        var c = d.clinic_name || '', t = d.team_name || '';
-        return escapeHtml(c && t ? c + ' / ' + t : c || t || '—');
-      }
+    { headerName: '의원', field: 'clinic_name', width: 100,
+      cellRenderer: function(p) { return escapeHtml(p.value || '—'); }
+    },
+    { headerName: '부서', field: 'team_name', width: 90,
+      cellRenderer: function(p) { return escapeHtml(p.value || '—'); }
     },
     { headerName: '제조사', field: 'manufacturer', width: 120,
       cellRenderer: function(p) {
@@ -776,7 +776,7 @@ async function exportEquipmentExcel() {
 
     var headers = [
       '장비번호', '장비명', '모델명', '제조사', '시리얼번호',
-      '사용부서', '의원', '팀', '현재위치', '현재상태',
+      '의원', '부서', '현재위치', '현재상태',
       '담당자', '연락처', '구매처', '취득가액',
       '취득일자', '제조일자', '유지보수종료일', '현재사용자', '비고', '등록일시'
     ];
@@ -794,7 +794,6 @@ async function exportEquipmentExcel() {
         item.model_name || '',
         item.manufacturer || '',
         item.serial_no || '',
-        item.department || '',
         item.clinic_name || '',
         item.team_name || '',
         item.location || '',

@@ -83,7 +83,7 @@
           </div>
           <div class="form-field eform-full">
             <label class="form-label">메모</label>
-            <textarea id="memo" class="input textarea" rows="3" placeholder="추가로 관리해야 할 사항을 입력하세요"></textarea>
+            <textarea id="memo" class="input textarea" rows="6" placeholder="추가로 관리해야 할 사항을 입력하세요"></textarea>
           </div>
         </div>
       </div>
@@ -160,31 +160,41 @@
         <i class="ti ti-photo"></i>
         <span>장비 사진</span>
         <span class="eform-section-desc">장비 식별이 가능한 사진을 등록하세요</span>
-      </div>
-      <div class="eform-photo-wrap">
-        <div class="eform-photo-preview" id="photoPreviewWrap">
-          <img id="photoPreviewImage" class="eform-photo-img is-hidden" alt="장비 사진 미리보기" />
-          <div id="photoPreviewEmpty" class="eform-photo-empty">
-            <i class="ti ti-photo-off"></i>
-            <span>등록된 사진이 없습니다.</span>
+        <div class="eform-photo-head-actions">
+          <div id="photoExistingMeta" style="display:none;">
+            <i class="ti ti-circle-check" style="color:#22c55e;font-size:13px;"></i>
+            <span>등록된 사진 있음</span>
           </div>
         </div>
-        <div class="eform-photo-right">
-          <div class="eform-photo-meta" id="photoExistingMeta" style="display:none;">
-            <i class="ti ti-circle-check" style="color:#22c55e;"></i> 현재 등록된 사진이 있습니다.
+      </div>
+      <div class="eform-photo-body">
+
+        <!-- 좌: 미리보기 -->
+        <div class="eform-photo-preview-panel" id="photoPreviewWrap">
+          <img id="photoPreviewImage" class="eform-photo-img is-hidden" alt="장비 사진 미리보기" />
+          <div id="photoPreviewEmpty" class="eform-photo-empty-panel">
+            <i class="ti ti-camera-off"></i>
+            <span>미리보기</span>
           </div>
-          <div class="eform-photo-actions">
-            <input type="file" id="photoInput" class="eform-file-input" accept="image/*" />
-            <label for="photoInput" class="btn btn-sm">
-              <i class="ti ti-upload"></i> 사진 선택
-            </label>
-            <span id="photoFileName" class="eform-file-name">선택된 파일 없음</span>
-            <button type="button" class="btn btn-sm btn-danger" id="removePhotoBtn" style="display:none;">
+        </div>
+
+        <!-- 우: 첨부 영역 -->
+        <div class="eform-photo-upload-panel">
+          <input type="file" id="photoInput" class="eform-file-input" accept="image/*" />
+          <label for="photoInput" class="eform-photo-dropzone" id="photoDropzone">
+            <i class="ti ti-cloud-upload"></i>
+            <span class="eform-photo-drop-title">사진을 끌어다 놓거나 클릭하여 선택</span>
+            <span class="eform-photo-drop-sub">JPG, PNG, WEBP · 업로드 전 자동 압축</span>
+          </label>
+          <div class="eform-photo-file-info" id="photoFileInfo" style="display:none;">
+            <i class="ti ti-file-check" style="color:#22c55e;"></i>
+            <span id="photoFileName" class="eform-file-name"></span>
+            <button type="button" class="btn btn-sm btn-danger" id="removePhotoBtn">
               <i class="ti ti-trash"></i> 제거
             </button>
           </div>
-          <p class="eform-photo-help">업로드 전에 자동 압축됩니다.</p>
         </div>
+
       </div>
     </div>
 
@@ -252,6 +262,61 @@
     var descEl  = document.getElementById('pageDesc');
     if (titleEl) titleEl.textContent = '일괄 등록';
     if (descEl)  descEl.textContent  = '엑셀 파일로 여러 장비를 한 번에 등록합니다.';
+  }
+})();
+</script>
+
+<script>
+// ── 드롭존 drag & drop ──────────────────────────────────────
+(function() {
+  var dropzone  = document.getElementById('photoDropzone');
+  var fileInput = document.getElementById('photoInput');
+  var fileInfo  = document.getElementById('photoFileInfo');
+  var fileName  = document.getElementById('photoFileName');
+
+  if (!dropzone || !fileInput) return;
+
+  ['dragenter','dragover'].forEach(function(evt) {
+    dropzone.addEventListener(evt, function(e) {
+      e.preventDefault();
+      dropzone.style.borderColor = '#2563eb';
+      dropzone.style.background  = '#eff6ff';
+    });
+  });
+
+  ['dragleave','drop'].forEach(function(evt) {
+    dropzone.addEventListener(evt, function(e) {
+      e.preventDefault();
+      dropzone.style.borderColor = '';
+      dropzone.style.background  = '';
+    });
+  });
+
+  dropzone.addEventListener('drop', function(e) {
+    var files = e.dataTransfer.files;
+    if (files && files[0]) {
+      fileInput.files = files;
+      fileInput.dispatchEvent(new Event('change', { bubbles: true }));
+    }
+  });
+
+  // 파일 선택 시 info 표시
+  fileInput.addEventListener('change', function() {
+    if (this.files && this.files[0]) {
+      if (fileName) fileName.textContent = this.files[0].name;
+      if (fileInfo) fileInfo.style.display = 'flex';
+      if (dropzone) dropzone.style.display = 'none';
+    }
+  });
+
+  // 제거 버튼
+  var removeBtn = document.getElementById('removePhotoBtn');
+  if (removeBtn) {
+    removeBtn.addEventListener('click', function() {
+      fileInput.value = '';
+      if (fileInfo) fileInfo.style.display = 'none';
+      if (dropzone) dropzone.style.display = '';
+    });
   }
 })();
 </script>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>검사항목 관리 · 정도관리</title>
+  <link rel="stylesheet" href="../../assets/css/common.css" />
+  <link rel="stylesheet" href="../../assets/css/pages/qc-items.css" />
+  <link rel="stylesheet" href="../../assets/font/tabler-icons/tabler-icons.min.css" />
+  <script>
+    if (new URLSearchParams(location.search).get('shell') === '1')
+      document.documentElement.classList.add('in-shell');
+  </script>
+</head>
+<body class="qc-items-page">
+
+<div class="lj-page">
+
+  <!-- 액션바 -->
+  <div class="lj-actionbar">
+    <div class="lj-actionbar-left">
+      <!-- 부서 필터 (scope=all/clinic) -->
+      <div id="deptFilterRow" style="display:none; align-items:center; gap:8px;">
+        <select id="clinicFilterSelect" class="input lj-filter-select"></select>
+        <select id="teamFilterSelect"   class="input lj-filter-select" disabled></select>
+      </div>
+      <!-- 그룹 필터 -->
+      <select id="groupFilterSelect" class="input lj-filter-select" onchange="onGroupFilterChange(this.value)">
+        <option value="">전체 그룹</option>
+      </select>
+      <!-- 항목 셀렉트 -->
+      <select id="itemSelect" class="input lj-filter-select lj-item-select"></select>
+    </div>
+    <div class="lj-actionbar-right">
+      <button type="button" class="btn btn-sm" id="editItemBtn" style="display:none;">
+        <i class="ti ti-pencil"></i> 수정
+      </button>
+      <button type="button" class="btn btn-sm btn-danger" id="deleteItemBtn" style="display:none;">
+        <i class="ti ti-trash"></i> 삭제
+      </button>
+      <button type="button" class="btn btn-sm" id="groupManageBtn" onclick="openGroupManageModal()">
+        <i class="ti ti-settings"></i> 그룹 관리
+      </button>
+      <button type="button" class="btn btn-sm btn-primary" id="addItemTabBtn">
+        <i class="ti ti-plus"></i> 항목 추가
+      </button>
+    </div>
+  </div>
+
+  <div id="messageBox" class="message-box" style="display:none;"></div>
+
+  <!-- 권한 없음 -->
+  <div id="permissionDenied" class="lj-card" style="display:none;">
+    <div class="lj-empty">
+      <i class="ti ti-lock" style="font-size:40px;color:#d1d5db;"></i>
+      <p class="lj-empty-title">접근 권한이 없습니다</p>
+      <p class="lj-empty-desc">관리자에게 권한을 요청하세요.</p>
+    </div>
+  </div>
+
+  <!-- 본문 2단: 좌(항목 설정 상세) / 우(그룹별 항목 목록) -->
+  <div class="qc-items-body">
+
+    <!-- 좌: 선택된 항목 상세 / 빈 상태 -->
+    <div class="lj-card qc-items-detail">
+      <div class="lj-card-head">
+        <span class="lj-card-title"><i class="ti ti-flask"></i> 항목 상세</span>
+      </div>
+      <div id="itemEmptyState" class="lj-empty">
+        <i class="ti ti-flask-off" style="font-size:36px;color:#d1d5db;"></i>
+        <p class="lj-empty-title" id="itemEmptyTitle">검사 항목을 선택하세요</p>
+        <p class="lj-empty-desc" id="itemEmptyDesc">상단에서 항목을 선택하거나 <strong>+ 항목 추가</strong>를 눌러 등록하세요.</p>
+      </div>
+      <!-- 설정 표시 -->
+      <div id="settingsSection" style="display:none;">
+        <div class="kpi-grid" id="settingsDisplay"></div>
+      </div>
+    </div>
+
+    <!-- 우: 그룹별 항목 목록 (그룹 관리 패널) -->
+    <div class="lj-card qc-items-groups">
+      <div class="lj-card-head">
+        <span class="lj-card-title"><i class="ti ti-folder"></i> 그룹별 항목</span>
+        <span id="groupItemCount" class="lj-card-count"></span>
+      </div>
+      <div id="groupItemListWrap" class="lj-group-item-list">
+        <div class="lj-empty">
+          <i class="ti ti-folder-off" style="font-size:32px;color:#d1d5db;"></i>
+          <p class="lj-empty-desc">항목이 없습니다</p>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /qc-items-body -->
+
+</div><!-- /lj-page -->
+
+<!-- 검사 항목 추가/수정 모달 -->
+<div class="lj-modal-overlay" id="itemModal" style="display:none;">
+  <div class="lj-modal">
+    <div class="lj-modal-head">
+      <span class="lj-modal-title" id="itemModalTitle">검사 항목 추가</span>
+      <button class="lj-modal-close" id="itemModalClose"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="lj-modal-body">
+      <input type="hidden" id="modalItemId" />
+      <div class="lj-modal-grid">
+        <div class="form-field lj-full">
+          <label class="form-label required">검사 항목명</label>
+          <input type="text" id="modalItemName" class="input" placeholder="예: GLU, HbA1c, RPR" />
+        </div>
+        <div class="form-field lj-full">
+          <label class="form-label">그룹 (선택)</label>
+          <select id="modalItemGroup" class="input"><option value="">미분류 (그룹 없음)</option></select>
+        </div>
+        <div id="modalOrgFields" style="display:none; contents:none;">
+          <div class="form-field">
+            <label class="form-label required">의원</label>
+            <select id="modalItemClinic" class="input"><option value="">선택</option></select>
+          </div>
+          <div class="form-field">
+            <label class="form-label required">팀</label>
+            <select id="modalItemTeam" class="input"><option value="">선택</option></select>
+          </div>
+        </div>
+        <div class="form-field lj-full">
+          <label class="form-label required">관리 유형</label>
+          <select id="modalItemType" class="input">
+            <option value="quantitative">정량적 (Quantitative) — 수치 측정값</option>
+            <option value="qualitative">정성적 (Qualitative) — Positive/Negative 등</option>
+          </select>
+        </div>
+        <!-- 정량적 -->
+        <div id="quantitativeFields" style="display:contents;">
+          <div class="form-field">
+            <label class="form-label required">단위</label>
+            <input type="text" id="modalItemUnit" class="input" placeholder="예: mg/dL, %" />
+          </div>
+          <div class="form-field">
+            <label class="form-label">소수점 자리수</label>
+            <select id="modalItemDecimal" class="input">
+              <option value="0">0자리 (예: 1)</option>
+              <option value="1">1자리 (예: 1.0)</option>
+              <option value="2">2자리 (예: 1.00)</option>
+              <option value="3" selected>3자리 (예: 1.000)</option>
+              <option value="4">4자리 (예: 1.0000)</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label class="form-label required">목표 평균 (Mean)</label>
+            <input type="number" id="modalItemMean" class="input" step="any" placeholder="0.00" />
+          </div>
+          <div class="form-field">
+            <label class="form-label required">표준편차 (SD)</label>
+            <input type="number" id="modalItemSd" class="input" step="any" placeholder="0.00" min="0.0001" />
+          </div>
+        </div>
+        <!-- 정성적 -->
+        <div id="qualitativeFields" style="display:none; contents:none;">
+          <div class="form-field lj-full">
+            <label class="form-label required">결과값 프리셋</label>
+            <select id="modalItemPreset" class="input">
+              <option value="pos_neg">Positive / Negative</option>
+              <option value="reactive">Reactive / Non-Reactive</option>
+              <option value="detected">Detected / Not Detected</option>
+              <option value="neg_plus">Negative / Trace / 1+ / 2+ / 3+ / 4+</option>
+              <option value="weak_reactive">Non-Reactive / Weakly Reactive / Reactive</option>
+              <option value="weak_pos">Negative / Weak Positive / Positive / Strong Positive</option>
+            </select>
+          </div>
+          <div class="form-field lj-full">
+            <label class="form-label required">기대 결과값 (정상)</label>
+            <select id="modalItemExpected" class="input"></select>
+          </div>
+        </div>
+        <div class="form-field lj-full">
+          <label class="form-label">메모 (선택)</label>
+          <input type="text" id="modalItemMemo" class="input" placeholder="장비명, 시약 lot 등 참고 정보" />
+        </div>
+      </div>
+    </div>
+    <div class="lj-modal-foot">
+      <button type="button" class="btn btn-sm" id="itemModalCancel">취소</button>
+      <button type="button" class="btn btn-sm btn-primary" id="itemModalSave">저장</button>
+    </div>
+  </div>
+</div>
+
+<!-- 그룹 관리 모달 -->
+<div class="lj-modal-overlay" id="groupManageModal" onclick="if(event.target===this)closeGroupManageModal()">
+  <div class="lj-modal lj-modal--wide">
+    <div id="groupModalSpinner" style="display:none;position:absolute;inset:0;background:rgba(255,255,255,0.78);border-radius:12px;z-index:10;align-items:center;justify-content:center;flex-direction:column;gap:10px;">
+      <div style="width:24px;height:24px;border:2px solid #e2e8f0;border-top-color:#2563eb;border-radius:50%;animation:lj-spin 0.75s linear infinite;"></div>
+      <span id="groupModalSpinnerText" style="font-size:12px;color:#334155;"></span>
+    </div>
+    <div class="lj-modal-head">
+      <span class="lj-modal-title"><i class="ti ti-settings"></i> 그룹 관리</span>
+      <button class="lj-modal-close" onclick="closeGroupManageModal()"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="lj-group-modal-body">
+      <!-- 왼쪽: 그룹 목록 -->
+      <div class="lj-group-modal-left">
+        <div class="lj-group-modal-section-title">그룹 목록</div>
+        <div id="groupManageList" class="lj-group-manage-list"></div>
+        <div class="lj-group-form">
+          <div id="groupFormTitle" class="lj-group-form-title">새 그룹 추가</div>
+          <input type="hidden" id="groupModalGroupId" />
+          <input type="text" id="groupModalGroupName" class="input" placeholder="그룹명 입력" onkeydown="if(event.key==='Enter')saveGroup()" />
+          <input type="text" id="groupModalMemo" class="input" placeholder="메모 (선택)" onkeydown="if(event.key==='Enter')saveGroup()" />
+          <div style="display:flex;gap:6px;">
+            <button class="btn btn-sm btn-primary" id="groupSaveBtn" onclick="saveGroup()" style="flex:1;">추가</button>
+            <button class="btn btn-sm" id="groupCancelEditBtn" onclick="resetGroupForm()" style="display:none;">취소</button>
+          </div>
+        </div>
+      </div>
+      <!-- 오른쪽: 항목 배정 -->
+      <div class="lj-group-modal-right">
+        <div id="assignPanelEmpty" class="lj-group-assign-empty">
+          왼쪽에서 그룹을 선택하면<br>항목을 배정할 수 있습니다
+        </div>
+        <div id="assignPanel" style="display:none;flex-direction:column;height:100%;">
+          <div class="lj-group-assign-head">
+            <span id="assignPanelTitle" style="font-size:13px;font-weight:700;color:#1e293b;"></span>
+            <span style="font-size:11px;color:#94a3b8;margin-left:6px;">항목 클릭으로 배정/해제</span>
+          </div>
+          <div class="lj-group-assign-panels">
+            <div class="lj-group-assign-col lj-group-assign-col--assigned">
+              <div class="lj-group-assign-col-head lj-group-assign-col-head--assigned">
+                이 그룹의 항목 <span id="assignedCount"></span>
+              </div>
+              <div id="assignedItems" class="lj-group-assign-items"></div>
+            </div>
+            <div class="lj-group-assign-col">
+              <div class="lj-group-assign-col-head">
+                미배정 항목 <span id="unassignedCount"></span>
+              </div>
+              <div id="unassignedItems" class="lj-group-assign-items"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="globalLoading" aria-hidden="true">
+  <div class="global-loading__dialog">
+    <div class="global-loading__spinner"></div>
+    <div id="globalLoadingText" class="global-loading__text">불러오는 중...</div>
+  </div>
+</div>
+
+<script src="../../assets/js/core/config.js"></script>
+<script src="../../assets/js/core/api.js"></script>
+<script src="../../assets/js/core/utils.js"></script>
+<script src="../../assets/js/core/auth.js"></script>
+<script src="../../assets/js/core/app-permission.js"></script>
+<script src="../../assets/js/qc/common.js"></script>
+<script src="../../assets/js/qc/items.js"></script>
+</body>
+</html>

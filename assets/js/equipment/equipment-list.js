@@ -30,6 +30,7 @@ function getListQueryParams() {
     keyword: params.get('keyword') || '',
     clinic_code: params.get('clinic_code') || '',
     team_code: params.get('team_code') || '',
+    team_suffix: params.get('team_suffix') || '',
     status: params.get('status') || '',
     manufacturer: params.get('manufacturer') || '',
     page: Number(params.get('page') || 1) || 1,
@@ -105,6 +106,7 @@ function getCurrentFilters() {
     keyword: getValue('keyword'),
     clinic_code: getValue('clinic_code'),
     team_code: getValue('team_code'),
+    team_suffix: getValue('team_suffix') || '',
     status: getValue('status'),
     manufacturer: getValue('manufacturer')
   };
@@ -144,6 +146,7 @@ function hasMeaningfulFilter(filters) {
     filters.keyword ||
     filters.clinic_code ||
     filters.team_code ||
+    filters.team_suffix ||
     filters.status ||
     filters.manufacturer
   );
@@ -564,6 +567,7 @@ function buildListRequestParams(filters, nextPage) {
     keyword:      filters.keyword,
     clinic_code:  filters.clinic_code,
     team_code:    filters.team_code,
+    team_suffix:  filters.team_suffix,
     status:       filters.status,
     manufacturer: filters.manufacturer,
     page:         nextPage,
@@ -912,60 +916,60 @@ function initListFiltersSync() {
 // 비동기 초기화 — org API 호출 후 필터 UI 세팅
 async function initListFiltersAsync() {
   var query = getListQueryParams();
-  var clinicEl = document.getElementById('clinic_code');
-  var teamEl = document.getElementById('team_code');
+  var clinicEl   = document.getElementById('clinic_code');  // hidden (scope 강제용)
+  var teamSufEl  = document.getElementById('team_suffix');  // 부서 select (team_suffix 기준)
+  var teamEl     = document.getElementById('team_code');    // hidden
 
-  if (!window.orgSelect || !clinicEl || !teamEl) return;
-
-  var orgInitResults = await Promise.all([
-    window.orgSelect.loadOrgData(),
-    apiGet('getScopedOrgOptions', {
-      request_user_email: equipmentListState.user?.email || equipmentListState.user?.user_email,
-      app_id: 'equipment'
-    })
-  ]);
-  var scopedResult = orgInitResults[1];
+  var scopedResult = await apiGet('getScopedOrgOptions', {
+    request_user_email: equipmentListState.user?.email || equipmentListState.user?.user_email,
+    app_id: 'equipment'
+  });
   var scopedData = scopedResult?.data || { clinics: [], teams: [], scope: null };
   var scope = scopedData.scope;
-  // scope 확정 후 state에 저장 — _initialLoad 필터링 시 참조
   equipmentListState.userScope = scope;
 
-  if (scope === 'team') {
-    window.orgSelect.fillSelectOptions(clinicEl, scopedData.clinics, { emptyText: '' });
-    clinicEl.value = equipmentListState.userClinicCode;
-    clinicEl.disabled = true;
-    window.orgSelect.fillSelectOptions(teamEl, scopedData.teams, { emptyText: '' });
-    teamEl.value = query.team_code || equipmentListState.userTeamCode;
-    teamEl.disabled = true;
-  } else if (scope === 'clinic') {
-    window.orgSelect.fillSelectOptions(clinicEl, scopedData.clinics, { emptyText: '' });
-    clinicEl.value = equipmentListState.userClinicCode;
-    clinicEl.disabled = true;
-    window.orgSelect.fillSelectOptions(teamEl, scopedData.teams, { emptyText: '전체 팀' });
-    teamEl.value = query.team_code || equipmentListState.userTeamCode || '';
-    teamEl.disabled = false;
-  } else {
-    window.orgSelect.fillSelectOptions(clinicEl, scopedData.clinics, { emptyText: '전체 의원' });
-    window.orgSelect.bindClinicTeamSelects({
-      clinicSelect: clinicEl,
-      teamSelect: teamEl,
-      teamEmptyText: '전체 팀',
-      onTeamChanged: null
-    });
-    // scope=all: URL 파라미터에 있는 값만 세팅, userClinicCode/userTeamCode 강제 안 함
-    var initClinic = query.clinic_code || '';
-    if (initClinic) {
-      clinicEl.value = initClinic;
-      window.orgSelect.fillSelectOptions(
-        teamEl,
-        window.orgSelect.getFilteredTeams(initClinic),
-        { emptyText: '전체 팀' }
-      );
-      teamEl.disabled = false;
-      teamEl.value = query.team_code || '';
+  // 의원 hidden 필드: scope 강제 (clinic/team이면 본인 의원 고정)
+  if (clinicEl) {
+    if (scope === 'clinic' || scope === 'team') {
+      clinicEl.value = equipmentListState.userClinicCode || '';
     } else {
-      teamEl.innerHTML = '<option value="">의원을 먼저 선택하세요</option>';
-      teamEl.disabled = true;
+      clinicEl.value = query.clinic_code || '';
+    }
+  }
+
+  // team hidden 필드 초기화
+  if (teamEl) teamEl.value = '';
+
+  // 부서 select: team_suffix 기준 중복 제거
+  if (teamSufEl) {
+    if (scope === 'team') {
+      // 본인 팀만 고정
+      var myTeam = scopedData.teams[0] || null;
+      var mySuffix = myTeam ? (myTeam.team_suffix || (myTeam.code_value || '').split('_')[1] || '') : '';
+      teamSufEl.innerHTML = '<option value="' + mySuffix + '">' + (myTeam ? myTeam.code_name : '') + '</option>';
+      teamSufEl.disabled = true;
+    } else {
+      // 사용 가능한 팀 목록에서 team_suffix 기준 중복 제거
+      var teams = scopedData.teams || [];
+      var seen = {};
+      var unique = [];
+      teams.forEach(function(t) {
+        var suffix = t.team_suffix || (t.code_value || '').split('_')[1] || '';
+        if (suffix && !seen[suffix]) {
+          seen[suffix] = true;
+          unique.push({ suffix: suffix, name: t.code_name });
+        }
+      });
+      // 정렬
+      unique.sort(function(a, b) { return a.name.localeCompare(b.name, 'ko'); });
+      var opts = '<option value="">전체 부서</option>';
+      unique.forEach(function(u) {
+        opts += '<option value="' + escapeHtml(u.suffix) + '">' + escapeHtml(u.name) + '</option>';
+      });
+      teamSufEl.innerHTML = opts;
+      teamSufEl.disabled = false;
+      // URL 파라미터 복원
+      teamSufEl.value = query.team_suffix || '';
     }
   }
 }

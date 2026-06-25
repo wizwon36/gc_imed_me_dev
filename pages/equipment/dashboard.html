@@ -360,9 +360,9 @@
         <span class="db-card-badge" id="deptDetailCount"></span>
       </div>
       <div class="db-grid-wrap" id="deptDetailGrid">
-        <div class="db-empty">
+        <div class="db-empty" id="deptDetailEmpty">
           <i class="ti ti-hand-click"></i>
-          위 차트에서 부서를 선택하세요
+          부서를 선택하면 장비 목록이 표시됩니다
         </div>
       </div>
     </div>
@@ -485,6 +485,22 @@ function renderDept(list) {
       '</div>'
     );
   }).join('');
+
+  // 우측 패널에 부서 선택 버튼 표시
+  var emptyEl = document.getElementById('deptDetailEmpty');
+  if (emptyEl) {
+    var btnHtml = '<i class="ti ti-list-details" style="font-size:20px;opacity:0.3;"></i>' +
+      '<span style="font-size:11px;color:#9ca3af;margin-top:4px;">부서를 선택하면 장비 목록이 표시됩니다</span>' +
+      '<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px;justify-content:center;">';
+    list.forEach(function(d, i) {
+      var label = d.department ? d.department.replace(/^.*\/\s*/, '') : (d.team_name || '미지정');
+      btnHtml += '<button onclick="onDeptClick(document.querySelectorAll(\'.db-dept-row\')[' + i + '],' + i + ')" ' +
+        'style="padding:4px 10px;border:1px solid #e5e7eb;border-radius:5px;background:#fff;font-size:11px;font-weight:600;color:#374151;cursor:pointer;">' +
+        esc(label) + ' ' + (d.count || 0) + '건</button>';
+    });
+    btnHtml += '</div>';
+    emptyEl.innerHTML = btnHtml;
+  }
 }
 
 function onDeptClick(rowEl, idx) {
@@ -539,12 +555,13 @@ async function renderDeptDetail(label, teamCode, count) {
       var slbl = typeof statusLabel === 'function' ? statusLabel(item.status) : (item.status || '');
       return (
         '<tr class="db-grid-tr">' +
-          '<td class="db-grid-td db-grid-td--name" style="width:38%">' + esc(item.equipment_name || '—') + '</td>' +
-          '<td class="db-grid-td db-grid-td--id"   style="width:26%">' + esc(item.equipment_id   || '—') + '</td>' +
-          '<td class="db-grid-td"                  style="width:18%">' +
+          '<td class="db-grid-td db-grid-td--name" style="width:30%">' + esc(item.equipment_name || '—') + '</td>' +
+          '<td class="db-grid-td db-grid-td--id"   style="width:22%">' + esc(item.serial_no      || '—') + '</td>' +
+          '<td class="db-grid-td"                  style="width:18%">' + esc(item.location        || '—') + '</td>' +
+          '<td class="db-grid-td"                  style="width:14%">' +
             '<span class="' + scls + '">' + esc(slbl) + '</span>' +
           '</td>' +
-          '<td class="db-grid-td"                  style="width:18%">' +
+          '<td class="db-grid-td"                  style="width:16%">' +
             '<button class="db-link-btn" onclick="goDetail(\'' + esc(item.equipment_id) + '\')">상세 보기</button>' +
           '</td>' +
         '</tr>'
@@ -554,10 +571,11 @@ async function renderDeptDetail(label, teamCode, count) {
     gridEl.innerHTML =
       '<table class="db-grid-table">' +
         '<thead class="db-grid-thead"><tr>' +
-          '<th class="db-grid-th" style="width:38%;text-align:left;">장비명</th>' +
-          '<th class="db-grid-th" style="width:26%">장비번호</th>' +
-          '<th class="db-grid-th" style="width:18%">상태</th>' +
-          '<th class="db-grid-th" style="width:18%">바로가기</th>' +
+          '<th class="db-grid-th" style="width:30%;text-align:left;">장비명</th>' +
+          '<th class="db-grid-th" style="width:22%">시리얼번호</th>' +
+          '<th class="db-grid-th" style="width:18%">위치</th>' +
+          '<th class="db-grid-th" style="width:14%">상태</th>' +
+          '<th class="db-grid-th" style="width:16%">바로가기</th>' +
         '</tr></thead>' +
         '<tbody>' + rows + '</tbody>' +
       '</table>';

@@ -526,43 +526,39 @@ function renderHistories(items) {
     return;
   }
 
+  const hasAction = detailPermission.canEdit;
+
   const rows = list.map(function(item) {
     const actionBtns = buildHistoryActionButtons(item);
+    const typeLabel   = escapeHtml(historyTypeLabel(item.history_type));
+    const dateLabel   = safeValue(formatDisplayDate(item.work_date));
+    const statusBadge = '<span class="timeline-badge ' + ResultStatusClass(item.result_status) + '">' +
+      escapeHtml(resultStatusLabel(item.result_status)) + '</span>';
+    const desc = escapeHtml(item.description || '-');
+
     return (
-      '<tr class="det-tbl-row">' +
-        '<td class="det-tbl-cell det-tbl-cell--type">' +
-          '<div class="det-tbl-main">' + escapeHtml(historyTypeLabel(item.history_type)) + '</div>' +
-          '<div class="det-tbl-sub">' + safeValue(formatDisplayDate(item.work_date)) + '</div>' +
+      '<tr class="sec-tbl-row">' +
+        '<td class="sec-tbl-cell sec-tbl-cell--left">' +
+          '<span class="sec-tbl-main">' + typeLabel + '</span>' +
+          '<span class="sec-tbl-sub">' + dateLabel + '</span>' +
         '</td>' +
-        '<td class="det-tbl-cell" style="text-align:center;">' +
-          '<span class="timeline-badge ' + ResultStatusClass(item.result_status) + '">' +
-            escapeHtml(resultStatusLabel(item.result_status)) +
-          '</span>' +
-        '</td>' +
-        '<td class="det-tbl-cell det-tbl-cell--desc" style="text-align:center;">' + nl2br(item.description || '-') + '</td>' +
-        (actionBtns
-          ? '<td class="det-tbl-cell det-tbl-cell--actions">' + actionBtns + '</td>'
-          : '') +
+        '<td class="sec-tbl-cell sec-tbl-cell--center">' + statusBadge + '</td>' +
+        '<td class="sec-tbl-cell sec-tbl-cell--grow">' + desc + '</td>' +
+        (hasAction ? '<td class="sec-tbl-cell sec-tbl-cell--action">' + (actionBtns || '') + '</td>' : '') +
       '</tr>'
     );
   }).join('');
 
-  const actionHeader = detailPermission.canEdit
-    ? '<th class="det-tbl-th det-tbl-th--actions" style="text-align:center;">처리</th>'
-    : '';
-
   area.innerHTML =
-    '<div class="det-tbl-scroll">' +
-      '<table class="det-tbl">' +
-        '<thead><tr>' +
-          '<th class="det-tbl-th det-tbl-th--type">구분 / 날짜</th>' +
-          '<th class="det-tbl-th" style="text-align:center;">상태</th>' +
-          '<th class="det-tbl-th det-tbl-th--desc" style="text-align:center;">내용</th>' +
-          actionHeader +
-        '</tr></thead>' +
-        '<tbody>' + rows + '</tbody>' +
-      '</table>' +
-    '</div>';
+    '<table class="sec-tbl">' +
+      '<thead class="sec-tbl-head"><tr>' +
+        '<th class="sec-tbl-th" style="width:90px">구분/날짜</th>' +
+        '<th class="sec-tbl-th sec-tbl-th--center" style="width:64px">상태</th>' +
+        '<th class="sec-tbl-th">내용</th>' +
+        (hasAction ? '<th class="sec-tbl-th sec-tbl-th--center" style="width:80px">처리</th>' : '') +
+      '</tr></thead>' +
+      '<tbody>' + rows + '</tbody>' +
+    '</table>';
 
   bindHistoryActionButtons();
 }
@@ -581,31 +577,35 @@ function renderInventoryLogs(items) {
   }
 
   const rows = list.map(function(item) {
+    const statusLabel = escapeHtml(conditionStatusLabel(item.condition_status));
+    const dateLabel   = safeValue(formatDisplayDate(item.checked_at));
+    const checker     = escapeHtml(item.checked_by_name || item.checked_by || '-');
+    const dept        = escapeHtml(item.department_at_check || '-');
+    const qrYn        = item.qr_scan_yn === 'Y' ? '✓' : '-';
+
     return (
-      '<tr class="det-tbl-row">' +
-        '<td class="det-tbl-cell det-tbl-cell--type">' +
-          '<div class="det-tbl-main">' + escapeHtml(conditionStatusLabel(item.condition_status)) + '</div>' +
-          '<div class="det-tbl-sub">' + safeValue(formatDisplayDate(item.checked_at)) + '</div>' +
+      '<tr class="sec-tbl-row">' +
+        '<td class="sec-tbl-cell sec-tbl-cell--left">' +
+          '<span class="sec-tbl-main">' + statusLabel + '</span>' +
+          '<span class="sec-tbl-sub">' + dateLabel + '</span>' +
         '</td>' +
-        '<td class="det-tbl-cell" style="text-align:center;">' + safeValue(item.checked_by_name || item.checked_by) + '</td>' +
-        '<td class="det-tbl-cell" style="text-align:center;">' + safeValue(item.department_at_check) + '</td>' +
-        '<td class="det-tbl-cell" style="text-align:center;">' + safeValue(item.location_at_check) + '</td>' +
+        '<td class="sec-tbl-cell sec-tbl-cell--center">' + checker + '</td>' +
+        '<td class="sec-tbl-cell sec-tbl-cell--grow">' + dept + '</td>' +
+        '<td class="sec-tbl-cell sec-tbl-cell--center">' + qrYn + '</td>' +
       '</tr>'
     );
   }).join('');
 
   area.innerHTML =
-    '<div class="det-tbl-scroll">' +
-      '<table class="det-tbl">' +
-        '<thead><tr>' +
-          '<th class="det-tbl-th det-tbl-th--type">상태 / 날짜</th>' +
-          '<th class="det-tbl-th" style="text-align:center;">점검자</th>' +
-          '<th class="det-tbl-th" style="text-align:center;">부서</th>' +
-          '<th class="det-tbl-th" style="text-align:center;">위치</th>' +
-        '</tr></thead>' +
-        '<tbody>' + rows + '</tbody>' +
-      '</table>' +
-    '</div>';
+    '<table class="sec-tbl">' +
+      '<thead class="sec-tbl-head"><tr>' +
+        '<th class="sec-tbl-th" style="width:90px">상태/날짜</th>' +
+        '<th class="sec-tbl-th sec-tbl-th--center" style="width:70px">점검자</th>' +
+        '<th class="sec-tbl-th">부서</th>' +
+        '<th class="sec-tbl-th sec-tbl-th--center" style="width:44px">QR</th>' +
+      '</tr></thead>' +
+      '<tbody>' + rows + '</tbody>' +
+    '</table>';
 }
 
 async function loadHistorySection(equipmentId, userEmail) {

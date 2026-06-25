@@ -449,8 +449,8 @@ function renderDetailInfo(item) {
     }
     return (
       '<div class="info-cell">' +
-        '<span class="info-cell-label">' + escapeHtml(field.label) + '</span>' +
-        '<span class="info-cell-value">' + valueHtml + '</span>' +
+        '<div class="info-cell-label">' + escapeHtml(field.label) + '</div>' +
+        '<div class="info-cell-value">' + valueHtml + '</div>' +
       '</div>'
     );
   }

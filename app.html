@@ -403,12 +403,6 @@ function navigate(page, tab, skipHistory) {
   const extraQueryStr = PAGE_QUERY_MAP[page] || '';
   let url = `${CONFIG.SITE_BASE_URL}/pages/${actualPage}.html?shell=1` + extraQueryStr;
   if (tab) url += `&tab=${tab}`;
-  // extraQuery 객체를 URL 파라미터로 추가 (예: { id: 'ME-001', from: 'list' })
-  if (extraQuery && typeof extraQuery === 'object') {
-    Object.keys(extraQuery).forEach(function(k) {
-      url += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(extraQuery[k]);
-    });
-  }
 
   // iframe 로드 전 숨김 → onload 후 표시 (자체 스피너 없이)
   frame.style.opacity = '0';
@@ -606,7 +600,7 @@ function showFlyout(menuId, triggerEl) {
     clearTimeout(_flyoutTimer);
   });
   flyout.addEventListener('mouseleave', () => {
-    _flyoutTimer = setTimeout(hideFlyout, 120);
+    _flyoutTimer = setTimeout(hideFlyoutSafe, 200);
   });
 }
 
@@ -618,6 +612,13 @@ function hideFlyout() {
     _flyout = null;
   }
   _currentMenuId = null;
+}
+
+function hideFlyoutSafe() {
+  // flyout2가 hover 중이면 1차 flyout도 닫지 않음
+  var f2 = document.getElementById('sbFlyout2');
+  if (f2 && f2.matches(':hover')) return;
+  hideFlyout();
 }
 
 // 아코디언 토글 — 클릭 시 첫 서브 아이템 이동 (호환용)
@@ -666,7 +667,7 @@ document.querySelectorAll('.sb-item-parent').forEach(btn => {
   });
 
   btn.addEventListener('mouseleave', () => {
-    _flyoutTimer = setTimeout(hideFlyout, 120);
+    _flyoutTimer = setTimeout(hideFlyoutSafe, 200);
   });
 });
 

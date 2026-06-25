@@ -262,6 +262,72 @@
   </div>
 </div>
 
+
+<!-- ── 라벨 출력 모달 ── -->
+<div id="labelModal" class="det-modal" aria-hidden="true">
+  <div class="det-modal-backdrop"></div>
+  <div class="det-modal-dialog det-modal-dialog--label">
+    <div class="det-modal-head">
+      <div class="det-modal-head-left">
+        <div class="det-modal-icon det-modal-icon--label">
+          <i class="ti ti-tag"></i>
+        </div>
+        <div>
+          <div class="det-modal-title">라벨 출력</div>
+          <div class="det-modal-subtitle">QR 포함 장비 식별 라벨을 인쇄합니다</div>
+        </div>
+      </div>
+      <button type="button" class="det-modal-close" id="labelModalClose">
+        <i class="ti ti-x"></i>
+      </button>
+    </div>
+    <div class="det-modal-body det-modal-body--label">
+      <div class="label-modal-toolbar">
+        <label class="form-label" style="margin:0;white-space:nowrap;">라벨 크기</label>
+        <select id="labelModalSizeSelect" class="input" style="width:140px;height:30px;font-size:12px;">
+          <option value="size-90x48" selected>90 × 48 mm</option>
+          <option value="size-70x40">70 × 40 mm</option>
+          <option value="size-50x30">50 × 30 mm</option>
+        </select>
+        <button type="button" class="btn btn-sm btn-primary" id="labelModalPrintBtn">
+          <i class="ti ti-printer"></i> 인쇄
+        </button>
+      </div>
+      <div class="label-modal-preview">
+        <div class="label-sheet-wrap">
+          <div class="device-label size-90x48" id="labelModalDevice">
+            <div class="device-label-main">
+              <div class="label-hospital">녹십자아이메드 의료장비 관리시스템</div>
+              <div class="label-title" id="lm_equipment_name">-</div>
+              <div class="label-info-block">
+                <div class="label-row label-row-emphasis">
+                  <div class="label-key">관리번호</div>
+                  <div class="label-value label-value-id" id="lm_equipment_id">-</div>
+                </div>
+                <div class="label-row" id="lm_row_model">
+                  <div class="label-key">모델명</div>
+                  <div class="label-value" id="lm_model_name">-</div>
+                </div>
+                <div class="label-row" id="lm_row_dept">
+                  <div class="label-key">사용부서</div>
+                  <div class="label-value" id="lm_department">-</div>
+                </div>
+                <div class="label-row" id="lm_row_loc">
+                  <div class="label-key">위치</div>
+                  <div class="label-value" id="lm_location">-</div>
+                </div>
+              </div>
+            </div>
+            <div class="qr-panel">
+              <div id="lm_qr" class="label-qr-box"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
   <div id="globalLoading" aria-hidden="true">
     <div class="global-loading__dialog">
       <div class="global-loading__spinner" aria-hidden="true"></div>

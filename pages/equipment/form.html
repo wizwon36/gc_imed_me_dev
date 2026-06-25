@@ -201,41 +201,80 @@
   </form>
 
   <!-- 일괄 등록 섹션 -->
-  <div id="bulkSection" class="eform-body" style="display:none;">
+  <div id="bulkSection" class="eform-body eform-bulk-body" style="display:none;">
+
+    <!-- STEP 1: 템플릿 다운로드 + 파일 업로드 -->
     <div class="eform-section">
       <div class="eform-section-head">
         <i class="ti ti-table-import"></i>
         <span>엑셀 일괄 등록</span>
         <span class="eform-section-desc">엑셀 파일로 여러 장비를 한 번에 등록합니다. 오류 발생 시 전체 롤백됩니다.</span>
       </div>
-      <div class="eform-bulk-toolbar">
-        <button type="button" class="btn btn-sm" id="downloadTemplateBtn">
-          <i class="ti ti-download"></i> 템플릿 다운로드
-        </button>
-        <span class="eform-bulk-desc"><strong>굵은 항목</strong>은 필수값입니다.</span>
-      </div>
-      <div class="eform-bulk-upload">
-        <input type="file" id="bulkFileInput" class="eform-file-input" accept=".xlsx,.xls" />
-        <label for="bulkFileInput" class="btn btn-sm">
-          <i class="ti ti-upload"></i> 파일 선택
-        </label>
-        <span id="bulkFileName" class="eform-file-name">선택된 파일 없음</span>
-      </div>
-      <div id="bulkPreviewWrap" style="display:none;">
-        <div class="eform-bulk-preview-head">
-          <span id="bulkPreviewCount" class="eform-bulk-count"></span>
-          <span id="bulkPreviewError" class="eform-bulk-error"></span>
+      <div class="eform-bulk-steps">
+
+        <!-- Step 1 -->
+        <div class="eform-bulk-step">
+          <div class="eform-bulk-step-num">1</div>
+          <div class="eform-bulk-step-content">
+            <div class="eform-bulk-step-title">템플릿 다운로드</div>
+            <div class="eform-bulk-step-desc">아래 버튼으로 양식을 내려받아 데이터를 입력하세요.<br><strong>굵은 항목</strong>은 필수값입니다.</div>
+            <button type="button" class="btn btn-sm" id="downloadTemplateBtn">
+              <i class="ti ti-download"></i> 템플릿 다운로드
+            </button>
+          </div>
         </div>
-        <div class="eform-bulk-table-wrap">
-          <table class="bulk-table" id="bulkPreviewTable"></table>
+
+        <div class="eform-bulk-step-divider"><i class="ti ti-arrow-right"></i></div>
+
+        <!-- Step 2 -->
+        <div class="eform-bulk-step">
+          <div class="eform-bulk-step-num">2</div>
+          <div class="eform-bulk-step-content">
+            <div class="eform-bulk-step-title">파일 업로드</div>
+            <div class="eform-bulk-step-desc">작성 완료된 엑셀 파일을 선택하면 자동으로 검증합니다.</div>
+            <div class="eform-bulk-upload-area">
+              <input type="file" id="bulkFileInput" class="eform-file-input" accept=".xlsx,.xls" />
+              <label for="bulkFileInput" class="eform-bulk-dropzone-sm" id="bulkDropzone">
+                <i class="ti ti-cloud-upload"></i>
+                <span>파일 선택 또는 드롭</span>
+                <span class="eform-bulk-file-ext">.xlsx, .xls</span>
+              </label>
+              <span id="bulkFileName" class="eform-file-name" style="display:none;"></span>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="eform-bulk-actions">
-        <button type="button" id="bulkSubmitBtn" class="btn btn-sm btn-primary" style="display:none;">
-          <i class="ti ti-upload"></i> 일괄 등록
-        </button>
+
+        <div class="eform-bulk-step-divider"><i class="ti ti-arrow-right"></i></div>
+
+        <!-- Step 3 -->
+        <div class="eform-bulk-step">
+          <div class="eform-bulk-step-num">3</div>
+          <div class="eform-bulk-step-content">
+            <div class="eform-bulk-step-title">검증 및 등록</div>
+            <div class="eform-bulk-step-desc">오류가 없으면 등록 버튼이 활성화됩니다.</div>
+            <button type="button" id="bulkSubmitBtn" class="btn btn-sm btn-primary" style="display:none;">
+              <i class="ti ti-check"></i> 일괄 등록
+            </button>
+            <div id="bulkStatusMsg" class="eform-bulk-status" style="display:none;"></div>
+          </div>
+        </div>
+
       </div>
     </div>
+
+    <!-- 미리보기 테이블 -->
+    <div id="bulkPreviewWrap" class="eform-section" style="display:none;">
+      <div class="eform-section-head">
+        <i class="ti ti-table"></i>
+        <span>데이터 미리보기</span>
+        <span class="eform-bulk-count" id="bulkPreviewCount"></span>
+        <span class="eform-bulk-error" id="bulkPreviewError"></span>
+      </div>
+      <div class="eform-bulk-table-wrap">
+        <table class="bulk-table" id="bulkPreviewTable"></table>
+      </div>
+    </div>
+
   </div>
 
 </div>

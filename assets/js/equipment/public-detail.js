@@ -80,10 +80,10 @@ function renderPage(item, isLoggedIn) {
 
   var contactHtml = (item.manager_name || item.manager_phone) ?
     '<div class="pub-card">' +
-      '<div class="pub-card-head"><i class="ti ti-user"></i> 담당자 정보</div>' +
+      '<div class="pub-card-head"><i class="ti ti-user"></i> 업체 담당자 정보</div>' +
       '<div class="pub-info-list">' +
-        row('담당자',  item.manager_name) +
-        row('연락처',  item.manager_phone) +
+        row('업체 담당자',  item.manager_name) +
+        row('업체 연락처',  item.manager_phone) +
       '</div>' +
     '</div>' : '';
 

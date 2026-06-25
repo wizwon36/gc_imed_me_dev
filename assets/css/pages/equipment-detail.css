@@ -65,16 +65,15 @@
   flex: 1;
   min-height: 0;
   display: grid;
-  grid-template-columns: 1fr 1.1fr 1.1fr;
+  grid-template-columns: 1fr 1.2fr 0.7fr;
   gap: 8px;
   overflow: hidden;
 }
 
-/* ── 1열: 기본정보 + 사진/QR ── */
+/* ── 1열: 기본정보 (1단) ── */
 .det-col-info {
   display: flex;
   flex-direction: column;
-  gap: 8px;
   min-height: 0;
   overflow: hidden;
 }
@@ -90,7 +89,7 @@
 .det-card--info::-webkit-scrollbar { width: 3px; }
 .det-card--info::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
 
-/* 기본정보 그리드가 카드 남은 공간 전체 차지 */
+/* 기본정보 그리드: 1단 구성 */
 .det-card--info .info-tile-grid {
   flex: 1;
   min-height: 0;
@@ -98,12 +97,12 @@
   flex-direction: column;
 }
 
-/* 일반 행은 수축하지 않도록 */
+/* 일반 행 수축 방지 */
 .det-card--info .info-row {
   flex-shrink: 0;
 }
 
-/* 비고 행이 남은 세로 공간 전부 차지 */
+/* 비고 행이 남은 공간 전부 차지 */
 .det-card--info .info-row--wide {
   flex: 1;
   min-height: 0;
@@ -111,7 +110,7 @@
   flex-direction: column;
 }
 
-/* 비고 셀: 라벨 상단 고정, 값 아래 전체 */
+/* 비고 셀: 라벨 위, 값 아래 전체 */
 .det-card--info .info-row--wide .info-cell {
   display: flex;
   flex-direction: column;
@@ -131,7 +130,7 @@
 
 .det-card--info .info-row--wide .info-cell-value {
   flex: 1;
-  min-height: 80px;  /* 내용 없어도 박스 영역 확보 */
+  min-height: 60px;
   font-size: 12px;
   font-weight: 400;
   color: #374151;
@@ -148,17 +147,11 @@
 .det-card--info .info-row--wide .info-cell-value::-webkit-scrollbar { width: 3px; }
 .det-card--info .info-row--wide .info-cell-value::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
 
-.det-media-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 8px;
-  flex-shrink: 0;
-}
-
-/* ── 2열: 수리이력 ── */
+/* ── 2열: 수리이력 + 재고이력 세로 배치 ── */
 .det-col-history {
   display: flex;
   flex-direction: column;
+  gap: 8px;
   min-height: 0;
   overflow: hidden;
 }
@@ -166,33 +159,38 @@
 .det-col-history .det-card {
   flex: 1;
   min-height: 0;
-}
-
-/* ── 3열: 재고이력 ── */
-.det-col-inventory {
   display: flex;
   flex-direction: column;
-  min-height: 0;
-  overflow: hidden;
 }
 
-.det-col-inventory .det-card {
-  flex: 1;
-  min-height: 0;
-}
-
-/* 이력 카드 스크롤 */
-.det-col-history .det-card > div:last-child,
-.det-col-inventory .det-card > div:last-child {
+.det-col-history .det-card > div:last-child {
   flex: 1;
   overflow-y: auto;
   min-height: 0;
 }
 
-.det-col-history .det-card > div:last-child::-webkit-scrollbar,
-.det-col-inventory .det-card > div:last-child::-webkit-scrollbar { width: 3px; }
-.det-col-history .det-card > div:last-child::-webkit-scrollbar-thumb,
-.det-col-inventory .det-card > div:last-child::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
+.det-col-history .det-card > div:last-child::-webkit-scrollbar { width: 3px; }
+.det-col-history .det-card > div:last-child::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
+
+/* ── 3열: 사진 + QR 세로 배치 ── */
+.det-col-media {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.det-col-media .det-card {
+  flex-shrink: 0;
+}
+
+.det-card--photo {
+  flex: 1 !important;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
 
 /* ── 카드 공통 ── */
 .det-card {
@@ -248,19 +246,24 @@
   border-bottom: 1px solid #f3f4f6;
 }
 
+/* 1단 구성 행 */
+.info-row--single {
+  grid-template-columns: 1fr;
+}
+
 .info-row:last-child { border-bottom: none; }
 .info-row--wide { grid-template-columns: 1fr; }
 
 .info-cell {
   display: grid;
-  grid-template-columns: 76px 1fr;
+  grid-template-columns: 80px 1fr;
   gap: 0 8px;
   align-items: baseline;
   padding: 5px 12px;
   min-width: 0;
 }
 
-.info-row:not(.info-row--wide) .info-cell:first-child {
+.info-row:not(.info-row--wide):not(.info-row--single) .info-cell:first-child {
   border-right: 1px solid #f3f4f6;
 }
 
@@ -461,19 +464,16 @@
 /* ── 반응형 ── */
 @media (max-width: 1200px) {
   .det-body { grid-template-columns: 1fr 1fr; }
-  .det-col-inventory { grid-column: 1 / -1; max-height: 240px; }
+  .det-col-media { grid-column: 1 / -1; flex-direction: row; max-height: 200px; }
 }
 
 @media (max-width: 768px) {
   .det-page { height: auto; overflow: auto; padding: 8px 10px; }
   .det-body { grid-template-columns: 1fr; overflow: visible; }
-  .det-col-info { overflow: visible; }
+  .det-col-info, .det-col-history, .det-col-media { overflow: visible; min-height: auto; }
   .det-card--info { overflow: visible; }
-  .det-media-row { grid-template-columns: 1fr 1fr; }
-  .det-col-history,
-  .det-col-inventory { overflow: visible; min-height: auto; max-height: none; }
-  .det-col-history .det-card > div:last-child,
-  .det-col-inventory .det-card > div:last-child { overflow: visible; }
+  .det-col-history .det-card > div:last-child { overflow: visible; }
+  .det-col-media { flex-direction: row; }
 }
 
 /* ================================================================

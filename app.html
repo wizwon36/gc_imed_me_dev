@@ -168,13 +168,13 @@
 
       <!-- 단일 앱들 -->
       <!-- 정도관리 -->
-      <button class="sb-item sb-item-parent" data-menu="lj" onclick="toggleSubMenu('lj')">
+      <button class="sb-item sb-item-parent" data-menu="qc" onclick="toggleSubMenu('lj')">
         <div class="sb-item-inner">
           <i class="ti ti-chart-line" aria-hidden="true"></i> 정도관리
         </div>
         <i class="ti ti-chevron-right sb-item-arrow" aria-hidden="true"></i>
       </button>
-      <div class="sb-submenu" id="menu-lj">
+      <div class="sb-submenu" id="menu-qc">
         <button class="sb-sub-item" data-page="qc/items" onclick="navigate('qc/items')">
           <i class="ti ti-flask" aria-hidden="true"></i> 검사항목 관리
         </button>
@@ -319,8 +319,8 @@ const MENU_META = {
   'equipment/label-print':        { app: '의료장비 관리', page: 'QR 라벨 출력' },
   'closing/closing':              { app: '월마감(구매)', page: '' },
   'statistics/statistics':        { app: '구매·사용 통계', page: '' },
-  'qc/items':           { app: '정도관리(LJ)', page: '검사항목 관리' },
-  'qc/data':            { app: '정도관리(LJ)', page: '데이터 입력' },
+  'qc/items':           { app: '정도관리', page: '검사항목 관리' },
+  'qc/data':            { app: '정도관리', page: '데이터 입력' },
   'task-manager/task-manager':    { app: '업무일정 관리', page: '' },
   'signage/signage-form':         { app: '사인물 신청', page: '' },
   'procurement/procurement':      { app: '구매규정', page: '' },
@@ -486,9 +486,9 @@ function updateActiveMenu(page, tab) {
   }
   // 정도관리 sub-accordion 자동 열기
   if (page === 'qc/items' || page === 'qc/data') {
-    var ljMenu = document.getElementById('menu-lj');
+    var ljMenu = document.getElementById('menu-qc');
     if (ljMenu && !ljMenu.classList.contains('is-open')) {
-      toggleSubMenu('lj-chart');
+      toggleSubMenu('qc');
     }
   }
   // 모든 활성 제거

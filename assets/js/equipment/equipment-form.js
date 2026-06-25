@@ -715,10 +715,14 @@ document.addEventListener('DOMContentLoaded', async () => {
       if (_fromList || !isEditMode) {
         shellNav('equipment/list');
       } else {
-        // 수정 모드인데 목록 진입이 아닌 경우(직접 URL) → 상세로
         shellNav('equipment/detail', { id: currentEquipmentId });
       }
     });
+  }
+  // 일괄등록 목록으로 버튼
+  var cancelBtnBulk = document.getElementById('cancelBtnBulk');
+  if (cancelBtnBulk) {
+    cancelBtnBulk.addEventListener('click', function() { shellNav('equipment/list'); });
   }
 
   const user = window.auth?.requireAuth?.();

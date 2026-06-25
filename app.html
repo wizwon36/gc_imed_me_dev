@@ -675,6 +675,33 @@ window.addEventListener('popstate', e => {
 // ── iframe 내부에서 navigate 요청 수신 ──────────────────────
 // 각 페이지에서 parent.shellNavigate(page, tab) 로 호출 가능
 window.shellNavigate = navigate;
+
+// 일괄 등록 메뉴 권한 체크 — admin이 아니면 비활성화
+async function checkBulkMenuPermission() {
+  try {
+    var user = window.auth && window.auth.getSession && window.auth.getSession();
+    var isRoleAdmin = user && String(user.role || '').toLowerCase() === 'admin';
+    var isAppAdmin = false;
+    if (!isRoleAdmin && window.appPermission && typeof window.appPermission.getPermission === 'function') {
+      var perm = await window.appPermission.getPermission('equipment');
+      isAppAdmin = String(perm || '').trim().toLowerCase() === 'admin';
+    }
+    if (!isRoleAdmin && !isAppAdmin) {
+      // 사이드바 일괄 등록 버튼 비활성화
+      var bulkBtns = document.querySelectorAll('[data-page="equipment/form-bulk"]');
+      bulkBtns.forEach(function(btn) {
+        btn.disabled = true;
+        btn.title = '관리자만 사용 가능합니다.';
+        btn.style.opacity = '0.4';
+        btn.style.cursor = 'not-allowed';
+        btn.onclick = function(e) { e.stopPropagation(); return false; };
+      });
+    }
+  } catch(e) {}
+}
+document.addEventListener('DOMContentLoaded', function() {
+  setTimeout(checkBulkMenuPermission, 800);
+});
 </script>
 
 </body>

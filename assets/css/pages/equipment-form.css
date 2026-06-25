@@ -393,6 +393,8 @@ body { background: #f0f2f5; }
 /* ── 일괄 등록 ── */
 .eform-bulk-body {
   gap: 8px;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 /* 3단계 스텝 */
@@ -502,8 +504,12 @@ body { background: #f0f2f5; }
 
 .eform-bulk-table-wrap {
   overflow-x: auto;
+  overflow-y: auto;
+  max-height: 400px;
   padding: 0 14px 14px;
 }
+.eform-bulk-table-wrap::-webkit-scrollbar { width: 4px; height: 4px; }
+.eform-bulk-table-wrap::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
 
 /* bulk-table은 기존 스타일 유지 */
 .bulk-table { border-collapse: collapse; font-size: 11px; min-width: 600px; }

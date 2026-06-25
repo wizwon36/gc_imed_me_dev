@@ -175,10 +175,10 @@
         <i class="ti ti-chevron-right sb-item-arrow" aria-hidden="true"></i>
       </button>
       <div class="sb-submenu" id="menu-lj">
-        <button class="sb-sub-item" data-page="lj-chart/items" onclick="navigate('lj-chart/items')">
+        <button class="sb-sub-item" data-page="lj-chart/lj-items" onclick="navigate('lj-chart/lj-items')">
           <i class="ti ti-flask" aria-hidden="true"></i> 검사항목 관리
         </button>
-        <button class="sb-sub-item" data-page="lj-chart/data" onclick="navigate('lj-chart/data')">
+        <button class="sb-sub-item" data-page="lj-chart/lj-data" onclick="navigate('lj-chart/lj-data')">
           <i class="ti ti-pencil-plus" aria-hidden="true"></i> 데이터 입력
         </button>
       </div>
@@ -319,8 +319,8 @@ const MENU_META = {
   'equipment/label-print':        { app: '의료장비 관리', page: 'QR 라벨 출력' },
   'closing/closing':              { app: '월마감(구매)', page: '' },
   'statistics/statistics':        { app: '구매·사용 통계', page: '' },
-  'lj-chart/items':              { app: '정도관리(LJ)', page: '검사항목 관리' },
-  'lj-chart/data':               { app: '정도관리(LJ)', page: '데이터 입력' },
+  'lj-chart/lj-items':           { app: '정도관리(LJ)', page: '검사항목 관리' },
+  'lj-chart/lj-data':            { app: '정도관리(LJ)', page: '데이터 입력' },
   'task-manager/task-manager':    { app: '업무일정 관리', page: '' },
   'signage/signage-form':         { app: '사인물 신청', page: '' },
   'procurement/procurement':      { app: '구매규정', page: '' },
@@ -485,7 +485,7 @@ function updateActiveMenu(page, tab) {
     }
   }
   // 정도관리 sub-accordion 자동 열기
-  if (page === 'lj-chart/items' || page === 'lj-chart/data') {
+  if (page === 'lj-chart/lj-items' || page === 'lj-chart/lj-data') {
     var ljMenu = document.getElementById('menu-lj');
     if (ljMenu && !ljMenu.classList.contains('is-open')) {
       toggleSubMenu('lj-chart');

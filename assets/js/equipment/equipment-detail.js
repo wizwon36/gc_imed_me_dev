@@ -812,14 +812,14 @@ document.addEventListener('DOMContentLoaded', async function() {
     const addHistoryBtn = qs('#addHistoryBtn');
     if (addHistoryBtn) {
       addHistoryBtn.addEventListener('click', function() {
-        location.href = 'history-form.html?equipment_id=' + encodeURIComponent(currentEquipmentId);
+        openHistoryModal(null);
       });
     }
 
     const addInventoryBtn = qs('#addInventoryBtn');
     if (addInventoryBtn) {
       addInventoryBtn.addEventListener('click', function() {
-        location.href = 'inventory-form.html?equipment_id=' + encodeURIComponent(currentEquipmentId);
+        openInventoryModal();
       });
     }
 

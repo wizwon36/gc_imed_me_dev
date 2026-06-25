@@ -1,4 +1,6 @@
 // ── shell 네비게이션 헬퍼 ──────────────────────────────────────
+var _fromList = new URLSearchParams(location.search).get('from') === 'list';
+
 function shellNav(page, extraQuery) {
   try {
     if (window.parent && window.parent.shellNavigate) {
@@ -14,6 +16,19 @@ function shellNav(page, extraQuery) {
     }
   } catch(e) {
     location.href = CONFIG.SITE_BASE_URL + '/pages/' + page + '.html';
+  }
+}
+
+function goAfterSave(equipmentId) {
+  // 목록에서 진입한 수정 → 목록으로 복귀
+  if (_fromList) {
+    shellNav('equipment/list');
+    return;
+  }
+  if (equipmentId) {
+    shellNav('equipment/detail', { id: equipmentId });
+  } else {
+    shellNav('equipment/list');
   }
 }
 
@@ -676,11 +691,7 @@ async function handleSubmit(event) {
       window.invalidateDashboardSessionCache();
     }
 
-    if (equipmentId) {
-      shellNav('equipment/detail', { id: equipmentId });
-    } else {
-      shellNav('equipment/list');
-    }
+    goAfterSave(equipmentId || null);
   } catch (error) {
     const msg = error.message || '장비 저장 중 오류가 발생했습니다.';
     showMessage(msg, 'error');
@@ -700,7 +711,14 @@ document.addEventListener('DOMContentLoaded', async () => {
   // 목록으로 버튼
   var cancelBtn = document.getElementById('cancelBtn');
   if (cancelBtn) {
-    cancelBtn.addEventListener('click', function() { shellNav('equipment/list'); });
+    cancelBtn.addEventListener('click', function() {
+      if (_fromList || !isEditMode) {
+        shellNav('equipment/list');
+      } else {
+        // 수정 모드인데 목록 진입이 아닌 경우(직접 URL) → 상세로
+        shellNav('equipment/detail', { id: currentEquipmentId });
+      }
+    });
   }
 
   const user = window.auth?.requireAuth?.();

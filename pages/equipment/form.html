@@ -16,22 +16,8 @@
 
 <div class="eform-page">
 
-  <!-- 액션바 -->
-  <div class="eform-actionbar">
-    <div class="eform-title-wrap">
-      <span class="eform-title" id="pageTitle" style="display:none;"></span>
-      <span class="eform-desc" id="pageDesc" style="display:none;"></span>
-    </div>
-    <div class="eform-actionbar-right">
-      <button type="button" class="btn btn-sm" id="cancelBtn">
-        <i class="ti ti-arrow-left"></i> 목록으로
-      </button>
-      <button type="submit" form="equipmentForm" class="btn btn-sm btn-primary" id="submitButton">
-        <i class="ti ti-device-floppy"></i>
-        <span id="submitButtonText">장비 등록</span>
-      </button>
-    </div>
-  </div>
+  <span id="pageTitle" style="display:none;"></span>
+  <span id="pageDesc" style="display:none;"></span>
 
   <div id="messageBox" class="message-box"></div>
 
@@ -99,6 +85,15 @@
           <i class="ti ti-receipt"></i>
           <span>구매 / 제조 정보</span>
           <span class="eform-section-desc">구매 및 제조 관련 정보</span>
+          <div class="eform-section-head-actions">
+            <button type="button" class="btn btn-sm" id="cancelBtn">
+              <i class="ti ti-arrow-left"></i> 목록으로
+            </button>
+            <button type="submit" form="equipmentForm" class="btn btn-sm btn-primary" id="submitButton">
+              <i class="ti ti-device-floppy"></i>
+              <span id="submitButtonText">장비 등록</span>
+            </button>
+          </div>
         </div>
         <div class="eform-grid eform-grid--2">
           <div class="form-field">
@@ -209,6 +204,11 @@
         <i class="ti ti-table-import"></i>
         <span>엑셀 일괄 등록</span>
         <span class="eform-section-desc">엑셀 파일로 여러 장비를 한 번에 등록합니다. 오류 발생 시 전체 롤백됩니다.</span>
+        <div class="eform-section-head-actions">
+          <button type="button" class="btn btn-sm" id="cancelBtnBulk">
+            <i class="ti ti-arrow-left"></i> 목록으로
+          </button>
+        </div>
       </div>
       <div class="eform-bulk-steps">
 

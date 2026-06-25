@@ -953,7 +953,8 @@ async function initListFiltersAsync() {
       teamEmptyText: '전체 팀',
       onTeamChanged: null
     });
-    var initClinic = query.clinic_code || equipmentListState.userClinicCode || '';
+    // scope=all: URL 파라미터에 있는 값만 세팅, userClinicCode/userTeamCode 강제 안 함
+    var initClinic = query.clinic_code || '';
     if (initClinic) {
       clinicEl.value = initClinic;
       window.orgSelect.fillSelectOptions(
@@ -962,7 +963,7 @@ async function initListFiltersAsync() {
         { emptyText: '전체 팀' }
       );
       teamEl.disabled = false;
-      teamEl.value = query.team_code || equipmentListState.userTeamCode || '';
+      teamEl.value = query.team_code || '';
     } else {
       teamEl.innerHTML = '<option value="">의원을 먼저 선택하세요</option>';
       teamEl.disabled = true;

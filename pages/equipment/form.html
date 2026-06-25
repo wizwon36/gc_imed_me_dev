@@ -150,41 +150,41 @@
         </div>
       </div>
 
-      <!-- 장비 사진 -->
-      <div class="eform-section eform-section--grow">
-        <div class="eform-section-head">
-          <i class="ti ti-photo"></i>
-          <span>장비 사진</span>
-          <span class="eform-section-desc">장비 식별이 가능한 사진을 등록하세요</span>
+    </div><!-- /eform-col right -->
+
+    <!-- 하단 1단: 장비 사진 -->
+    <div class="eform-section eform-photo-row">
+      <div class="eform-section-head">
+        <i class="ti ti-photo"></i>
+        <span>장비 사진</span>
+        <span class="eform-section-desc">장비 식별이 가능한 사진을 등록하세요</span>
+      </div>
+      <div class="eform-photo-wrap">
+        <div class="eform-photo-preview" id="photoPreviewWrap">
+          <img id="photoPreviewImage" class="eform-photo-img is-hidden" alt="장비 사진 미리보기" />
+          <div id="photoPreviewEmpty" class="eform-photo-empty">
+            <i class="ti ti-photo-off"></i>
+            <span>등록된 사진이 없습니다.</span>
+          </div>
         </div>
-        <div class="eform-photo-wrap">
-          <div class="eform-photo-preview" id="photoPreviewWrap">
-            <img id="photoPreviewImage" class="eform-photo-img is-hidden" alt="장비 사진 미리보기" />
-            <div id="photoPreviewEmpty" class="eform-photo-empty">
-              <i class="ti ti-photo-off"></i>
-              <span>등록된 사진이 없습니다.</span>
-            </div>
+        <div class="eform-photo-right">
+          <div class="eform-photo-meta" id="photoExistingMeta" style="display:none;">
+            <i class="ti ti-circle-check" style="color:#22c55e;"></i> 현재 등록된 사진이 있습니다.
           </div>
-          <div class="eform-photo-right">
-            <div class="eform-photo-meta" id="photoExistingMeta" style="display:none;">
-              <i class="ti ti-circle-check" style="color:#22c55e;"></i> 현재 등록된 사진이 있습니다.
-            </div>
-            <div class="eform-photo-actions">
-              <input type="file" id="photoInput" class="eform-file-input" accept="image/*" />
-              <label for="photoInput" class="btn btn-sm">
-                <i class="ti ti-upload"></i> 사진 선택
-              </label>
-              <span id="photoFileName" class="eform-file-name">선택된 파일 없음</span>
-              <button type="button" class="btn btn-sm btn-danger" id="removePhotoBtn" style="display:none;">
-                <i class="ti ti-trash"></i> 제거
-              </button>
-            </div>
-            <p class="eform-photo-help">업로드 전에 자동 압축됩니다.</p>
+          <div class="eform-photo-actions">
+            <input type="file" id="photoInput" class="eform-file-input" accept="image/*" />
+            <label for="photoInput" class="btn btn-sm">
+              <i class="ti ti-upload"></i> 사진 선택
+            </label>
+            <span id="photoFileName" class="eform-file-name">선택된 파일 없음</span>
+            <button type="button" class="btn btn-sm btn-danger" id="removePhotoBtn" style="display:none;">
+              <i class="ti ti-trash"></i> 제거
+            </button>
           </div>
+          <p class="eform-photo-help">업로드 전에 자동 압축됩니다.</p>
         </div>
       </div>
-
-    </div><!-- /eform-col right -->
+    </div>
 
   </form>
 

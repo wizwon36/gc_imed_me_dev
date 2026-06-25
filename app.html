@@ -8,6 +8,44 @@
   <link rel="stylesheet" href="assets/css/common.css" />
   <link rel="stylesheet" href="assets/css/shell.css" />
   <link rel="stylesheet" href="assets/font/tabler-icons/tabler-icons.min.css" />
+<style>
+/* ── 3depth 장비등록 sub-accordion ── */
+.sb-sub-parent {
+  display: flex !important;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+.sb-sub-parent span { flex: 1; margin-left: 4px; }
+.sb-sub-arrow {
+  font-size: 11px;
+  color: rgba(255,255,255,0.4);
+  transition: transform 0.15s;
+  flex-shrink: 0;
+}
+.sb-sub-submenu { display: none; flex-direction: column; }
+.sb-sub-submenu.is-open { display: flex; }
+.sb-sub-sub-item {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 5px 14px 5px 32px;
+  font-size: 12px;
+  font-weight: 500;
+  color: rgba(255,255,255,0.55);
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  transition: background 0.12s, color 0.12s;
+  border-radius: 5px;
+  margin: 0 6px;
+  width: calc(100% - 12px);
+}
+.sb-sub-sub-item:hover { background: rgba(255,255,255,0.07); color: #fff; }
+.sb-sub-sub-item.active { background: rgba(255,255,255,0.12); color: #fff; font-weight: 600; }
+.sb-sub-sub-item i { font-size: 12px; flex-shrink: 0; width: 14px; text-align: center; }
+</style>
 </head>
 <body>
 
@@ -53,12 +91,20 @@
         <button class="sb-sub-item" data-page="equipment/list" onclick="navigate('equipment/list')">
           <i class="ti ti-list" aria-hidden="true"></i> 장비 목록
         </button>
-        <button class="sb-sub-item" data-page="equipment/form" onclick="navigate('equipment/form')">
-          <i class="ti ti-forms" aria-hidden="true"></i> 단건 등록
+        <!-- 장비 등록 sub-accordion -->
+        <button class="sb-sub-item sb-sub-parent" data-menu="equipment-form" >
+          <i class="ti ti-plus" aria-hidden="true"></i>
+          <span>장비 등록</span>
+          <i class="ti ti-chevron-right sb-sub-arrow" aria-hidden="true"></i>
         </button>
-        <button class="sb-sub-item" data-page="equipment/form-bulk" onclick="navigate('equipment/form-bulk')">
-          <i class="ti ti-table-import" aria-hidden="true"></i> 일괄 등록
-        </button>
+        <div class="sb-sub-submenu" id="menu-equipment-form">
+          <button class="sb-sub-sub-item" data-page="equipment/form" onclick="navigate('equipment/form')">
+            <i class="ti ti-forms" aria-hidden="true"></i> 단건 등록
+          </button>
+          <button class="sb-sub-sub-item" data-page="equipment/form-bulk" onclick="navigate('equipment/form-bulk')">
+            <i class="ti ti-table-import" aria-hidden="true"></i> 일괄 등록
+          </button>
+        </div>
       </div>
 
       <!-- 월마감(구매) (아코디언) -->
@@ -394,8 +440,15 @@ function updateBreadcrumb(page, tab) {
 
 // ── 사이드바 활성 상태 ───────────────────────────────────────
 function updateActiveMenu(page, tab) {
+  // 장비등록 sub-accordion 자동 열기
+  if (page === 'equipment/form' || page === 'equipment/form-bulk') {
+    var subMenu = document.getElementById('menu-equipment-form');
+    if (subMenu && !subMenu.classList.contains('is-open')) {
+      toggleSubMenu('equipment-form');
+    }
+  }
   // 모든 활성 제거
-  document.querySelectorAll('.sb-item.active, .sb-sub-item.active').forEach(el => {
+  document.querySelectorAll('.sb-item.active, .sb-sub-item.active, .sb-sub-sub-item.active').forEach(el => {
     el.classList.remove('active');
   });
 
@@ -404,10 +457,14 @@ function updateActiveMenu(page, tab) {
   if (tab) {
     matched = document.querySelector(
       `.sb-sub-item[data-page="${page}"][data-tab="${tab}"]`
+    ) || document.querySelector(
+      `.sb-sub-sub-item[data-page="${page}"][data-tab="${tab}"]`
     );
   }
   if (!matched) {
     matched = document.querySelector(
+      `.sb-sub-sub-item[data-page="${page}"]`
+    ) || document.querySelector(
       `.sb-sub-item[data-page="${page}"]`
     ) || document.querySelector(
       `.sb-item[data-page="${page}"]`
@@ -416,7 +473,6 @@ function updateActiveMenu(page, tab) {
 
   if (matched) {
     matched.classList.add('active');
-    // flyout 내부 버튼도 active 동기화는 다음 hover 시 자동 반영
   }
 }
 
@@ -437,18 +493,33 @@ function showFlyout(menuId, triggerEl) {
   flyout.className = 'sb-flyout';
   flyout.id = 'sbFlyout';
 
-  // 서브메뉴 버튼들 복사
-  const items = submenu.querySelectorAll('.sb-sub-item');
-  items.forEach(item => {
-    const btn = item.cloneNode(true);
-    // onclick 속성 복사
-    const origOnclick = item.getAttribute('onclick');
-    if (origOnclick) {
-      btn.setAttribute('onclick', origOnclick);
+  // 서브메뉴 버튼들 복사 — 3depth(sub-parent + sub-submenu) 포함
+  const directChildren = submenu.children;
+  Array.from(directChildren).forEach(child => {
+    if (child.classList.contains('sb-sub-parent')) {
+      // 장비 등록 같은 sub-parent: 라벨만 표시 (비활성 구분선 역할)
+      const label = document.createElement('div');
+      label.style.cssText = 'padding:4px 10px 2px;font-size:10px;font-weight:700;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:0.05em;';
+      label.textContent = child.querySelector('span') ? child.querySelector('span').textContent.trim() : '';
+      flyout.appendChild(label);
+    } else if (child.classList.contains('sb-sub-submenu')) {
+      // 하위 항목들 — indent 없이 바로 표시
+      Array.from(child.querySelectorAll('.sb-sub-sub-item')).forEach(item => {
+        const btn = item.cloneNode(true);
+        btn.className = 'sb-sub-item';
+        btn.style.paddingLeft = '20px';
+        const origOnclick = item.getAttribute('onclick');
+        if (origOnclick) btn.setAttribute('onclick', origOnclick);
+        if (item.classList.contains('active')) btn.classList.add('active');
+        flyout.appendChild(btn);
+      });
+    } else if (child.classList.contains('sb-sub-item')) {
+      const btn = child.cloneNode(true);
+      const origOnclick = child.getAttribute('onclick');
+      if (origOnclick) btn.setAttribute('onclick', origOnclick);
+      if (child.classList.contains('active')) btn.classList.add('active');
+      flyout.appendChild(btn);
     }
-    // active 클래스 동기화
-    if (item.classList.contains('active')) btn.classList.add('active');
-    flyout.appendChild(btn);
   });
 
   document.body.appendChild(flyout);
@@ -487,8 +558,16 @@ function hideFlyout() {
 function toggleMenu(menuId) {
   const submenu = document.getElementById(`menu-${menuId}`);
   if (!submenu) return;
-  const first = submenu.querySelector('.sb-sub-item');
+  const first = submenu.querySelector('.sb-sub-item:not(.sb-sub-parent)');
   if (first) first.click();
+}
+
+function toggleSubMenu(menuId) {
+  const submenu = document.getElementById(`menu-${menuId}`);
+  if (!submenu) return;
+  const isOpen = submenu.classList.toggle('is-open');
+  const arrow = document.querySelector(`[data-menu="${menuId}"] .sb-sub-arrow`);
+  if (arrow) arrow.style.transform = isOpen ? 'rotate(90deg)' : '';
 }
 
 // ── 모바일 사이드바 ─────────────────────────────────────────

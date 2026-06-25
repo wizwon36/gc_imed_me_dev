@@ -832,7 +832,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     const printLabelBtn = qs('#printLabelBtn');
     if (printLabelBtn) {
       printLabelBtn.addEventListener('click', function() {
-        location.href = 'label-print.html?equipment_id=' + encodeURIComponent(currentEquipmentId);
+        openLabelModal(currentEquipmentId);
       });
     }
 
@@ -1165,4 +1165,100 @@ document.addEventListener('DOMContentLoaded', function() {
   if (iCancel)   iCancel.addEventListener('click', closeInventoryModal);
   if (iSubmit)   iSubmit.addEventListener('click', submitInventoryModal);
   if (iBackdrop) iBackdrop.addEventListener('click', closeInventoryModal);
+});
+
+
+// ================================================================
+// 라벨 출력 모달
+// ================================================================
+
+var _labelModalQrRendered = false;
+
+function openLabelModal(equipmentId) {
+  var modal   = qs('#labelModal');
+  var data    = currentEquipmentData || {};
+
+  // 필드 채우기
+  setText('lm_equipment_name', data.equipment_name || '-');
+  setText('lm_equipment_id',   data.equipment_id   || equipmentId || '-');
+  setText('lm_model_name',     data.model_name     || '-');
+  setText('lm_department',     data.department     || '-');
+  setText('lm_location',       data.location       || '-');
+
+  // 크기 초기화
+  var sizeSelect = qs('#labelModalSizeSelect');
+  if (sizeSelect) sizeSelect.value = 'size-90x48';
+  _labelModalQrRendered = false;
+  labelModalApplySize('size-90x48', equipmentId);
+
+  if (modal) {
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+  }
+}
+
+function closeLabelModal() {
+  var modal = qs('#labelModal');
+  if (modal) {
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+  }
+}
+
+function labelModalApplySize(sizeClass, equipmentId) {
+  var label = qs('#labelModalDevice');
+  if (label) {
+    label.classList.remove('size-90x48', 'size-70x40', 'size-50x30');
+    label.classList.add(sizeClass);
+  }
+
+  // 행 표시 제어
+  var rowModel = qs('#lm_row_model');
+  var rowDept  = qs('#lm_row_dept');
+  var rowLoc   = qs('#lm_row_loc');
+  if (rowModel) rowModel.style.display = sizeClass === 'size-50x30' ? 'none' : '';
+  if (rowDept)  rowDept.style.display  = sizeClass === 'size-50x30' ? 'none' : '';
+  if (rowLoc)   rowLoc.style.display   = (sizeClass === 'size-70x40' || sizeClass === 'size-50x30') ? 'none' : '';
+
+  // QR 렌더링
+  var qrEl = qs('#lm_qr');
+  if (!qrEl) return;
+  qrEl.innerHTML = '';
+
+  var id  = equipmentId || currentEquipmentId;
+  var url = (typeof CONFIG !== 'undefined' ? CONFIG.SITE_BASE_URL : '') +
+            '/pages/equipment/public-detail.html?id=' + encodeURIComponent(id);
+  var qrSize = sizeClass === 'size-70x40' ? 64 : sizeClass === 'size-50x30' ? 48 : 84;
+
+  if (typeof QRCode !== 'undefined' && id) {
+    new QRCode(qrEl, { text: url, width: qrSize, height: qrSize });
+  }
+}
+
+function setText(id, val) {
+  var el = qs('#' + id);
+  if (el) el.textContent = val;
+}
+
+// 모달 이벤트 바인딩 (DOMContentLoaded에 추가)
+document.addEventListener('DOMContentLoaded', function() {
+  var lClose   = qs('#labelModalClose');
+  var lBackdrop = qs('#labelModal .det-modal-backdrop');
+  var lPrint   = qs('#labelModalPrintBtn');
+  var lSize    = qs('#labelModalSizeSelect');
+
+  if (lClose)    lClose.addEventListener('click', closeLabelModal);
+  if (lBackdrop) lBackdrop.addEventListener('click', closeLabelModal);
+
+  if (lSize) {
+    lSize.addEventListener('change', function() {
+      labelModalApplySize(this.value, currentEquipmentId);
+    });
+  }
+
+  if (lPrint) {
+    lPrint.addEventListener('click', function() {
+      window.print();
+    });
+  }
 });

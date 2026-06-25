@@ -96,21 +96,22 @@ function getCurrentUserSafe() {
 }
 
 function setPageMode() {
-  const titleEl = document.querySelector('.page-title');
-  const descEl = document.querySelector('.page-desc');
+  // 새 shell 폼의 id 기반 셀렉터 우선, 없으면 기존 class 기반 폴백
+  const titleEl = qs('#pageTitle') || document.querySelector('.page-title');
+  const descEl  = qs('#pageDesc')  || document.querySelector('.page-desc');
   const submitBtn = qs('#submitButton');
   const submitBtnText = qs('#submitButtonText');
   const formTabs = qs('#formTabs');
 
   if (isEditMode) {
     if (titleEl) titleEl.textContent = '장비 수정';
-    if (descEl) descEl.textContent = '등록된 장비 정보를 수정합니다.';
+    if (descEl)  descEl.textContent  = '등록된 장비 정보를 수정합니다.';
     if (submitBtnText) {
       submitBtnText.textContent = '수정 저장';
     } else if (submitBtn) {
       submitBtn.textContent = '수정 저장';
     }
-    // 수정 모드에서는 탭 숨김
+    // 수정 모드에서는 일괄등록 탭/섹션 숨김
     if (formTabs) formTabs.style.display = 'none';
   } else {
     if (titleEl) titleEl.textContent = '장비 등록';

@@ -112,12 +112,14 @@
   flex-direction: column;
 }
 
-/* 비고 셀: 라벨 위, 값 아래 전체 */
+/* 비고 셀: 라벨 위, 값 아래 전체 — !important로 전역 .info-cell grid 오버라이드 */
 .det-card--info .info-row--wide .info-cell {
+  display: flex !important;
+  flex-direction: column !important;
+  grid-template-columns: unset !important;
+  align-items: stretch !important;
   flex: 1;
   min-height: 0;
-  display: flex;
-  flex-direction: column;
   gap: 4px;
   padding: 8px 12px;
   box-sizing: border-box;
@@ -129,10 +131,13 @@
   color: #9ca3af;
   flex-shrink: 0;
   line-height: 1.4;
+  white-space: normal;
+  overflow: visible;
+  text-overflow: unset;
 }
 
 .det-card--info .info-row--wide .info-cell-value {
-  flex: 1;
+  flex: 1 !important;
   min-height: 60px;
   font-size: 12px;
   font-weight: 400;

@@ -373,7 +373,7 @@ function renderUserInfo(user) {
 }
 
 // ── 페이지 이동 ───────────────────────────────────────────────
-function navigate(page, tab, skipHistory) {
+function navigate(page, tab, skipHistory, extraQuery) {
   const frame   = document.getElementById('shellFrame');
 
   currentPage = page;
@@ -403,6 +403,11 @@ function navigate(page, tab, skipHistory) {
   const extraQueryStr = PAGE_QUERY_MAP[page] || '';
   let url = `${CONFIG.SITE_BASE_URL}/pages/${actualPage}.html?shell=1` + extraQueryStr;
   if (tab) url += `&tab=${tab}`;
+  if (extraQuery && typeof extraQuery === 'object') {
+    Object.keys(extraQuery).forEach(function(k) {
+      url += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(extraQuery[k]);
+    });
+  }
 
   // iframe 로드 전 숨김 → onload 후 표시 (자체 스피너 없이)
   frame.style.opacity = '0';

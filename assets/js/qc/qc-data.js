@@ -79,7 +79,7 @@ function bindDataEvents() {
   applyDatePreset(30, false);
 }
 
-// ── 이하: 기존 lj-chart.js 에서 데이터/차트 관련 함수 전체 ──
+// ── 이하: 기존 qc 소스 파일 에서 데이터/차트 관련 함수 전체 ──
 async function loadItems() {
   const user = window.auth.getSession();
   try {

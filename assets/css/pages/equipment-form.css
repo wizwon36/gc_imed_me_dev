@@ -98,22 +98,48 @@ body { background: #f0f2f5; }
   min-height: 0;
 }
 
-/* 2단 레이아웃 — 상단 2열 + 하단 사진 1단 */
+/* 2단 + 하단 사진 구조 */
 .eform-body--2col {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr auto;
+  display: flex;
+  flex-direction: column;
   gap: 8px;
   flex: 1;
   min-height: 0;
   overflow: hidden;
-  align-items: stretch;
 }
 
-/* 하단 장비사진: 2열 전체 차지 */
-.eform-photo-row {
-  grid-column: 1 / -1;
+/* 상단 2단 영역 — 콘텐츠 높이만큼만 */
+.eform-top-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  align-items: start;
   flex-shrink: 0;
+}
+
+/* 하단 장비사진 — 남은 공간 전부 */
+.eform-photo-row {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.eform-photo-row .eform-section-head {
+  flex-shrink: 0;
+}
+
+.eform-photo-row .eform-photo-wrap {
+  flex: 1;
+  min-height: 0;
+  padding: 12px 14px;
+}
+
+.eform-photo-row .eform-photo-preview {
+  flex: 1;
+  min-height: 0;
+  height: auto;
 }
 
 /* 좌/우 컬럼 */

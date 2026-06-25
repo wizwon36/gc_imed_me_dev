@@ -167,17 +167,7 @@ body { background: #f0f2f5; }
 }
 
 
-/* 장비정보 섹션도 남은 공간 차지 */
-.eform-col--stretch .eform-section:last-of-type:not(.eform-section--grow) {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  flex-direction: column;
-}
 
-.eform-col--stretch .eform-section:last-of-type:not(.eform-section--grow) .eform-grid {
-  flex: 1;
-}
 
 /* ── 섹션 ── */
 .eform-section {
@@ -224,31 +214,6 @@ body { background: #f0f2f5; }
   grid-template-columns: repeat(2, 1fr);
 }
 
-/* 좌측 장비정보 마지막 섹션이 우측과 높이 맞도록 */
-.eform-col--stretch .eform-section:first-child {
-  display: flex;
-  flex-direction: column;
-}
-
-.eform-col--stretch .eform-section:first-child .eform-grid {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-/* 메모 필드가 남은 공간 차지 */
-.eform-col--stretch .eform-section:first-child .eform-full {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-}
-
-.eform-col--stretch .eform-section:first-child .eform-full textarea.input {
-  flex: 1;
-  resize: none;
-  min-height: 60px;
-}
-
 .eform-full { grid-column: 1 / -1; }
 
 /* form-field/form-label은 common.css 그대로 활용 */
@@ -281,7 +246,7 @@ body { background: #f0f2f5; }
 /* 사진 본문 — 좌: 미리보기 / 우: 업로드 */
 .eform-photo-body {
   display: grid;
-  grid-template-columns: 280px 1fr;
+  grid-template-columns: 200px 1fr;
   gap: 12px;
   padding: 12px 14px;
   flex: 1;

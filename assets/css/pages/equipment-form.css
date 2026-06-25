@@ -11,52 +11,12 @@ body { background: #f0f2f5; }
   flex-direction: column;
   height: 100vh;
   overflow: hidden;
-  padding: 10px 14px;
+  padding: 8px 14px;
   gap: 8px;
   box-sizing: border-box;
 }
 
-/* ── 액션바 ── */
-.eform-actionbar {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  background: #fff;
-  border: 1px solid #e5e7eb;
-  border-radius: 8px;
-  padding: 8px 14px;
-  flex-shrink: 0;
-  gap: 12px;
-}
-
-.eform-title-wrap {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  min-width: 0;
-}
-
-.eform-title {
-  font-size: 15px;
-  font-weight: 700;
-  color: #111827;
-  white-space: nowrap;
-}
-
-.eform-desc {
-  font-size: 11px;
-  color: #9ca3af;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.eform-actionbar-right {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  flex-shrink: 0;
-}
+/* eform-actionbar 제거 */
 
 /* ── 탭 ── */
 .eform-tabs {
@@ -187,6 +147,14 @@ body { background: #f0f2f5; }
   font-size: 12px;
   font-weight: 700;
   color: #374151;
+}
+
+.eform-section-head-actions {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
 .eform-section-head i {

@@ -1022,10 +1022,25 @@ function initBulkSection(user, isAppAdmin) {
   const userEmail = user.email || user.user_email || '';
   const isRoleAdmin = String(user.role || '').toLowerCase() === 'admin';
 
-  // role:admin 또는 app:admin이 아니면 탭 자체를 숨김
+  // role:admin 또는 app:admin이 아니면 비활성화 처리 (숨김 X)
   if (!isRoleAdmin && !isAppAdmin) {
     const tabBulk = qs('#tabBulk');
-    if (tabBulk) tabBulk.style.display = 'none';
+    if (tabBulk) {
+      tabBulk.disabled = true;
+      tabBulk.title = '관리자만 사용 가능합니다.';
+      tabBulk.style.opacity = '0.4';
+      tabBulk.style.cursor = 'not-allowed';
+    }
+    // mode=bulk로 직접 진입한 경우 단건으로 리다이렉트
+    if (new URLSearchParams(location.search).get('mode') === 'bulk') {
+      const bulkSection = qs('#bulkSection');
+      const singleForm  = qs('#equipmentForm');
+      const submitBtn   = qs('#submitButton');
+      if (bulkSection) bulkSection.style.display = 'none';
+      if (singleForm)  singleForm.style.display  = '';
+      if (submitBtn)   submitBtn.style.display    = '';
+      showMessage('일괄 등록은 관리자만 사용 가능합니다.', 'error');
+    }
     return;
   }
 

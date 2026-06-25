@@ -210,7 +210,7 @@ function buildEquipmentCard(item) {
   leftActions += '<a class="btn" href="detail.html?id=' + encodeURIComponent(item.equipment_id || '') + '">상세</a>';
 
   if (equipmentListState.canEdit && canEditItem(item)) {
-    leftActions += '<a class="btn btn-primary" href="form.html?id=' + encodeURIComponent(item.equipment_id || '') + '">수정</a>';
+    leftActions += '<button class="btn btn-primary" onclick="openEditForm(\'' + escapeHtml(item.equipment_id || '') + '\')">수정</button>';
   }
 
   rightActions = window.innerWidth > 768
@@ -269,7 +269,7 @@ function buildEquipmentRow(item) {
   actions += '<a class="tbl-btn" href="detail.html?id=' + encodeURIComponent(item.equipment_id || '') + '">상세</a>';
 
   if (equipmentListState.canEdit && canEditItem(item)) {
-    actions += '<a class="tbl-btn tbl-btn--primary" href="form.html?id=' + encodeURIComponent(item.equipment_id || '') + '">수정</a>';
+    actions += '<button class="tbl-btn tbl-btn--primary" onclick="openEditForm(\'' + escapeHtml(item.equipment_id || '') + '\')">수정</button>';
   }
 
   if (window.innerWidth > 768) {
@@ -316,7 +316,7 @@ function getActionButtons(item) {
   var id = escapeHtml(item.equipment_id || '');
   var btns = '<a class="tbl-btn" href="detail.html?id=' + id + '&shell=1" onclick="saveListState()">상세</a>';
   if (equipmentListState.canEdit && canEditItem(item)) {
-    btns += '<a class="tbl-btn tbl-btn--primary" href="form.html?id=' + id + '&shell=1" onclick="saveListState()">수정</a>';
+    btns += '<button class="tbl-btn tbl-btn--primary" onclick="saveListState();openEditForm(\'' + id + '\')">수정</button>';
   }
   if (equipmentListState.canEdit) {
     btns += '<button class="tbl-btn" onclick="openListLabelModal(\'' + id + '\')">라벨</button>';
@@ -1475,5 +1475,19 @@ function listLabelApplySize(sizeClass, equipmentId) {
 
   if (typeof QRCode !== 'undefined' && equipmentId) {
     new QRCode(qrEl, { text: url, width: qrSize, height: qrSize });
+  }
+}
+
+
+// 장비 수정 진입 — 목록에서만 호출, 저장/취소 후 목록으로 복귀
+function openEditForm(equipmentId) {
+  try {
+    if (window.parent && window.parent.shellNavigate) {
+      window.parent.shellNavigate('equipment/form', '', false, { id: equipmentId, from: 'list' });
+    } else {
+      location.href = 'form.html?id=' + encodeURIComponent(equipmentId);
+    }
+  } catch(e) {
+    location.href = 'form.html?id=' + encodeURIComponent(equipmentId);
   }
 }

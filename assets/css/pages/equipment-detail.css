@@ -97,14 +97,16 @@
   flex-direction: column;
 }
 
-/* 일반 행 수축 방지 */
-.det-card--info .info-row {
+/* 일반 행 수축 방지 — single/기본 모두 */
+.det-card--info .info-row,
+.det-card--info .info-row--single {
   flex-shrink: 0;
+  min-height: 0;
 }
 
 /* 비고 행이 남은 공간 전부 차지 */
 .det-card--info .info-row--wide {
-  flex: 1;
+  flex: 1 1 0;
   min-height: 0;
   display: flex;
   flex-direction: column;
@@ -112,11 +114,12 @@
 
 /* 비고 셀: 라벨 위, 값 아래 전체 */
 .det-card--info .info-row--wide .info-cell {
+  flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   gap: 4px;
   padding: 8px 12px;
-  height: 100%;
   box-sizing: border-box;
 }
 
@@ -188,10 +191,7 @@
   flex-direction: column;
 }
 
-.det-card--photo {
-  display: flex;
-  flex-direction: column;
-}
+/* det-card--photo: det-col-media .det-card에서 flex:1 이미 적용 */
 
 /* ── 카드 공통 ── */
 .det-card {
@@ -300,6 +300,7 @@
   justify-content: center;
   background: #f9fafb;
   overflow: hidden;
+  border-radius: 0 0 8px 8px;
 }
 
 .det-photo-img {

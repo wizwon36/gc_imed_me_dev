@@ -8,7 +8,7 @@
 .det-page {
   display: flex;
   flex-direction: column;
-  height: calc(100vh - 48px);
+  height: 100vh;
   overflow: hidden;
   padding: 10px 16px;
   gap: 8px;
@@ -114,10 +114,12 @@
 
 /* 비고 셀: 라벨 위, 값 아래 전체 */
 .det-card--info .info-row--wide .info-cell {
+  display: flex !important;
+  flex-direction: column !important;
+  grid-template-columns: unset !important;
+  align-items: stretch !important;
   flex: 1;
   min-height: 0;
-  display: flex;
-  flex-direction: column;
   gap: 4px;
   padding: 8px 12px;
   box-sizing: border-box;
@@ -132,7 +134,7 @@
 }
 
 .det-card--info .info-row--wide .info-cell-value {
-  flex: 1;
+  flex: 1 !important;
   min-height: 60px;
   font-size: 12px;
   font-weight: 400;

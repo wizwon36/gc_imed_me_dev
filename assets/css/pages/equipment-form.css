@@ -137,17 +137,60 @@ body { background: #f0f2f5; }
 .eform-grid {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  gap: 10px;
+  gap: 8px;
   padding: 12px 14px;
+  align-items: start;
+}
+
+/* select가 내용 때문에 늘어나지 않도록 */
+.eform-grid select.input {
+  width: 100%;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .eform-full { grid-column: 1 / -1; }
 
 /* form-field/form-label은 common.css 그대로 활용 */
-.eform-grid .form-field { gap: 3px; }
-.eform-grid .form-label { font-size: 11px; font-weight: 600; color: #4b5563; }
-.eform-grid .input { height: 32px; font-size: 12px; }
-.eform-grid textarea.input { height: auto; min-height: 60px; padding: 6px 10px; }
+.eform-grid .form-field { gap: 4px; }
+.eform-grid .form-label {
+  font-size: 11px;
+  font-weight: 700;
+  color: #374151;
+  padding-bottom: 2px;
+  border-bottom: 1px solid #f3f4f6;
+  margin-bottom: 2px;
+}
+.eform-grid .input {
+  height: 34px;
+  font-size: 12px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  transition: border-color 0.12s, box-shadow 0.12s;
+}
+.eform-grid .input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 2px rgba(37,99,235,0.08);
+  outline: none;
+}
+.eform-grid select.input { cursor: pointer; }
+.eform-grid textarea.input {
+  height: auto;
+  min-height: 72px;
+  padding: 7px 10px;
+  resize: vertical;
+}
+
+/* 섹션 내 그리드 구분선 */
+.eform-section + .eform-section { margin-top: 0; }
+.eform-grid .form-field {
+  background: #fafafa;
+  border: 1px solid #f0f0f0;
+  border-radius: 6px;
+  padding: 8px 10px;
+}
 
 /* ── 사진 영역 ── */
 .eform-photo-wrap {

@@ -98,15 +98,22 @@ body { background: #f0f2f5; }
   min-height: 0;
 }
 
-/* 2단 레이아웃 */
+/* 2단 레이아웃 — 상단 2열 + 하단 사진 1단 */
 .eform-body--2col {
   display: grid;
   grid-template-columns: 1fr 1fr;
+  grid-template-rows: 1fr auto;
   gap: 8px;
-  align-items: stretch;
   flex: 1;
   min-height: 0;
   overflow: hidden;
+  align-items: stretch;
+}
+
+/* 하단 장비사진: 2열 전체 차지 */
+.eform-photo-row {
+  grid-column: 1 / -1;
+  flex-shrink: 0;
 }
 
 /* 좌/우 컬럼 */
@@ -131,16 +138,6 @@ body { background: #f0f2f5; }
   overflow: hidden;
 }
 
-.eform-section--grow .eform-photo-wrap {
-  flex: 1;
-  min-height: 0;
-}
-
-.eform-section--grow .eform-photo-preview {
-  flex: 1;
-  min-height: 0;
-  height: auto;
-}
 
 /* 장비정보 섹션도 남은 공간 차지 */
 .eform-col--stretch .eform-section:last-of-type:not(.eform-section--grow) {

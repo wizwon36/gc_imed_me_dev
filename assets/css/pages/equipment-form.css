@@ -391,44 +391,118 @@ body { background: #f0f2f5; }
 }
 
 /* ── 일괄 등록 ── */
-.eform-bulk-toolbar {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 10px 14px;
-  border-bottom: 1px solid #f3f4f6;
-}
-
-.eform-bulk-desc { font-size: 12px; color: #6b7280; }
-
-.eform-bulk-upload {
-  display: flex;
-  align-items: center;
+.eform-bulk-body {
   gap: 8px;
-  padding: 10px 14px;
-  border-bottom: 1px solid #f3f4f6;
 }
 
-.eform-bulk-preview-head {
+/* 3단계 스텝 */
+.eform-bulk-steps {
+  display: flex;
+  align-items: flex-start;
+  gap: 0;
+  padding: 16px 14px;
+}
+
+.eform-bulk-step {
+  flex: 1;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.eform-bulk-step-divider {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 8px 14px;
-  border-bottom: 1px solid #f3f4f6;
+  padding: 0 8px;
+  margin-top: 8px;
+  color: #d1d5db;
+  font-size: 18px;
+  flex-shrink: 0;
 }
 
-.eform-bulk-count { font-size: 12px; font-weight: 600; color: #374151; }
-.eform-bulk-error { font-size: 12px; color: #b91c1c; }
+.eform-bulk-step-num {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #0b1630;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.eform-bulk-step-content {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.eform-bulk-step-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.eform-bulk-step-desc {
+  font-size: 11px;
+  color: #6b7280;
+  line-height: 1.5;
+}
+
+/* 파일 업로드 */
+.eform-bulk-upload-area {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.eform-bulk-dropzone-sm {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  border: 1.5px dashed #d1d5db;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  color: #374151;
+  background: #fafafa;
+  transition: border-color 0.12s, background 0.12s;
+}
+
+.eform-bulk-dropzone-sm:hover {
+  border-color: #2563eb;
+  background: #eff6ff;
+  color: #2563eb;
+}
+
+.eform-bulk-dropzone-sm i { font-size: 16px; }
+
+.eform-bulk-file-ext {
+  font-size: 10px;
+  color: #9ca3af;
+  font-weight: 400;
+}
+
+/* 상태 메시지 */
+.eform-bulk-status {
+  font-size: 11px;
+  color: #6b7280;
+  margin-top: 2px;
+}
+
+/* 미리보기 */
+.eform-bulk-count { font-size: 11px; font-weight: 600; color: #374151; margin-left: 8px; }
+.eform-bulk-error { font-size: 11px; color: #b91c1c; margin-left: 6px; }
 
 .eform-bulk-table-wrap {
   overflow-x: auto;
   padding: 0 14px 14px;
-}
-
-.eform-bulk-actions {
-  padding: 10px 14px;
-  display: flex;
-  justify-content: flex-end;
 }
 
 /* bulk-table은 기존 스타일 유지 */

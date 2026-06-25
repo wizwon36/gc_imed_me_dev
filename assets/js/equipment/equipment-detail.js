@@ -1,1162 +1,629 @@
-let currentEquipmentId = '';
-let currentEquipmentData = null;
-let detailPermission = { canView: false, canEdit: false, canDelete: false, isAdmin: false, isAppAdmin: false };
+/* ============================================================
+ * equipment-detail.css — 장비 상세 (2열 compact)
+ * ============================================================ */
 
-function getCurrentUser() {
-  if (window.auth && typeof window.auth.getSession === 'function') {
-    return window.auth.getSession() || null;
-  }
-  return null;
+.equipment-detail-page { background: #f0f2f5; }
+
+/* ── 페이지 구조 ── */
+.det-page {
+  display: flex;
+  flex-direction: column;
+  height: calc(100vh - 48px);
+  overflow: hidden;
+  padding: 10px 16px;
+  gap: 8px;
+  box-sizing: border-box;
 }
 
-async function getEquipmentPermissionContext() {
-  const user = getCurrentUser();
-  if (!user || !user.email) {
-    return { canView: false, canEdit: false, canDelete: false, isAdmin: false, isAppAdmin: false };
-  }
-
-  const role = String(user.role || '').trim().toLowerCase();
-  if (role === 'admin') {
-    return { canView: true, canEdit: true, canDelete: true, isAdmin: true, isAppAdmin: false };
-  }
-
-  try {
-    const result = await apiGet('getUserAppPermission', {
-      user_email: user.email,
-      app_id: 'equipment',
-      request_user_email: user.email
-    });
-
-    const permission = String((result && result.data && result.data.permission) || '')
-      .trim()
-      .toLowerCase();
-
-    return {
-      canView: ['view', 'edit', 'admin'].indexOf(permission) > -1,
-      canEdit: ['edit', 'admin'].indexOf(permission) > -1,
-      canDelete: false,
-      isAdmin: false,
-      isAppAdmin: permission === 'admin'
-    };
-  } catch (error) {
-    return { canView: false, canEdit: false, canDelete: false, isAdmin: false, isAppAdmin: false };
-  }
+/* ── 액션 바 ── */
+.det-actionbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  padding: 8px 14px;
+  flex-shrink: 0;
 }
 
-function safeValue(value) {
-  return escapeHtml(value || '-');
+.det-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
 }
 
-function formatDisplayDate(value) {
-  const raw = String(value || '').trim();
-  if (!raw) return '-';
-  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
-
-  const dateOnlyMatch = raw.match(/^(\d{4}-\d{2}-\d{2})[T\s]/);
-  if (dateOnlyMatch) return dateOnlyMatch[1];
-
-  const parsed = new Date(raw);
-  if (!isNaN(parsed.getTime())) {
-    const yyyy = parsed.getFullYear();
-    const mm = String(parsed.getMonth() + 1).padStart(2, '0');
-    const dd = String(parsed.getDate()).padStart(2, '0');
-    return yyyy + '-' + mm + '-' + dd;
-  }
-
-  return raw;
+.det-name {
+  font-size: 15px;
+  font-weight: 700;
+  color: #111827;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
-function formatDisplayDateTime(value) {
-  const raw = String(value || '').trim();
-  if (!raw) return '-';
-
-  const isoMatch = raw.match(/^(\d{4}-\d{2}-\d{2})[T\s](\d{2}:\d{2})/);
-  if (isoMatch) {
-    return isoMatch[1] + ' ' + isoMatch[2];
-  }
-
-  if (/^\d{4}-\d{2}-\d{2}$/.test(raw)) return raw;
-
-  const parsed = new Date(raw);
-  if (!isNaN(parsed.getTime())) {
-    const yyyy = parsed.getFullYear();
-    const mm = String(parsed.getMonth() + 1).padStart(2, '0');
-    const dd = String(parsed.getDate()).padStart(2, '0');
-    const hh = String(parsed.getHours()).padStart(2, '0');
-    const mi = String(parsed.getMinutes()).padStart(2, '0');
-    return yyyy + '-' + mm + '-' + dd + ' ' + hh + ':' + mi;
-  }
-
-  return raw;
+.det-id {
+  font-size: 11px;
+  color: #9ca3af;
+  font-family: 'Consolas', monospace;
+  white-space: nowrap;
+  flex-shrink: 0;
 }
 
-function safeNumber(value) {
-  if (value === null || value === undefined || value === '') return '-';
-  return formatNumber(value);
+.det-btns {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
 }
 
-function invalidateDashboardSessionCacheSafe() {
-  try {
-    if (typeof window.invalidateDashboardSessionCache === 'function') {
-      window.invalidateDashboardSessionCache();
-    }
-  } catch (error) {}
+/* ── 메인 3열 레이아웃 ── */
+.det-body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 8px;
+  overflow: hidden;
 }
 
-function applyActionVisibility() {
-  const editBtn = qs('#editEquipmentBtn');
-  const deleteBtn = qs('#deleteBtn');
-  const addHistoryBtn = qs('#addHistoryBtn');
-  const addInventoryBtn = qs('#addInventoryBtn');
-  const printLabelBtn = qs('#printLabelBtn');
-  const inspectionCertBtn = qs('#inspectionCertBtn');
-
-  const isDeleted =
-    String((currentEquipmentData && currentEquipmentData.deleted_yn) || 'N')
-      .trim()
-      .toUpperCase() === 'Y';
-
-  // ★ user이면 본인 소속 팀 장비만 수정/이력/재고 버튼 표시
-  // app:admin이면 타 팀 장비도 수정/이력/재고 버튼 표시
-  const currentUser = getCurrentUser();
-  const isAdmin = detailPermission.isAdmin;
-  const isAppAdmin = detailPermission.isAppAdmin;
-  const canEditThisItem = detailPermission.canEdit && (
-    isAdmin ||
-    isAppAdmin ||
-    (
-      currentEquipmentData &&
-      currentUser &&
-      String(currentEquipmentData.team_code || '').trim() === String(currentUser.team_code || '').trim()
-    )
-  );
-
-  if (editBtn) editBtn.style.display = canEditThisItem && !isDeleted ? '' : 'none';
-  if (deleteBtn) deleteBtn.style.display = detailPermission.canDelete ? '' : 'none';
-  if (addHistoryBtn) addHistoryBtn.style.display = canEditThisItem && !isDeleted ? '' : 'none';
-  if (addInventoryBtn) addInventoryBtn.style.display = canEditThisItem && !isDeleted ? '' : 'none';
-  const isMobile = window.innerWidth <= 768;
-  if (printLabelBtn) printLabelBtn.style.display = (detailPermission.canView && !isMobile) ? '' : 'none';
-  if (inspectionCertBtn) inspectionCertBtn.style.display = (isAdmin || isAppAdmin) ? '' : 'none';
-
-  if (typeof applyTopActionsColClass === 'function') applyTopActionsColClass();
+/* ── 1열: 기본정보 (1단) ── */
+.det-col-info {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
 }
 
-function buildEquipmentDetailUrl(equipmentId) {
-  return CONFIG.SITE_BASE_URL + '/pages/equipment/public-detail.html?id=' + encodeURIComponent(equipmentId);
+.det-card--info {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
 }
 
-function renderDetailSkeleton() {
-  const detailInfoGrid = qs('#detailInfoGrid');
-  const qrBox = qs('#qrBox');
-  const qrText = qs('#qrText');
-  const photoImg = qs('#detailPhotoImage');
-  const photoEmpty = qs('#detailPhotoEmpty');
+.det-card--info::-webkit-scrollbar { width: 3px; }
+.det-card--info::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
 
-  if (detailInfoGrid) {
-    detailInfoGrid.innerHTML = '';
-  }
-
-  if (qrBox) {
-    qrBox.innerHTML = '';
-  }
-
-  if (qrText) {
-    qrText.innerHTML = '';
-  }
-
-  if (photoImg) {
-    photoImg.src = '';
-    photoImg.classList.add('is-hidden');
-  }
-
-  if (photoEmpty) {
-    photoEmpty.classList.remove('is-hidden');
-    photoEmpty.textContent = '불러오는 중...';
-  }
+/* 기본정보 그리드: 1단 구성 */
+.det-card--info .info-tile-grid {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
-function renderSectionLoading(areaSelector, countSelector) {
-  const area = qs(areaSelector);
-  const countEl = qs(countSelector);
-
-  if (countEl) countEl.textContent = '불러오는 중...';
-  if (area) {
-    area.innerHTML = '<div class="empty-box">불러오는 중...</div>';
-  }
+/* 일반 행 수축 방지 — single/기본 모두 */
+.det-card--info .info-row,
+.det-card--info .info-row--single {
+  flex-shrink: 0;
+  min-height: 0;
 }
 
-function renderSectionError(areaSelector, countSelector, message) {
-  const area = qs(areaSelector);
-  const countEl = qs(countSelector);
-
-  if (countEl) countEl.textContent = '로드 실패';
-  if (area) {
-    area.innerHTML =
-      '<div class="empty-box">' +
-      escapeHtml(message || '불러오기에 실패했습니다.') +
-      '</div>';
-  }
+/* 비고 행이 남은 공간 전부 차지 */
+.det-card--info .info-row--wide {
+  flex: 1 1 0;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
-function renderHero(item) {
-  const heroEquipmentName = qs('#heroEquipmentName');
-  const heroEquipmentId = qs('#heroEquipmentId');
-  const badge = qs('#heroStatusBadge');
-
-  if (heroEquipmentName) heroEquipmentName.textContent = item.equipment_name || '장비명';
-  if (heroEquipmentId) heroEquipmentId.textContent = item.equipment_id || '-';
-
-  if (badge) {
-    badge.textContent = statusLabel(item.status);
-    badge.className = 'status-badge ' + statusClass(item.status);
-  }
+/* 비고 셀: 라벨 위, 값 아래 전체 */
+.det-card--info .info-row--wide .info-cell {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding: 8px 12px;
+  box-sizing: border-box;
 }
 
-function renderPhoto(item) {
-  const imgEl = qs('#detailPhotoImage');
-  const emptyEl = qs('#detailPhotoEmpty');
-  const openBtn = qs('#photoOpenBtn');
-  const deleteBtn = qs('#photoDeleteBtn');
-
-  if (!imgEl || !emptyEl) return;
-
-  const inlineUrl = String((item && item.photo_inline_url) || '').trim();
-  const directUrl = String((item && item.photo_url) || '').trim();
-  const finalUrl = inlineUrl || directUrl;
-  const hasPhoto = !!finalUrl;
-
-  imgEl.onerror = function() {
-    imgEl.src = '';
-    imgEl.classList.add('is-hidden');
-    emptyEl.classList.remove('is-hidden');
-    emptyEl.textContent = '사진을 불러오지 못했습니다. 네트워크 또는 파일 접근 경로를 확인하세요.';
-    if (openBtn) openBtn.style.display = 'none';
-    if (deleteBtn) deleteBtn.style.display = 'none';
-  };
-
-  imgEl.onload = function() {
-    emptyEl.classList.add('is-hidden');
-  };
-
-  if (hasPhoto) {
-    imgEl.src = finalUrl;
-    imgEl.classList.remove('is-hidden');
-    emptyEl.classList.add('is-hidden');
-    emptyEl.textContent = '등록된 사진이 없습니다.';
-  } else {
-    imgEl.src = '';
-    imgEl.classList.add('is-hidden');
-    emptyEl.classList.remove('is-hidden');
-    emptyEl.textContent = '등록된 사진이 없습니다.';
-  }
-
-  if (openBtn) {
-    openBtn.style.display = hasPhoto ? '' : 'none';
-  }
-
-  if (deleteBtn) {
-    deleteBtn.style.display = hasPhoto && detailPermission.canEdit ? '' : 'none';
-  }
+.det-card--info .info-row--wide .info-cell-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #9ca3af;
+  flex-shrink: 0;
+  line-height: 1.4;
 }
 
-function getCurrentPhotoUrl() {
-  if (!currentEquipmentData) return '';
-  return String(currentEquipmentData.photo_inline_url || currentEquipmentData.photo_url || '').trim();
+.det-card--info .info-row--wide .info-cell-value {
+  flex: 1;
+  min-height: 60px;
+  font-size: 12px;
+  font-weight: 400;
+  color: #374151;
+  white-space: pre-wrap;
+  word-break: break-word;
+  line-height: 1.6;
+  overflow-y: auto;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 8px 10px;
 }
 
-function openPhotoInNewWindow() {
-  const imageUrl = getCurrentPhotoUrl();
-  if (!imageUrl) {
-    showMessage('열 수 있는 사진이 없습니다.', 'error');
-    return;
-  }
+.det-card--info .info-row--wide .info-cell-value::-webkit-scrollbar { width: 3px; }
+.det-card--info .info-row--wide .info-cell-value::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
 
-  const win = window.open('', '_blank');
-  if (!win) {
-    showMessage('새 창을 열 수 없습니다. 팝업 차단을 확인해주세요.', 'error');
-    return;
-  }
-
-  const title = escapeHtml((currentEquipmentData && currentEquipmentData.equipment_name) || '장비 사진');
-
-  win.document.open();
-  win.document.write(
-    '<!DOCTYPE html>' +
-    '<html lang="ko">' +
-    '<head>' +
-      '<meta charset="UTF-8">' +
-      '<meta name="viewport" content="width=device-width, initial-scale=1.0">' +
-      '<title>' + title + '</title>' +
-      '<style>' +
-        'html,body{margin:0;padding:0;background:#111;height:100%;}' +
-        'body{display:flex;align-items:center;justify-content:center;}' +
-        'img{max-width:100vw;max-height:100vh;object-fit:contain;display:block;}' +
-      '</style>' +
-    '</head>' +
-    '<body>' +
-      '<img src="' + imageUrl + '" alt="' + title + '">' +
-    '</body>' +
-    '</html>'
-  );
-  win.document.close();
+/* ── 2열: 수리이력 + 재고이력 세로 배치 ── */
+.det-col-history {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  overflow: hidden;
 }
 
-async function deleteCurrentPhoto() {
-  if (!detailPermission.canEdit) {
-    showMessage('사진을 삭제할 권한이 없습니다.', 'error');
-    return;
-  }
-
-  if (!currentEquipmentId) {
-    showMessage('장비 정보가 없습니다.', 'error');
-    return;
-  }
-
-  const confirmed = confirm('현재 등록된 장비 사진을 삭제하시겠습니까?');
-  if (!confirmed) return;
-
-  const user = getCurrentUser();
-  const userEmail = (user && user.email) || '';
-
-  try {
-    showGlobalLoading('장비 사진을 삭제하는 중...');
-    await apiPost('deleteEquipmentPhoto', {
-      equipment_id: currentEquipmentId,
-      request_user_email: userEmail
-    });
-
-    await loadEquipmentCore(currentEquipmentId, userEmail, { resetSkeleton: false });
-    invalidateDashboardSessionCacheSafe();
-    showMessage('장비 사진이 삭제되었습니다.', 'success');
-  } catch (error) {
-    showMessage(error.message || '장비 사진 삭제 중 오류가 발생했습니다.', 'error');
-  } finally {
-    if (typeof hideGlobalLoading === 'function') {
-      hideGlobalLoading();
-    }
-  }
+.det-col-history .det-card {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
-async function deleteCurrentEquipment() {
-  if (!detailPermission.canDelete) {
-    showMessage('장비를 삭제할 권한이 없습니다.', 'error');
-    return;
-  }
-
-  if (!currentEquipmentId) {
-    showMessage('장비 정보가 없습니다.', 'error');
-    return;
-  }
-
-  const confirmed = confirm('이 장비를 삭제하시겠습니까? 삭제 후 목록에서 제외됩니다.');
-  if (!confirmed) return;
-
-  const user = getCurrentUser();
-  const userEmail = (user && user.email) || '';
-
-  try {
-    showGlobalLoading('장비를 삭제하는 중...');
-    await apiPost('deleteEquipment', {
-      equipment_id: currentEquipmentId,
-      request_user_email: userEmail
-    });
-
-    invalidateDashboardSessionCacheSafe();
-    alert('장비가 삭제되었습니다.');
-    location.href = 'list.html';
-  } catch (error) {
-    showMessage(error.message || '장비 삭제 중 오류가 발생했습니다.', 'error');
-  } finally {
-    if (typeof hideGlobalLoading === 'function') {
-      hideGlobalLoading();
-    }
-  }
+.det-col-history .det-card > div:last-child {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
 }
 
-function bindPhotoActionButtons() {
-  const openBtn = qs('#photoOpenBtn');
-  const deleteBtn = qs('#photoDeleteBtn');
+.det-col-history .det-card > div:last-child::-webkit-scrollbar { width: 3px; }
+.det-col-history .det-card > div:last-child::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
 
-  if (openBtn) {
-    openBtn.onclick = openPhotoInNewWindow;
-  }
-
-  if (deleteBtn) {
-    deleteBtn.onclick = deleteCurrentPhoto;
-  }
+/* ── 3열: 사진 + QR 세로 배치 ── */
+.det-col-media {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  overflow: hidden;
 }
 
-function renderQrCode(equipmentId) {
-  const qrBox = qs('#qrBox');
-  const qrText = qs('#qrText');
-
-  if (!qrBox || !qrText) return;
-
-  const qrValue = buildEquipmentDetailUrl(equipmentId);
-  qrBox.innerHTML = '';
-  qrText.textContent = 'QR 스캔 시 장비 상세 페이지로 이동';
-  qrText.title = qrValue;
-
-  if (typeof QRCode === 'function') {
-    new QRCode(qrBox, {
-      text: qrValue,
-      width: 180,
-      height: 180
-    });
-  } else {
-    qrBox.innerHTML =
-      'QR 라이브러리를 불러오지 못했습니다.<br>아래 링크로 접근하세요.<br>' +
-      escapeHtml(qrValue);
-  }
+.det-col-media .det-card {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
 }
 
-function renderDetailInfo(item) {
-  const detailInfoGrid = qs('#detailInfoGrid');
-  if (!detailInfoGrid) return;
+/* det-card--photo: det-col-media .det-card에서 flex:1 이미 적용 */
 
-  const fields = [
-    { label: '장비번호',      value: item.equipment_id },
-    { label: '장비명',        value: item.equipment_name },
-    { label: '모델명',        value: item.model_name },
-    { label: '사용부서',      value: item.department },
-    { label: '제조사',        value: item.manufacturer },
-    { label: '시리얼번호',    value: item.serial_no },
-    { label: '제조일자',      value: formatDisplayDate(item.manufacture_date) },
-    { label: '취득일자',      value: formatDisplayDate(item.purchase_date) },
-    { label: '구매처',        value: item.vendor },
-    { label: '취득가액',      value: safeNumber(item.acquisition_cost) },
-    { label: '담당자',        value: item.manager_name },
-    { label: '연락처',        value: item.manager_phone },
-    { label: '유지보수 종료', value: formatDisplayDate(item.maintenance_end_date) },
-    { label: '현재 상태',     value: item.status, isStatus: true },
-    { label: '현재 위치',     value: item.location },
-    { label: '현재 사용자',   value: item.current_user },
-    { label: '등록일시',      value: formatDisplayDateTime(item.created_at) },
-    { label: '수정일시',      value: formatDisplayDateTime(item.updated_at) },
-    { label: '비고',          value: item.memo || '-', wide: true }
-  ];
-
-  function buildInfoCell(field) {
-    let valueHtml;
-    if (field.isStatus) {
-      valueHtml = '<span class="status-badge ' + statusClass(field.value) + '">' +
-        escapeHtml(statusLabel(field.value)) + '</span>';
-    } else {
-      const display = (field.value === null || field.value === undefined || field.value === '')
-        ? '-' : field.value;
-      valueHtml = nl2br(display);
-    }
-    return (
-      '<div class="info-cell">' +
-        '<div class="info-cell-label">' + escapeHtml(field.label) + '</div>' +
-        '<div class="info-cell-value">' + valueHtml + '</div>' +
-      '</div>'
-    );
-  }
-
-  // 1단 구성 — 일반 필드는 한 줄씩, 비고는 맨 마지막에 flex:1로 분리
-  const normalFields = fields.filter(function(f) { return !f.wide; });
-  const wideFields   = fields.filter(function(f) { return f.wide; });
-
-  const rows = [];
-  normalFields.forEach(function(f) {
-    rows.push('<div class="info-row info-row--single">' + buildInfoCell(f) + '</div>');
-  });
-  wideFields.forEach(function(f) {
-    rows.push('<div class="info-row info-row--wide">' + buildInfoCell(f) + '</div>');
-  });
-
-  detailInfoGrid.innerHTML = rows.join('');
+/* ── 카드 공통 ── */
+.det-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
-function buildHistoryActionButtons(item) {
-  if (!detailPermission.canEdit) return '';
 
-  // 등록자 본인 또는 admin / isAppAdmin만 수정/완료 처리 가능
-  const currentUser = window.auth && typeof window.auth.getSession === 'function'
-    ? window.auth.getSession()
-    : null;
-  const currentEmail = String((currentUser && currentUser.email) || '').trim().toLowerCase();
-  const createdBy    = String(item.created_by || '').trim().toLowerCase();
-  const isOwner      = currentEmail && createdBy && currentEmail === createdBy;
-  const isAdmin      = detailPermission.isAdmin;
-  const isAppAdmin   = detailPermission.isAppAdmin;
 
-  if (!isOwner && !isAdmin && !isAppAdmin) return '';
-
-  const buttons = [];
-  const historyId  = item.history_id || '';
-  const equipmentId = item.equipment_id || currentEquipmentId || '';
-
-  if (String(item.result_status || '') !== 'COMPLETED') {
-    buttons.push(
-      '<button type="button" class="btn btn-light btn-sm js-edit-history" ' +
-        'data-history-id="' + escapeHtml(historyId) + '" ' +
-        'data-status="' + escapeHtml(item.result_status) + '">' +
-        '수정</button>'
-    );
-  }
-
-  if (String(item.history_type || '') === 'REPAIR' && String(item.result_status || '') === 'IN_PROGRESS') {
-    buttons.push(
-      '<button type="button" class="btn btn-primary btn-sm js-complete-history" data-history-id="' +
-        escapeHtml(historyId) +
-        '" data-equipment-id="' +
-        escapeHtml(equipmentId) +
-        '">완료 처리</button>'
-    );
-  }
-
-  return buttons.length
-    ? '<div class="timeline-actions">' + buttons.join('') + '</div>'
-    : '';
+/* 카드 헤더 */
+.det-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-bottom: 1px solid #f3f4f6;
+  background: #f8fafc;
+  flex-shrink: 0;
+  gap: 8px;
 }
 
-function renderHistories(items) {
-  const area = qs('#historyArea');
-  const countText = qs('#historyCountText');
-  const list = Array.isArray(items) ? items : [];
-
-  if (countText) countText.textContent = formatNumber(list.length) + '건';
-  if (!area) return;
-
-  if (!list.length) {
-    area.innerHTML = '<div class="empty-box">등록된 이력이 없습니다.</div>';
-    return;
-  }
-
-  const rows = list.map(function(item) {
-    const actionBtns = buildHistoryActionButtons(item);
-    return (
-      '<tr class="det-tbl-row">' +
-        '<td class="det-tbl-cell det-tbl-cell--type">' +
-          '<div class="det-tbl-main">' + escapeHtml(historyTypeLabel(item.history_type)) + '</div>' +
-          '<div class="det-tbl-sub">' + safeValue(formatDisplayDate(item.work_date)) + '</div>' +
-        '</td>' +
-        '<td class="det-tbl-cell" style="text-align:center;">' +
-          '<span class="timeline-badge ' + ResultStatusClass(item.result_status) + '">' +
-            escapeHtml(resultStatusLabel(item.result_status)) +
-          '</span>' +
-        '</td>' +
-        '<td class="det-tbl-cell det-tbl-cell--desc" style="text-align:center;">' + nl2br(item.description || '-') + '</td>' +
-        (actionBtns
-          ? '<td class="det-tbl-cell det-tbl-cell--actions">' + actionBtns + '</td>'
-          : '') +
-      '</tr>'
-    );
-  }).join('');
-
-  const actionHeader = detailPermission.canEdit
-    ? '<th class="det-tbl-th det-tbl-th--actions" style="text-align:center;">처리</th>'
-    : '';
-
-  area.innerHTML =
-    '<div class="det-tbl-scroll">' +
-      '<table class="det-tbl">' +
-        '<thead><tr>' +
-          '<th class="det-tbl-th det-tbl-th--type">구분 / 날짜</th>' +
-          '<th class="det-tbl-th" style="text-align:center;">상태</th>' +
-          '<th class="det-tbl-th det-tbl-th--desc" style="text-align:center;">내용</th>' +
-          actionHeader +
-        '</tr></thead>' +
-        '<tbody>' + rows + '</tbody>' +
-      '</table>' +
-    '</div>';
-
-  bindHistoryActionButtons();
+.det-card-title {
+  font-size: 12px;
+  font-weight: 700;
+  color: #374151;
 }
 
-function renderInventoryLogs(items) {
-  const area = qs('#inventoryArea');
-  const countText = qs('#inventoryCountText');
-  const list = Array.isArray(items) ? items : [];
-
-  if (countText) countText.textContent = formatNumber(list.length) + '건';
-  if (!area) return;
-
-  if (!list.length) {
-    area.innerHTML = '<div class="empty-box">등록된 재고조사 이력이 없습니다.</div>';
-    return;
-  }
-
-  const rows = list.map(function(item) {
-    return (
-      '<tr class="det-tbl-row">' +
-        '<td class="det-tbl-cell det-tbl-cell--type">' +
-          '<div class="det-tbl-main">' + escapeHtml(conditionStatusLabel(item.condition_status)) + '</div>' +
-          '<div class="det-tbl-sub">' + safeValue(formatDisplayDate(item.checked_at)) + '</div>' +
-        '</td>' +
-        '<td class="det-tbl-cell" style="text-align:center;">' + safeValue(item.checked_by_name || item.checked_by) + '</td>' +
-        '<td class="det-tbl-cell" style="text-align:center;">' + safeValue(item.department_at_check) + '</td>' +
-        '<td class="det-tbl-cell" style="text-align:center;">' + safeValue(item.location_at_check) + '</td>' +
-      '</tr>'
-    );
-  }).join('');
-
-  area.innerHTML =
-    '<div class="det-tbl-scroll">' +
-      '<table class="det-tbl">' +
-        '<thead><tr>' +
-          '<th class="det-tbl-th det-tbl-th--type">상태 / 날짜</th>' +
-          '<th class="det-tbl-th" style="text-align:center;">점검자</th>' +
-          '<th class="det-tbl-th" style="text-align:center;">부서</th>' +
-          '<th class="det-tbl-th" style="text-align:center;">위치</th>' +
-        '</tr></thead>' +
-        '<tbody>' + rows + '</tbody>' +
-      '</table>' +
-    '</div>';
+.det-card-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
 }
 
-async function loadHistorySection(equipmentId, userEmail) {
-  try {
-    renderSectionLoading('#historyArea', '#historyCountText');
-
-    const result = await apiGet('listHistories', {
-      equipment_id: equipmentId,
-      request_user_email: userEmail
-    });
-
-    renderHistories((result && result.data) || []);
-  } catch (error) {
-    renderSectionError('#historyArea', '#historyCountText', error.message || '이력 정보를 불러오지 못했습니다.');
-  }
+.det-card-count {
+  font-size: 11px;
+  color: #9ca3af;
 }
 
-async function loadInventorySection(equipmentId, userEmail) {
-  try {
-    renderSectionLoading('#inventoryArea', '#inventoryCountText');
-
-    const result = await apiGet('listInventoryLogs', {
-      equipment_id: equipmentId,
-      request_user_email: userEmail
-    });
-
-    renderInventoryLogs((result && result.data) || []);
-  } catch (error) {
-    renderSectionError('#inventoryArea', '#inventoryCountText', error.message || '재고조사 이력을 불러오지 못했습니다.');
-  }
+/* ── 기본 정보 그리드 ── */
+.info-tile-grid {
+  display: flex;
+  flex-direction: column;
+  padding: 0;
 }
 
-async function loadEquipmentCore(equipmentId, userEmail, options) {
-  const opts = options || {};
-  const shouldResetSkeleton = opts.resetSkeleton === true;
-
-  if (shouldResetSkeleton) {
-    renderDetailSkeleton();
-  }
-
-  const detailResult = await apiGet('getEquipment', {
-    id: equipmentId,
-    request_user_email: userEmail
-  });
-
-  currentEquipmentData = detailResult.data || {};
-
-  renderHero(currentEquipmentData);
-  renderPhoto(currentEquipmentData);
-  renderDetailInfo(currentEquipmentData);
-  renderQrCode(currentEquipmentData.equipment_id);
-  applyActionVisibility();
-  bindPhotoActionButtons();
-
-  return currentEquipmentData;
+.info-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid #f3f4f6;
 }
 
-async function reloadDetailSectionsOnly() {
-  const user = getCurrentUser();
-  const userEmail = (user && user.email) || '';
-  if (!currentEquipmentId || !userEmail) return;
-
-  await Promise.all([
-    loadHistorySection(currentEquipmentId, userEmail),
-    loadInventorySection(currentEquipmentId, userEmail)
-  ]);
+/* 1단 구성 행 */
+.info-row--single {
+  grid-template-columns: 1fr;
+  flex-shrink: 0;
 }
 
-async function loadEquipmentDetail(options) {
-  const opts = options || {};
-  const forceReset = opts.forceReset === true;
+.info-row:last-child { border-bottom: none; }
+.info-row--wide { grid-template-columns: 1fr; }
 
-  clearMessage();
-
-  if (forceReset) {
-    renderDetailSkeleton();
-  }
-
-  renderSectionLoading('#historyArea', '#historyCountText');
-  renderSectionLoading('#inventoryArea', '#inventoryCountText');
-
-  const id = getQueryParam('id') || currentEquipmentId;
-  currentEquipmentId = id;
-
-  if (!id) {
-    throw new Error('장비 ID가 없습니다.');
-  }
-
-  const user = getCurrentUser();
-  const userEmail = (user && user.email) || '';
-
-  await loadEquipmentCore(id, userEmail, {
-    resetSkeleton: forceReset
-  });
-
-  await Promise.all([
-    loadHistorySection(id, userEmail),
-    loadInventorySection(id, userEmail)
-  ]);
+.info-cell {
+  display: grid;
+  grid-template-columns: 80px 1fr;
+  gap: 0 8px;
+  align-items: baseline;
+  padding: 5px 12px;
+  min-width: 0;
 }
 
-function bindHistoryActionButtons() {
-  document.querySelectorAll('.js-edit-history').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      const historyId = this.getAttribute('data-history-id');
-      const status = this.getAttribute('data-status');
-  
-      if (!historyId) return;
-  
-      if (status === 'COMPLETED') {
-        alert('완료된 이력은 수정할 수 없습니다.');
-        return;
-      }
-  
-      openHistoryModal(historyId);
-    });
-  });
-
-  document.querySelectorAll('.js-complete-history').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      const historyId = this.getAttribute('data-history-id');
-      const equipmentId = this.getAttribute('data-equipment-id') || currentEquipmentId;
-      if (!historyId || !equipmentId) return;
-      completeRepairHistory(historyId, equipmentId);
-    });
-  });
+.info-row:not(.info-row--wide):not(.info-row--single) .info-cell:first-child {
+  border-right: 1px solid #f3f4f6;
 }
 
-async function completeRepairHistory(historyId, equipmentId) {
-  if (!detailPermission.canEdit) return;
-
-  const confirmed = confirm('이 수리 이력을 완료 처리하시겠습니까? 장비 상태도 사용중으로 변경됩니다.');
-  if (!confirmed) return;
-
-  const user = getCurrentUser();
-  const userEmail = (user && user.email) || '';
-
-  try {
-    showGlobalLoading('수리 이력을 완료 처리하는 중...');
-    await apiPost('updateHistory', {
-      history_id: historyId,
-      equipment_id: equipmentId,
-      result_status: 'COMPLETED',
-      update_equipment_status: 'IN_USE',
-      updated_by: userEmail
-    });
-
-    await loadEquipmentCore(currentEquipmentId, userEmail, { resetSkeleton: false });
-    await reloadDetailSectionsOnly();
-    invalidateDashboardSessionCacheSafe();
-    alert('완료 처리되었습니다.');
-  } catch (error) {
-    showMessage(error.message || '완료 처리 중 오류가 발생했습니다.', 'error');
-  } finally {
-    if (typeof hideGlobalLoading === 'function') {
-      hideGlobalLoading();
-    }
-  }
+.info-cell-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #9ca3af;
+  white-space: nowrap;
+  line-height: 1.8;
 }
 
-document.addEventListener('DOMContentLoaded', async function() {
-  const user = window.auth && typeof window.auth.requireAuth === 'function'
-    ? window.auth.requireAuth()
-    : null;
-
-  if (!user) return;
-
-  try {
-    if (typeof showGlobalLoading === 'function') {
-      showGlobalLoading('상세 정보를 불러오는 중...');
-    }
-
-    detailPermission = await getEquipmentPermissionContext();
-
-    if (!detailPermission.canView) {
-      showMessage('장비 정보를 조회할 권한이 없습니다.', 'error');
-      applyActionVisibility();
-      return;
-    }
-
-    await loadEquipmentDetail({ forceReset: true });
-
-    const backBtn = qs('#backToListBtn');
-    if (backBtn) {
-      backBtn.addEventListener('click', function() {
-        location.href = 'list.html';
-      });
-    }
-
-    const editBtn = qs('#editEquipmentBtn');
-    if (editBtn) {
-      editBtn.addEventListener('click', function() {
-        location.href = 'form.html?id=' + encodeURIComponent(currentEquipmentId);
-      });
-    }
-
-    const addHistoryBtn = qs('#addHistoryBtn');
-    if (addHistoryBtn) {
-      addHistoryBtn.addEventListener('click', function() {
-        openHistoryModal(null);
-      });
-    }
-
-    const addInventoryBtn = qs('#addInventoryBtn');
-    if (addInventoryBtn) {
-      addInventoryBtn.addEventListener('click', function() {
-        openInventoryModal();
-      });
-    }
-
-    const deleteBtn = qs('#deleteBtn');
-    if (deleteBtn) {
-      deleteBtn.addEventListener('click', function() {
-        deleteCurrentEquipment();
-      });
-    }
-
-    const printLabelBtn = qs('#printLabelBtn');
-    if (printLabelBtn) {
-      printLabelBtn.addEventListener('click', function() {
-        location.href = 'label-print.html?equipment_id=' + encodeURIComponent(currentEquipmentId);
-      });
-    }
-
-    const inspectionCertBtn = qs('#inspectionCertBtn');
-    if (inspectionCertBtn) {
-      inspectionCertBtn.addEventListener('click', function() {
-        if (typeof generateInspectionCertPDF === 'function' && currentEquipmentData) {
-          generateInspectionCertPDF(currentEquipmentData);
-        }
-      });
-    }
-  } catch (error) {
-    showMessage(error.message || '상세 정보를 불러오지 못했습니다.', 'error');
-  } finally {
-    if (typeof hideGlobalLoading === 'function') {
-      hideGlobalLoading();
-    }
-  }
-});
-
-
-// ================================================================
-// 이력 모달
-// ================================================================
-
-var _historyModalMode = 'create'; // 'create' | 'edit'
-var _historyModalId   = null;
-var _historyModalData = null;
-
-function openHistoryModal(historyId) {
-  _historyModalMode = historyId ? 'edit' : 'create';
-  _historyModalId   = historyId || null;
-  _historyModalData = null;
-
-  var modal = qs('#historyModal');
-  var title = qs('#historyModalTitle');
-  var submitBtn = qs('#historyModalSubmit');
-
-  if (title) title.textContent = _historyModalMode === 'edit' ? '수리 / 점검 이력 수정' : '수리 / 점검 이력 등록';
-  if (submitBtn) submitBtn.textContent = _historyModalMode === 'edit' ? '수정 저장' : '저장';
-
-  // 폼 초기화
-  historyModalSetField('m_history_type', '');
-  historyModalSetField('m_work_date', todayYmd());
-  historyModalSetField('m_requester', '');
-  historyModalSetField('m_vendor_name', '');
-  historyModalSetField('m_amount', '');
-  historyModalSetField('m_result_status', '');
-  historyModalSetField('m_update_equipment_status', '');
-  historyModalSetField('m_description', '');
-  historyModalHideMsg();
-
-  if (modal) {
-    modal.classList.add('is-open');
-    modal.setAttribute('aria-hidden', 'false');
-  }
-
-  if (_historyModalMode === 'edit' && historyId) {
-    loadHistoryForModal(historyId);
-  }
+.info-cell-value {
+  font-size: 12px;
+  font-weight: 500;
+  color: #111827;
+  line-height: 1.8;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
-function closeHistoryModal() {
-  var modal = qs('#historyModal');
-  if (modal) {
-    modal.classList.remove('is-open');
-    modal.setAttribute('aria-hidden', 'true');
-  }
+/* info-row--wide 기본 스타일은 det-card--info 전용 스타일로 대체 */
+
+/* ── 사진 ── */
+.det-card--photo { min-height: 140px; }
+
+.det-photo-wrap {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f9fafb;
+  overflow: hidden;
+  border-radius: 0 0 8px 8px;
 }
 
-async function loadHistoryForModal(historyId) {
-  var user = getCurrentUser();
-  try {
-    showGlobalLoading('이력 정보를 불러오는 중...');
-    var result = await apiGet('getHistory', {
-      history_id: historyId,
-      request_user_email: user && user.email || ''
-    });
-    var item = result.data || {};
-    _historyModalData = item;
-    historyModalSetField('m_history_type', item.history_type || '');
-    historyModalSetField('m_work_date', item.work_date || '');
-    historyModalSetField('m_requester', item.requester || '');
-    historyModalSetField('m_vendor_name', item.vendor_name || '');
-    historyModalSetField('m_amount', item.amount ? String(item.amount).replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '');
-    historyModalSetField('m_result_status', item.result_status || '');
-    historyModalSetField('m_description', item.description || '');
-  } catch(e) {
-    historyModalShowMsg(e.message || '이력 정보를 불러오지 못했습니다.', 'error');
-  } finally {
-    hideGlobalLoading();
-  }
+.det-photo-img {
+  display: block;
+  max-width: 100%;
+  max-height: 160px;
+  object-fit: contain;
 }
 
-async function submitHistoryModal() {
-  historyModalHideMsg();
+.det-photo-img.is-hidden { display: none; }
 
-  var historyType = historyModalGetField('m_history_type');
-  var workDate    = historyModalGetField('m_work_date');
-  var description = historyModalGetField('m_description');
-
-  if (!historyType)  { historyModalShowMsg('이력 유형을 선택하세요.', 'error'); return; }
-  if (!workDate)     { historyModalShowMsg('처리일자를 입력하세요.', 'error'); return; }
-  if (!description)  { historyModalShowMsg('처리내용을 입력하세요.', 'error'); return; }
-
-  var user = getCurrentUser();
-  var actor = user && (user.email || user.user_email) || '';
-
-  var equipment = currentEquipmentData || {};
-  var payload = {
-    equipment_id:   currentEquipmentId,
-    history_type:   historyType,
-    work_date:      workDate,
-    requester:      historyModalGetField('m_requester'),
-    vendor_name:    historyModalGetField('m_vendor_name'),
-    amount:         historyModalGetField('m_amount').replace(/[^\d.-]/g, ''),
-    result_status:  historyModalGetField('m_result_status'),
-    description:    description,
-    update_equipment_status: historyModalGetField('m_update_equipment_status'),
-    created_by:     actor,
-    updated_by:     actor,
-    request_clinic_code: equipment.clinic_code || '',
-    request_clinic_name: equipment.clinic_name || '',
-    request_team_code:   equipment.team_code   || '',
-    request_team_name:   equipment.team_name   || '',
-    request_department:  equipment.department_display || equipment.department || ''
-  };
-
-  if (_historyModalMode === 'edit' && _historyModalId) {
-    payload.history_id = _historyModalId;
-    payload.client_updated_at = (_historyModalData && _historyModalData.updated_at) || '';
-  }
-
-  var submitBtn = qs('#historyModalSubmit');
-  try {
-    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '저장 중...'; }
-    showGlobalLoading(_historyModalMode === 'edit' ? '이력을 수정하는 중...' : '이력을 저장하는 중...');
-
-    if (_historyModalMode === 'edit') {
-      await apiPost('updateHistory', payload);
-    } else {
-      await apiPost('createHistory', payload);
-    }
-
-    closeHistoryModal();
-    var user2 = getCurrentUser();
-    var email2 = user2 && (user2.email || user2.user_email) || '';
-    await loadHistorySection(currentEquipmentId, email2);
-    if (payload.update_equipment_status) {
-      await loadEquipmentCore(currentEquipmentId, email2, { resetSkeleton: false });
-    }
-  } catch(e) {
-    historyModalShowMsg(e.message || '저장 중 오류가 발생했습니다.', 'error');
-  } finally {
-    hideGlobalLoading();
-    if (submitBtn) {
-      submitBtn.disabled = false;
-      submitBtn.textContent = _historyModalMode === 'edit' ? '수정 저장' : '저장';
-    }
-  }
+.det-photo-empty {
+  font-size: 11px;
+  color: #9ca3af;
+  padding: 16px;
+  text-align: center;
 }
 
-function historyModalSetField(id, val) {
-  var el = qs('#' + id);
-  if (el) el.value = val;
-}
-function historyModalGetField(id) {
-  var el = qs('#' + id);
-  return el ? el.value.trim() : '';
-}
-function historyModalShowMsg(msg, type) {
-  var el = qs('#historyModalMsg');
-  if (!el) return;
-  el.textContent = msg;
-  el.className = 'det-modal-msg det-modal-msg--' + (type || 'error');
-  el.style.display = '';
-}
-function historyModalHideMsg() {
-  var el = qs('#historyModalMsg');
-  if (el) { el.style.display = 'none'; el.textContent = ''; }
+/* ── QR ── */
+.det-card--qr { min-height: 140px; }
+
+.det-qr-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 10px;
+  gap: 6px;
 }
 
-// 로컬 날짜 헬퍼
-function todayYmd() {
-  var d = new Date();
-  return d.getFullYear() + '-' +
-    String(d.getMonth() + 1).padStart(2, '0') + '-' +
-    String(d.getDate()).padStart(2, '0');
+.det-qr-box {
+  width: 100px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed #d1d5db;
+  border-radius: 6px;
+  background: #f9fafb;
+  overflow: hidden;
 }
 
-// ================================================================
-// 재고조사 모달
-// ================================================================
-
-function openInventoryModal() {
-  var modal = qs('#inventoryModal');
-  var user = getCurrentUser();
-
-  // 폼 초기화
-  inventoryModalSetField('m_checked_at', getNowDateTime());
-  inventoryModalSetField('m_checked_by', (user && (user.name || user.user_name)) || '');
-  inventoryModalSetField('m_condition_status', '');
-  inventoryModalSetField('m_qr_scan_yn', 'Y');
-  inventoryModalSetField('m_memo', '');
-  inventoryModalHideMsg();
-
-  if (modal) {
-    modal.classList.add('is-open');
-    modal.setAttribute('aria-hidden', 'false');
-  }
+.det-qr-text {
+  font-size: 10px;
+  color: #9ca3af;
+  text-align: center;
+  word-break: break-all;
+  width: 100%;
+  max-width: none;
+  padding: 0 8px;
+  line-height: 1.4;
 }
 
-function closeInventoryModal() {
-  var modal = qs('#inventoryModal');
-  if (modal) {
-    modal.classList.remove('is-open');
-    modal.setAttribute('aria-hidden', 'true');
-  }
+/* 이력 테이블 — JS가 생성하는 .det-tbl-scroll 포함 */
+.det-tbl-scroll {
+  overflow-x: auto;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
-async function submitInventoryModal() {
-  inventoryModalHideMsg();
-
-  var conditionStatus = inventoryModalGetField('m_condition_status');
-  var checkedBy       = inventoryModalGetField('m_checked_by');
-
-  if (!conditionStatus) { inventoryModalShowMsg('상태를 선택하세요.', 'error'); return; }
-  if (!checkedBy)       { inventoryModalShowMsg('점검자를 입력하세요.', 'error'); return; }
-
-  var user = getCurrentUser();
-  var equipment = currentEquipmentData || {};
-
-  var payload = {
-    equipment_id:          currentEquipmentId,
-    checked_at:            inventoryModalGetField('m_checked_at'),
-    checked_by:            user && (user.email || user.user_email) || '',
-    checked_by_name:       checkedBy,
-    clinic_code_at_check:  equipment.clinic_code || '',
-    clinic_name_at_check:  equipment.clinic_name || '',
-    team_code_at_check:    equipment.team_code   || '',
-    team_name_at_check:    equipment.team_name   || '',
-    department_at_check:   equipment.department_display || equipment.department || '',
-    location_at_check:     equipment.location || '',
-    condition_status:      conditionStatus,
-    qr_scan_yn:            inventoryModalGetField('m_qr_scan_yn'),
-    memo:                  inventoryModalGetField('m_memo')
-  };
-
-  var submitBtn = qs('#inventoryModalSubmit');
-  try {
-    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '저장 중...'; }
-    showGlobalLoading('재고조사 이력을 저장하는 중...');
-
-    await apiPost('createInventoryLog', payload);
-
-    closeInventoryModal();
-    var user2 = getCurrentUser();
-    var email2 = user2 && (user2.email || user2.user_email) || '';
-    await loadInventorySection(currentEquipmentId, email2);
-  } catch(e) {
-    inventoryModalShowMsg(e.message || '저장 중 오류가 발생했습니다.', 'error');
-  } finally {
-    hideGlobalLoading();
-    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '저장'; }
-  }
+.det-tbl {
+  width: 100%;
+  min-width: 280px;
+  border-collapse: collapse;
+  font-size: 11px;
 }
 
-function inventoryModalSetField(id, val) {
-  var el = qs('#' + id);
-  if (el) el.value = val;
-}
-function inventoryModalGetField(id) {
-  var el = qs('#' + id);
-  return el ? el.value.trim() : '';
-}
-function inventoryModalShowMsg(msg, type) {
-  var el = qs('#inventoryModalMsg');
-  if (!el) return;
-  el.textContent = msg;
-  el.className = 'det-modal-msg det-modal-msg--' + (type || 'error');
-  el.style.display = '';
-}
-function inventoryModalHideMsg() {
-  var el = qs('#inventoryModalMsg');
-  if (el) { el.style.display = 'none'; el.textContent = ''; }
+.det-tbl-th {
+  position: sticky;
+  top: 0;
+  padding: 6px 8px;
+  background: #f8fafc;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 10px;
+  font-weight: 700;
+  color: #6b7280;
+  text-align: left;
+  white-space: nowrap;
+  z-index: 1;
 }
 
-function getNowDateTime() {
-  var now = new Date();
-  return now.getFullYear() + '-' +
-    String(now.getMonth() + 1).padStart(2, '0') + '-' +
-    String(now.getDate()).padStart(2, '0') + ' ' +
-    String(now.getHours()).padStart(2, '0') + ':' +
-    String(now.getMinutes()).padStart(2, '0') + ':' +
-    String(now.getSeconds()).padStart(2, '0');
+.det-tbl-th--type    { width: 90px; }
+.det-tbl-th--desc    { min-width: 80px; }
+.det-tbl-th--actions { width: 80px; }
+
+.det-tbl-row { border-bottom: 1px solid #f3f4f6; transition: background 0.1s; }
+.det-tbl-row:last-child { border-bottom: none; }
+.det-tbl-row:hover { background: #f8faff; }
+
+.det-tbl-cell {
+  padding: 5px 8px;
+  font-size: 11px;
+  color: #374151;
+  vertical-align: top;
 }
 
-// ================================================================
-// 모달 이벤트 바인딩
-// ================================================================
+.det-tbl-cell--desc { white-space: normal; line-height: 1.4; }
+.det-tbl-cell--actions { white-space: nowrap; vertical-align: middle; }
 
-document.addEventListener('DOMContentLoaded', function() {
-  // 이력 모달
-  var hClose   = qs('#historyModalClose');
-  var hCancel  = qs('#historyModalCancel');
-  var hSubmit  = qs('#historyModalSubmit');
-  var hBackdrop = qs('#historyModal .det-modal-backdrop');
+.det-tbl-main { font-size: 11px; font-weight: 600; color: #111827; line-height: 1.3; }
+.det-tbl-sub  { margin-top: 1px; font-size: 10px; color: #9ca3af; }
 
-  if (hClose)   hClose.addEventListener('click', closeHistoryModal);
-  if (hCancel)  hCancel.addEventListener('click', closeHistoryModal);
-  if (hSubmit)  hSubmit.addEventListener('click', submitHistoryModal);
-  if (hBackdrop) hBackdrop.addEventListener('click', closeHistoryModal);
+/* 이력 버튼 */
+.timeline-actions { display: inline-flex; gap: 4px; flex-wrap: nowrap; }
+.timeline-actions .btn { height: 22px !important; min-height: 22px !important; padding: 0 7px !important; border-radius: 4px !important; font-size: 10px !important; }
 
-  // 금액 콤마 포맷
-  var amountEl = qs('#m_amount');
-  if (amountEl) {
-    amountEl.addEventListener('input', function() {
-      var raw = this.value.replace(/[^\d]/g, '');
-      this.value = raw ? raw.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '';
-    });
-  }
+/* 뱃지 */
+.timeline-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 3px;
+  background: #f1f5f9;
+  border: 1px solid #e5e7eb;
+  color: #374151;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
 
-  // 재고조사 모달
-  var iClose    = qs('#inventoryModalClose');
-  var iCancel   = qs('#inventoryModalCancel');
-  var iSubmit   = qs('#inventoryModalSubmit');
-  var iBackdrop = qs('#inventoryModal .det-modal-backdrop');
+/* 상태 뱃지 */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 3px;
+  font-size: 10px;
+  font-weight: 700;
+  border: 1px solid transparent;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
 
-  if (iClose)    iClose.addEventListener('click', closeInventoryModal);
-  if (iCancel)   iCancel.addEventListener('click', closeInventoryModal);
-  if (iSubmit)   iSubmit.addEventListener('click', submitInventoryModal);
-  if (iBackdrop) iBackdrop.addEventListener('click', closeInventoryModal);
-});
+.is-in-use     { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
+.is-repairing  { background: #fff7ed; color: #9a3412; border-color: #fed7aa; }
+.is-inspecting { background: #eff6ff; color: #1e40af; border-color: #bfdbfe; }
+.is-stored     { background: #f9fafb; color: #374151; border-color: #e5e7eb; }
+.is-disposed   { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
+
+/* 빈 상태 */
+.empty-box {
+  padding: 16px;
+  text-align: center;
+  font-size: 11px;
+  color: #9ca3af;
+}
+
+/* 버튼 크기 */
+.btn-card-action {
+  height: 26px;
+  padding: 0 10px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 600;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  color: #374151;
+  cursor: pointer;
+}
+
+.btn-card-action:hover { background: #f3f4f6; }
+
+/* ── 반응형 ── */
+@media (max-width: 1200px) {
+  .det-body { grid-template-columns: 1fr 1fr; }
+  .det-col-media { grid-column: 1 / -1; flex-direction: row; max-height: 200px; }
+}
+
+@media (max-width: 768px) {
+  .det-page { height: auto; overflow: auto; padding: 8px 10px; }
+  .det-body { grid-template-columns: 1fr; overflow: visible; }
+  .det-col-info, .det-col-history, .det-col-media { overflow: visible; min-height: auto; }
+  .det-card--info { overflow: visible; }
+  .det-col-history .det-card > div:last-child { overflow: visible; }
+  .det-col-media { flex-direction: row; }
+}
+
+/* ================================================================
+ * 이력/재고조사 모달 — 시스템 디자인 토큰 기반
+ * ================================================================ */
+
+.det-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+}
+.det-modal.is-open { display: flex; }
+
+.det-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(11, 22, 48, 0.5);
+}
+
+.det-modal-dialog {
+  position: relative;
+  z-index: 1;
+  background: var(--surface, #fff);
+  border-radius: var(--radius-lg, 12px);
+  width: 480px;
+  max-width: calc(100vw - 32px);
+  max-height: calc(100vh - 64px);
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-modal, 0 20px 60px rgba(0,0,0,0.16));
+  border: 1px solid var(--border, #e5e7eb);
+  overflow: hidden;
+}
+
+/* 헤더 */
+.det-modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px 12px;
+  border-bottom: 1px solid var(--border-soft, #f3f4f6);
+  background: var(--navy, #0b1630);
+  flex-shrink: 0;
+}
+
+.det-modal-head-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.det-modal-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-sm, 6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  flex-shrink: 0;
+}
+
+.det-modal-icon--history   { background: rgba(47,109,246,0.18); color: #60a5fa; }
+.det-modal-icon--inventory { background: rgba(34,197,94,0.18);  color: #4ade80; }
+
+.det-modal-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: #fff;
+  line-height: 1.3;
+}
+
+.det-modal-subtitle {
+  font-size: 11px;
+  color: rgba(255,255,255,0.5);
+  margin-top: 1px;
+}
+
+.det-modal-close {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: rgba(255,255,255,0.08);
+  border-radius: var(--radius-sm, 6px);
+  cursor: pointer;
+  color: rgba(255,255,255,0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: background var(--transition, 0.15s), color var(--transition, 0.15s);
+  flex-shrink: 0;
+}
+.det-modal-close i { font-size: 14px; }
+.det-modal-close:hover { background: rgba(255,255,255,0.16); color: #fff; }
+
+/* 바디 */
+.det-modal-body {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.det-modal-body::-webkit-scrollbar { width: 3px; }
+.det-modal-body::-webkit-scrollbar-thumb { background: var(--border-input, #d1d5db); border-radius: 999px; }
+
+/* 메시지 */
+.det-modal-msg {
+  padding: 8px 12px;
+  border-radius: var(--radius-sm, 6px);
+  font-size: 12px;
+  font-weight: 500;
+}
+.det-modal-msg--error   { background: var(--danger-bg, #fef2f2); color: var(--danger-text, #991b1b); border: 1px solid var(--danger-border, #fecaca); }
+.det-modal-msg--success { background: var(--success-bg, #f0fdf4); color: var(--success-text, #166534); border: 1px solid var(--success-border, #bbf7d0); }
+
+/* 바디 안 form-row/form-field는 common.css 그대로 활용 */
+.det-modal-body .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.det-modal-body .form-field { gap: 4px; }
+
+.det-modal-body .form-label {
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text-secondary, #4b5563);
+}
+
+/* 푸터 */
+.det-modal-foot {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 6px;
+  padding: 10px 16px 12px;
+  border-top: 1px solid var(--border-soft, #f3f4f6);
+  background: var(--surface-soft, #f8fafc);
+  flex-shrink: 0;
+}

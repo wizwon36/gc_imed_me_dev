@@ -403,6 +403,12 @@ function navigate(page, tab, skipHistory) {
   const extraQueryStr = PAGE_QUERY_MAP[page] || '';
   let url = `${CONFIG.SITE_BASE_URL}/pages/${actualPage}.html?shell=1` + extraQueryStr;
   if (tab) url += `&tab=${tab}`;
+  // extraQuery 객체를 URL 파라미터로 추가 (예: { id: 'ME-001', from: 'list' })
+  if (extraQuery && typeof extraQuery === 'object') {
+    Object.keys(extraQuery).forEach(function(k) {
+      url += '&' + encodeURIComponent(k) + '=' + encodeURIComponent(extraQuery[k]);
+    });
+  }
 
   // iframe 로드 전 숨김 → onload 후 표시 (자체 스피너 없이)
   frame.style.opacity = '0';

@@ -455,14 +455,16 @@ function renderDetailInfo(item) {
     );
   }
 
-  // 1단 구성 — 모든 필드를 한 줄씩 배치, 비고는 wide 클래스 유지
+  // 1단 구성 — 일반 필드는 한 줄씩, 비고는 맨 마지막에 flex:1로 분리
+  const normalFields = fields.filter(function(f) { return !f.wide; });
+  const wideFields   = fields.filter(function(f) { return f.wide; });
+
   const rows = [];
-  fields.forEach(function(f) {
-    if (f.wide) {
-      rows.push('<div class="info-row info-row--wide">' + buildInfoCell(f) + '</div>');
-    } else {
-      rows.push('<div class="info-row info-row--single">' + buildInfoCell(f) + '</div>');
-    }
+  normalFields.forEach(function(f) {
+    rows.push('<div class="info-row info-row--single">' + buildInfoCell(f) + '</div>');
+  });
+  wideFields.forEach(function(f) {
+    rows.push('<div class="info-row info-row--wide">' + buildInfoCell(f) + '</div>');
   });
 
   detailInfoGrid.innerHTML = rows.join('');

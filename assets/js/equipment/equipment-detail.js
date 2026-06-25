@@ -727,11 +727,7 @@ function bindHistoryActionButtons() {
         return;
       }
   
-      location.href =
-        'history-form.html?equipment_id=' +
-        encodeURIComponent(currentEquipmentId) +
-        '&history_id=' +
-        encodeURIComponent(historyId);
+      openHistoryModal(historyId);
     });
   });
 
@@ -856,4 +852,318 @@ document.addEventListener('DOMContentLoaded', async function() {
       hideGlobalLoading();
     }
   }
+});
+
+
+// ================================================================
+// 이력 모달
+// ================================================================
+
+var _historyModalMode = 'create'; // 'create' | 'edit'
+var _historyModalId   = null;
+var _historyModalData = null;
+
+function openHistoryModal(historyId) {
+  _historyModalMode = historyId ? 'edit' : 'create';
+  _historyModalId   = historyId || null;
+  _historyModalData = null;
+
+  var modal = qs('#historyModal');
+  var title = qs('#historyModalTitle');
+  var submitBtn = qs('#historyModalSubmit');
+
+  if (title) title.textContent = _historyModalMode === 'edit' ? '수리 / 점검 이력 수정' : '수리 / 점검 이력 등록';
+  if (submitBtn) submitBtn.textContent = _historyModalMode === 'edit' ? '수정 저장' : '저장';
+
+  // 폼 초기화
+  historyModalSetField('m_history_type', '');
+  historyModalSetField('m_work_date', todayYmd());
+  historyModalSetField('m_requester', '');
+  historyModalSetField('m_vendor_name', '');
+  historyModalSetField('m_amount', '');
+  historyModalSetField('m_result_status', '');
+  historyModalSetField('m_update_equipment_status', '');
+  historyModalSetField('m_description', '');
+  historyModalHideMsg();
+
+  if (modal) {
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+  }
+
+  if (_historyModalMode === 'edit' && historyId) {
+    loadHistoryForModal(historyId);
+  }
+}
+
+function closeHistoryModal() {
+  var modal = qs('#historyModal');
+  if (modal) {
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+  }
+}
+
+async function loadHistoryForModal(historyId) {
+  var user = getCurrentUser();
+  try {
+    showGlobalLoading('이력 정보를 불러오는 중...');
+    var result = await apiGet('getHistory', {
+      history_id: historyId,
+      request_user_email: user && user.email || ''
+    });
+    var item = result.data || {};
+    _historyModalData = item;
+    historyModalSetField('m_history_type', item.history_type || '');
+    historyModalSetField('m_work_date', item.work_date || '');
+    historyModalSetField('m_requester', item.requester || '');
+    historyModalSetField('m_vendor_name', item.vendor_name || '');
+    historyModalSetField('m_amount', item.amount ? String(item.amount).replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '');
+    historyModalSetField('m_result_status', item.result_status || '');
+    historyModalSetField('m_description', item.description || '');
+  } catch(e) {
+    historyModalShowMsg(e.message || '이력 정보를 불러오지 못했습니다.', 'error');
+  } finally {
+    hideGlobalLoading();
+  }
+}
+
+async function submitHistoryModal() {
+  historyModalHideMsg();
+
+  var historyType = historyModalGetField('m_history_type');
+  var workDate    = historyModalGetField('m_work_date');
+  var description = historyModalGetField('m_description');
+
+  if (!historyType)  { historyModalShowMsg('이력 유형을 선택하세요.', 'error'); return; }
+  if (!workDate)     { historyModalShowMsg('처리일자를 입력하세요.', 'error'); return; }
+  if (!description)  { historyModalShowMsg('처리내용을 입력하세요.', 'error'); return; }
+
+  var user = getCurrentUser();
+  var actor = user && (user.email || user.user_email) || '';
+
+  var equipment = currentEquipment || {};
+  var payload = {
+    equipment_id:   currentEquipmentId,
+    history_type:   historyType,
+    work_date:      workDate,
+    requester:      historyModalGetField('m_requester'),
+    vendor_name:    historyModalGetField('m_vendor_name'),
+    amount:         historyModalGetField('m_amount').replace(/[^\d.-]/g, ''),
+    result_status:  historyModalGetField('m_result_status'),
+    description:    description,
+    update_equipment_status: historyModalGetField('m_update_equipment_status'),
+    created_by:     actor,
+    updated_by:     actor,
+    request_clinic_code: equipment.clinic_code || '',
+    request_clinic_name: equipment.clinic_name || '',
+    request_team_code:   equipment.team_code   || '',
+    request_team_name:   equipment.team_name   || '',
+    request_department:  equipment.department_display || equipment.department || ''
+  };
+
+  if (_historyModalMode === 'edit' && _historyModalId) {
+    payload.history_id = _historyModalId;
+    payload.client_updated_at = (_historyModalData && _historyModalData.updated_at) || '';
+  }
+
+  var submitBtn = qs('#historyModalSubmit');
+  try {
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '저장 중...'; }
+    showGlobalLoading(_historyModalMode === 'edit' ? '이력을 수정하는 중...' : '이력을 저장하는 중...');
+
+    if (_historyModalMode === 'edit') {
+      await apiPost('updateHistory', payload);
+    } else {
+      await apiPost('createHistory', payload);
+    }
+
+    closeHistoryModal();
+    // 이력 섹션만 재로드
+    var user2 = getCurrentUser();
+    await loadHistorySection(currentEquipmentId, user2 && user2.email || '');
+    // 장비 상태 반영 시 기본정보도 갱신
+    if (payload.update_equipment_status) {
+      await loadEquipmentCore(currentEquipmentId, user2 && user2.email || '', { resetSkeleton: false });
+    }
+  } catch(e) {
+    historyModalShowMsg(e.message || '저장 중 오류가 발생했습니다.', 'error');
+  } finally {
+    hideGlobalLoading();
+    if (submitBtn) {
+      submitBtn.disabled = false;
+      submitBtn.textContent = _historyModalMode === 'edit' ? '수정 저장' : '저장';
+    }
+  }
+}
+
+function historyModalSetField(id, val) {
+  var el = qs('#' + id);
+  if (el) el.value = val;
+}
+function historyModalGetField(id) {
+  var el = qs('#' + id);
+  return el ? el.value.trim() : '';
+}
+function historyModalShowMsg(msg, type) {
+  var el = qs('#historyModalMsg');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'det-modal-msg det-modal-msg--' + (type || 'error');
+  el.style.display = '';
+}
+function historyModalHideMsg() {
+  var el = qs('#historyModalMsg');
+  if (el) { el.style.display = 'none'; el.textContent = ''; }
+}
+
+// 로컬 날짜 헬퍼
+function todayYmd() {
+  var d = new Date();
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0');
+}
+
+// ================================================================
+// 재고조사 모달
+// ================================================================
+
+function openInventoryModal() {
+  var modal = qs('#inventoryModal');
+  var user = getCurrentUser();
+
+  // 폼 초기화
+  inventoryModalSetField('m_checked_at', getNowDateTime());
+  inventoryModalSetField('m_checked_by', (user && (user.name || user.user_name)) || '');
+  inventoryModalSetField('m_condition_status', '');
+  inventoryModalSetField('m_qr_scan_yn', 'Y');
+  inventoryModalSetField('m_memo', '');
+  inventoryModalHideMsg();
+
+  if (modal) {
+    modal.classList.add('is-open');
+    modal.setAttribute('aria-hidden', 'false');
+  }
+}
+
+function closeInventoryModal() {
+  var modal = qs('#inventoryModal');
+  if (modal) {
+    modal.classList.remove('is-open');
+    modal.setAttribute('aria-hidden', 'true');
+  }
+}
+
+async function submitInventoryModal() {
+  inventoryModalHideMsg();
+
+  var conditionStatus = inventoryModalGetField('m_condition_status');
+  var checkedBy       = inventoryModalGetField('m_checked_by');
+
+  if (!conditionStatus) { inventoryModalShowMsg('상태를 선택하세요.', 'error'); return; }
+  if (!checkedBy)       { inventoryModalShowMsg('점검자를 입력하세요.', 'error'); return; }
+
+  var user = getCurrentUser();
+  var equipment = currentEquipment || {};
+
+  var payload = {
+    equipment_id:          currentEquipmentId,
+    checked_at:            inventoryModalGetField('m_checked_at'),
+    checked_by:            user && (user.email || user.user_email) || '',
+    checked_by_name:       checkedBy,
+    clinic_code_at_check:  equipment.clinic_code || '',
+    clinic_name_at_check:  equipment.clinic_name || '',
+    team_code_at_check:    equipment.team_code   || '',
+    team_name_at_check:    equipment.team_name   || '',
+    department_at_check:   equipment.department_display || equipment.department || '',
+    location_at_check:     equipment.location || '',
+    condition_status:      conditionStatus,
+    qr_scan_yn:            inventoryModalGetField('m_qr_scan_yn'),
+    memo:                  inventoryModalGetField('m_memo')
+  };
+
+  var submitBtn = qs('#inventoryModalSubmit');
+  try {
+    if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = '저장 중...'; }
+    showGlobalLoading('재고조사 이력을 저장하는 중...');
+
+    await apiPost('createInventoryLog', payload);
+
+    closeInventoryModal();
+    var user2 = getCurrentUser();
+    await loadInventorySection(currentEquipmentId, user2 && user2.email || '');
+  } catch(e) {
+    inventoryModalShowMsg(e.message || '저장 중 오류가 발생했습니다.', 'error');
+  } finally {
+    hideGlobalLoading();
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = '저장'; }
+  }
+}
+
+function inventoryModalSetField(id, val) {
+  var el = qs('#' + id);
+  if (el) el.value = val;
+}
+function inventoryModalGetField(id) {
+  var el = qs('#' + id);
+  return el ? el.value.trim() : '';
+}
+function inventoryModalShowMsg(msg, type) {
+  var el = qs('#inventoryModalMsg');
+  if (!el) return;
+  el.textContent = msg;
+  el.className = 'det-modal-msg det-modal-msg--' + (type || 'error');
+  el.style.display = '';
+}
+function inventoryModalHideMsg() {
+  var el = qs('#inventoryModalMsg');
+  if (el) { el.style.display = 'none'; el.textContent = ''; }
+}
+
+function getNowDateTime() {
+  var now = new Date();
+  return now.getFullYear() + '-' +
+    String(now.getMonth() + 1).padStart(2, '0') + '-' +
+    String(now.getDate()).padStart(2, '0') + ' ' +
+    String(now.getHours()).padStart(2, '0') + ':' +
+    String(now.getMinutes()).padStart(2, '0') + ':' +
+    String(now.getSeconds()).padStart(2, '0');
+}
+
+// ================================================================
+// 모달 이벤트 바인딩
+// ================================================================
+
+document.addEventListener('DOMContentLoaded', function() {
+  // 이력 모달
+  var hClose   = qs('#historyModalClose');
+  var hCancel  = qs('#historyModalCancel');
+  var hSubmit  = qs('#historyModalSubmit');
+  var hBackdrop = qs('#historyModal .det-modal-backdrop');
+
+  if (hClose)   hClose.addEventListener('click', closeHistoryModal);
+  if (hCancel)  hCancel.addEventListener('click', closeHistoryModal);
+  if (hSubmit)  hSubmit.addEventListener('click', submitHistoryModal);
+  if (hBackdrop) hBackdrop.addEventListener('click', closeHistoryModal);
+
+  // 금액 콤마 포맷
+  var amountEl = qs('#m_amount');
+  if (amountEl) {
+    amountEl.addEventListener('input', function() {
+      var raw = this.value.replace(/[^\d]/g, '');
+      this.value = raw ? raw.replace(/\B(?=(\d{3})+(?!\d))/g, ',') : '';
+    });
+  }
+
+  // 재고조사 모달
+  var iClose    = qs('#inventoryModalClose');
+  var iCancel   = qs('#inventoryModalCancel');
+  var iSubmit   = qs('#inventoryModalSubmit');
+  var iBackdrop = qs('#inventoryModal .det-modal-backdrop');
+
+  if (iClose)    iClose.addEventListener('click', closeInventoryModal);
+  if (iCancel)   iCancel.addEventListener('click', closeInventoryModal);
+  if (iSubmit)   iSubmit.addEventListener('click', submitInventoryModal);
+  if (iBackdrop) iBackdrop.addEventListener('click', closeInventoryModal);
 });

@@ -65,6 +65,10 @@
           <input type="text" id="model_name" class="input" placeholder="모델명을 입력하세요" />
         </div>
         <div class="form-field">
+          <label class="form-label required">시리얼번호</label>
+          <input type="text" id="serial_no" class="input" placeholder="시리얼번호를 입력하세요" />
+        </div>
+        <div class="form-field">
           <label class="form-label required">의원</label>
           <select id="clinic_code" class="input"></select>
         </div>
@@ -72,17 +76,13 @@
           <label class="form-label required">팀</label>
           <select id="team_code" class="input"></select>
         </div>
-        <div class="form-field" style="display:none;">
-          <label class="form-label">부서명</label>
-          <input type="text" id="department_preview" class="input" readonly placeholder="의원 / 팀 선택 시 자동 표시" />
-        </div>
         <div class="form-field">
           <label class="form-label">상태</label>
           <select id="status" class="input"></select>
         </div>
-        <div class="form-field">
-          <label class="form-label required">시리얼번호</label>
-          <input type="text" id="serial_no" class="input" placeholder="시리얼번호를 입력하세요" />
+        <div class="form-field" style="display:none;">
+          <label class="form-label">부서명</label>
+          <input type="text" id="department_preview" class="input" readonly placeholder="의원 / 팀 선택 시 자동 표시" />
         </div>
       </div>
     </div>
@@ -131,20 +131,20 @@
       </div>
       <div class="eform-grid">
         <div class="form-field">
-          <label class="form-label">담당자</label>
-          <input type="text" id="manager_name" class="input" placeholder="담당자명을 입력하세요" />
+          <label class="form-label">업체 담당자</label>
+          <input type="text" id="manager_name" class="input" placeholder="업체 담당자명을 입력하세요" />
         </div>
         <div class="form-field">
-          <label class="form-label">담당자 연락처</label>
-          <input type="text" id="manager_phone" class="input" placeholder="연락처를 입력하세요" />
+          <label class="form-label">업체 연락처</label>
+          <input type="text" id="manager_phone" class="input" placeholder="업체 연락처를 입력하세요" />
         </div>
         <div class="form-field">
           <label class="form-label">위치</label>
           <input type="text" id="location" class="input" placeholder="예: 3층 진료실" />
         </div>
         <div class="form-field">
-          <label class="form-label">현재 사용자</label>
-          <input type="text" id="current_user" class="input" placeholder="현재 사용자를 입력하세요" />
+          <label class="form-label">부서 담당자</label>
+          <input type="text" id="current_user" class="input" placeholder="부서 담당자를 입력하세요" />
         </div>
         <div class="form-field eform-full">
           <label class="form-label">메모</label>

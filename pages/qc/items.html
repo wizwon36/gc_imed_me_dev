@@ -30,7 +30,13 @@
     <div class="qc-card">
       <div class="qc-card-head">
         <span class="qc-card-title"><i class="ti ti-folder"></i> 그룹</span>
-        <span class="qc-card-count" id="groupCountText"></span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span class="qc-card-count" id="groupCountText"></span>
+          <button class="btn btn-sm" id="groupCancelEditBtn" onclick="resetGroupForm()" style="display:none;">취소</button>
+          <button class="btn btn-sm btn-primary" id="groupSaveBtn" onclick="saveGroup()">
+            <i class="ti ti-plus"></i> <span id="groupSaveBtnText">추가</span>
+          </button>
+        </div>
       </div>
       <div class="qc-group-form">
         <div class="qc-form-label" id="groupFormTitle">새 그룹</div>
@@ -39,12 +45,6 @@
           onkeydown="if(event.key==='Enter')saveGroup()" />
         <input type="text" id="groupModalMemo" class="input" placeholder="메모 (선택)"
           onkeydown="if(event.key==='Enter')saveGroup()" />
-        <div class="qc-form-btns">
-          <button class="btn btn-sm btn-primary" id="groupSaveBtn" onclick="saveGroup()">
-            <i class="ti ti-plus"></i> <span id="groupSaveBtnText">추가</span>
-          </button>
-          <button class="btn btn-sm" id="groupCancelEditBtn" onclick="resetGroupForm()" style="display:none;">취소</button>
-        </div>
       </div>
       <div class="qc-group-list" id="groupManageList">
         <div class="qc-empty"><i class="ti ti-folder-off"></i><span>그룹이 없습니다</span></div>

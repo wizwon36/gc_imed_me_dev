@@ -19,7 +19,7 @@ body { background: #f0f2f5; }
 /* ── 2단 본문 ── */
 .qc-body {
   display: grid;
-  grid-template-columns: 260px 1fr;
+  grid-template-columns: 320px 1fr;
   gap: 8px;
   flex: 1;
   min-height: 0;
@@ -138,37 +138,36 @@ body { background: #f0f2f5; }
 .qc-group-row-actions { display: flex; gap: 4px; flex-shrink: 0; }
 .qc-group-row-actions .btn { height: 26px; padding: 0 8px; font-size: 11px; }
 
-/* ── 항목 테이블 ── */
-.qc-item-table-wrap {
+/* ── AG Grid 래퍼 ── */
+.qc-grid-wrap {
   flex: 1;
-  overflow-y: auto;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+#itemGrid {
+  flex: 1;
   min-height: 0;
 }
 
-.qc-item-table-wrap::-webkit-scrollbar { width: 3px; }
-.qc-item-table-wrap::-webkit-scrollbar-thumb { background: #d1d5db; border-radius: 999px; }
-
-.qc-item-table { width: 100%; border-collapse: collapse; font-size: 12px; }
-
-.qc-item-table thead { position: sticky; top: 0; z-index: 1; background: #f8fafc; }
-
-.qc-item-table th {
-  padding: 7px 12px;
-  font-size: 11px;
-  font-weight: 700;
-  color: #4b5563;
-  border-bottom: 1px solid #e5e7eb;
-  text-align: left;
-  white-space: nowrap;
+.ag-theme-alpine {
+  --ag-font-size: 11px;
+  --ag-font-family: "Pretendard", "Noto Sans KR", sans-serif;
+  --ag-header-background-color: #f8fafc;
+  --ag-header-foreground-color: #4b5563;
+  --ag-border-color: #e5e7eb;
+  --ag-row-border-color: #f0f0f0;
+  --ag-background-color: #fff;
+  --ag-odd-row-background-color: #fff;
+  --ag-row-hover-color: #f0f5ff;
+  --ag-selected-row-background-color: #eff6ff;
+  --ag-cell-horizontal-padding: 12px;
 }
 
-.qc-item-td { padding: 8px 12px; border-bottom: 1px solid #f3f4f6; vertical-align: middle; }
-.qc-item-row:last-child .qc-item-td { border-bottom: none; }
-.qc-item-row:hover .qc-item-td { background: #f8faff; }
-.qc-item-name { font-weight: 600; color: #111827; }
-.qc-item-sub  { font-size: 11px; color: #6b7280; }
-.qc-item-actions { display: flex; gap: 4px; justify-content: flex-end; }
-.qc-item-actions .btn { height: 26px; padding: 0 8px; font-size: 11px; }
+.ag-theme-alpine .ag-header-cell-label { font-weight: 700; font-size: 11px; }
+.ag-body-horizontal-scroll { display: none !important; }
 
 /* ── 뱃지 ── */
 .qc-group-badge {

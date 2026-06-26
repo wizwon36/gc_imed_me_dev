@@ -103,7 +103,7 @@ body { background: #f0f2f5; }
 
 .qc-group-form .input { height: 30px; font-size: 12px; }
 
-.qc-form-btns { display: flex; gap: 6px; }
+
 
 /* ── 그룹 목록 ── */
 .qc-group-list {

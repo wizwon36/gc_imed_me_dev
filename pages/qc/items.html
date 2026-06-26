@@ -7,6 +7,9 @@
   <link rel="stylesheet" href="../../assets/css/common.css" />
   <link rel="stylesheet" href="../../assets/css/pages/qc-items.css" />
   <link rel="stylesheet" href="../../assets/font/tabler-icons/tabler-icons.min.css" />
+  <link rel="stylesheet" href="../../assets/libs/ag-grid/ag-grid.min.css" />
+  <link rel="stylesheet" href="../../assets/libs/ag-grid/ag-theme-alpine.min.css" />
+  <script src="../../assets/libs/ag-grid/ag-grid-community.min.js"></script>
   <script>
     if (new URLSearchParams(location.search).get('shell') === '1')
       document.documentElement.classList.add('in-shell');
@@ -17,13 +20,8 @@
 <div class="qc-page">
 
   <div id="messageBox" class="message-box" style="display:none;"></div>
-
   <div id="permissionDenied" class="qc-card" style="display:none;">
-    <div class="qc-empty">
-      <i class="ti ti-lock"></i>
-      <strong>접근 권한이 없습니다</strong>
-      <span>관리자에게 권한을 요청하세요.</span>
-    </div>
+    <div class="qc-empty"><i class="ti ti-lock"></i><strong>접근 권한이 없습니다</strong></div>
   </div>
 
   <div class="qc-body">
@@ -53,7 +51,7 @@
       </div>
     </div>
 
-    <!-- 우: 검사항목 목록 -->
+    <!-- 우: 검사항목 AG Grid -->
     <div class="qc-card">
       <div class="qc-card-head">
         <span class="qc-card-title"><i class="ti ti-flask"></i> 검사항목</span>
@@ -65,32 +63,15 @@
           </button>
         </div>
       </div>
-      <div class="qc-item-table-wrap">
-        <div class="qc-empty" id="itemEmptyState">
-          <i class="ti ti-flask-off"></i>
-          <strong id="itemEmptyTitle">등록된 검사항목이 없습니다</strong>
-          <span id="itemEmptyDesc">+ 항목 추가 버튼으로 첫 번째 항목을 등록하세요.</span>
-        </div>
-        <table class="qc-item-table" id="itemTable" style="display:none;">
-          <thead>
-            <tr>
-              <th>항목명</th>
-              <th>그룹</th>
-              <th>유형</th>
-              <th>단위 / 프리셋</th>
-              <th>Mean / SD</th>
-              <th style="width:80px;"></th>
-            </tr>
-          </thead>
-          <tbody id="itemTableBody"></tbody>
-        </table>
+      <div class="qc-grid-wrap">
+        <div id="itemGrid" class="ag-theme-alpine"></div>
       </div>
     </div>
 
   </div>
 </div>
 
-<!-- 숨김 호환 요소 (기존 JS 호환) -->
+<!-- 숨김 호환 요소 -->
 <div style="display:none;">
   <div id="skeletonBody"></div><div id="appBody"></div>
   <div id="deptFilterRow"></div>
@@ -102,9 +83,11 @@
   <div id="assignPanelTitle"></div><div id="assignedCount"></div>
   <div id="unassignedCount"></div><div id="assignedItems"></div><div id="unassignedItems"></div>
   <div id="groupModalSpinner"></div><span id="groupModalSpinnerText"></span>
+  <div id="itemEmptyState"></div><span id="itemEmptyTitle"></span><span id="itemEmptyDesc"></span>
+  <tbody id="itemTableBody"></tbody><table id="itemTable"></table>
 </div>
 
-<!-- 검사 항목 모달 -->
+<!-- 항목 모달 -->
 <div class="qc-modal-overlay" id="itemModal" style="display:none;">
   <div class="qc-modal">
     <div class="qc-modal-head">
@@ -202,19 +185,20 @@
 <script src="../../assets/js/qc/items.js"></script>
 <script>
 const _$ = id => document.getElementById(id);
+let _itemGrid = null;
 
 // ── items.js 훅 ──────────────────────────────────────────────
 const _origRIS = window.renderItemSelect;
 window.renderItemSelect = function() {
   if (_origRIS) _origRIS();
-  _renderItemTable();
   _renderGroupTable();
+  _renderItemGrid();
   if (state.canEdit) { const b = _$('addItemTabBtn'); if (b) b.style.display = ''; }
 };
 
 window.renderGroupManageList = function() { _renderGroupTable(); };
 
-// ── 그룹 테이블 ──────────────────────────────────────────────
+// ── 그룹 목록 렌더링 ─────────────────────────────────────────
 function _renderGroupTable() {
   const wrap = _$('groupManageList');
   const list = state.groups || [];
@@ -223,6 +207,7 @@ function _renderGroupTable() {
 
   if (!list.length) {
     wrap.innerHTML = '<div class="qc-empty"><i class="ti ti-folder-off"></i><span>그룹이 없습니다</span></div>';
+    _refreshGroupSelect();
     return;
   }
 
@@ -242,60 +227,102 @@ function _renderGroupTable() {
       </div>` : ''}
     </div>`).join('');
 
-  // 모달 그룹 select 갱신
-  const sel = _$('modalItemGroup');
-  if (sel) {
-    const cur = sel.value;
-    sel.innerHTML = '<option value="">미분류 (그룹 없음)</option>' +
-      list.map(g => `<option value="${escHtml(g.group_id)}">${escHtml(g.group_name)}</option>`).join('');
-    if (cur) sel.value = cur;
-  }
+  _refreshGroupSelect();
 }
 
-// ── 항목 테이블 ──────────────────────────────────────────────
-function _renderItemTable() {
-  const tbody = _$('itemTableBody');
-  const table = _$('itemTable');
-  const empty = _$('itemEmptyState');
-  const list  = state.items || [];
-  const ct    = _$('itemCountText');
-  if (ct) ct.textContent = list.length + '건';
+function _refreshGroupSelect() {
+  const sel = _$('modalItemGroup');
+  if (!sel) return;
+  const cur = sel.value;
+  sel.innerHTML = '<option value="">미분류 (그룹 없음)</option>' +
+    (state.groups || []).map(g =>
+      `<option value="${escHtml(g.group_id)}">${escHtml(g.group_name)}</option>`).join('');
+  if (cur) sel.value = cur;
+}
 
-  if (!list.length) {
-    if (table) table.style.display = 'none';
-    if (empty) empty.style.display = '';
-    return;
-  }
-  if (table) table.style.display = '';
-  if (empty) empty.style.display = 'none';
+// ── AG Grid 렌더링 ───────────────────────────────────────────
+function _renderItemGrid() {
+  const list = state.items || [];
+  const ct = _$('itemCountText');
+  if (ct) ct.textContent = list.length + '건';
 
   const gm = {};
   (state.groups || []).forEach(g => { gm[g.group_id] = g.group_name; });
 
-  tbody.innerHTML = list.map(item => {
-    const gn   = item.group_id ? (gm[item.group_id] || '미분류') : '미분류';
-    const isQl = item.item_type === 'qualitative';
-    const unit = isQl ? (QUALITATIVE_PRESETS[item.preset]?.label?.split('/')[0]?.trim() || '-') : (item.unit || '-');
-    const ms   = !isQl && item.mean != null ? `${item.mean} / ${item.sd}` : '-';
-    return `<tr class="qc-item-row">
-      <td class="qc-item-td qc-item-name">${escHtml(item.item_name)}</td>
-      <td class="qc-item-td"><span class="qc-group-badge">${escHtml(gn)}</span></td>
-      <td class="qc-item-td"><span class="${isQl ? 'qc-type-qualitative' : 'qc-type-quantitative'}">${isQl ? '정성' : '정량'}</span></td>
-      <td class="qc-item-td qc-item-sub">${escHtml(unit)}</td>
-      <td class="qc-item-td qc-item-sub">${escHtml(ms)}</td>
-      <td class="qc-item-td">${state.canEdit ? `<div class="qc-item-actions">
-        <button class="btn btn-sm" onclick="openItemModal(state.items.find(i=>i.item_id==='${escHtml(item.item_id)}'))">
-          <i class="ti ti-pencil"></i>
-        </button>
-        <button class="btn btn-sm btn-danger" onclick="_qcDeleteItem('${escHtml(item.item_id)}')">
-          <i class="ti ti-trash"></i>
-        </button>
-      </div>` : ''}</td>
-    </tr>`;
-  }).join('');
+  const rowData = list.map(item => ({
+    item_id:    item.item_id,
+    item_name:  item.item_name,
+    group_name: item.group_id ? (gm[item.group_id] || '미분류') : '미분류',
+    item_type:  item.item_type === 'qualitative' ? '정성' : '정량',
+    unit:       item.item_type === 'qualitative'
+                  ? (QUALITATIVE_PRESETS[item.preset]?.label?.split('/')[0]?.trim() || '-')
+                  : (item.unit || '-'),
+    mean_sd:    item.item_type !== 'qualitative' && item.mean != null
+                  ? `${item.mean} / ${item.sd}` : '-',
+    _raw: item
+  }));
+
+  const colDefs = [
+    { field: 'item_name',  headerName: '항목명',       flex: 1,   minWidth: 80 },
+    { field: 'group_name', headerName: '그룹',         width: 130,
+      cellRenderer: p => p.value === '미분류'
+        ? `<span style="color:#9ca3af;font-size:11px;">미분류</span>`
+        : `<span style="display:inline-flex;padding:1px 7px;border-radius:999px;font-size:10px;font-weight:600;background:#eff6ff;color:#2563eb;border:1px solid #bfdbfe;">${escHtml(p.value)}</span>`
+    },
+    { field: 'item_type',  headerName: '유형',         width: 70,
+      cellRenderer: p => p.value === '정성'
+        ? `<span style="display:inline-flex;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700;background:#fdf4ff;color:#7e22ce;border:1px solid #e9d5ff;">정성</span>`
+        : `<span style="display:inline-flex;padding:1px 7px;border-radius:4px;font-size:10px;font-weight:700;background:#f0fdf4;color:#166534;border:1px solid #bbf7d0;">정량</span>`
+    },
+    { field: 'unit',       headerName: '단위 / 프리셋', width: 120 },
+    { field: 'mean_sd',    headerName: 'Mean / SD',    width: 130, cellStyle: { textAlign: 'right' } },
+    { headerName: '',      width: 80, sortable: false, filter: false, suppressMovable: true,
+      cellRenderer: p => state.canEdit ? `
+        <div style="display:flex;gap:4px;align-items:center;height:100%;justify-content:flex-end;">
+          <button class="btn btn-sm" onclick="_qcOpenEdit('${escHtml(p.data.item_id)}')"><i class="ti ti-pencil"></i></button>
+          <button class="btn btn-sm btn-danger" onclick="_qcDeleteItem('${escHtml(p.data.item_id)}')"><i class="ti ti-trash"></i></button>
+        </div>` : ''
+    }
+  ];
+
+  if (_itemGrid) {
+    _itemGrid.setGridOption('rowData', rowData);
+    _itemGrid.setGridOption('columnDefs', colDefs);
+    return;
+  }
+
+  const el = _$('itemGrid');
+  if (!el) return;
+
+  const gridH = el.clientHeight || 400;
+  const pageSize = Math.floor((gridH - 34) / 36);
+
+  _itemGrid = agGrid.createGrid(el, {
+    columnDefs: colDefs,
+    rowData: rowData,
+    rowHeight: 36,
+    headerHeight: 34,
+    defaultColDef: { sortable: true, resizable: true, suppressMovable: false },
+    suppressHorizontalScroll: true,
+    overlayNoRowsTemplate: '<div style="padding:32px;color:#9ca3af;font-size:12px;">등록된 검사항목이 없습니다</div>',
+    onFirstDataRendered: p => {
+      const bodyH = p.api.getVerticalPixelRange ? undefined : undefined;
+    }
+  });
 }
 
-// ── 그룹 수정 ────────────────────────────────────────────────
+// ── 편집/삭제 ────────────────────────────────────────────────
+function _qcOpenEdit(itemId) {
+  const item = (state.items || []).find(i => i.item_id === itemId);
+  if (item) openItemModal(item);
+}
+
+async function _qcDeleteItem(itemId) {
+  state.activeItemId = itemId;
+  await deleteActiveItem();
+  _renderItemGrid();
+}
+
 function _qcEditGroup(id, name, memo) {
   _$('groupModalGroupId').value = id;
   _$('groupModalGroupName').value = name;
@@ -315,12 +342,6 @@ window.resetGroupForm = function() {
   _$('groupSaveBtnText').textContent = '추가';
   _$('groupCancelEditBtn').style.display = 'none';
 };
-
-async function _qcDeleteItem(itemId) {
-  state.activeItemId = itemId;
-  await deleteActiveItem();
-  _renderItemTable();
-}
 </script>
 </body>
 </html>
